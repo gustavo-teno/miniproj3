@@ -1,0 +1,2 @@
+# scripts de shell sempre com fim de linha Unix (senão quebram no Linux/WSL)
+*.sh text eol=lf
