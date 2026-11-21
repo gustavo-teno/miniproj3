@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.core.contadores import contador_iniciais
 from app.db import get_db
+from app.deps import get_current_user
+from app.models.user import User
 from app.schemas.user import UserCreate, UserOut, UserPage
 from app.services import users as service
 
@@ -35,3 +37,10 @@ def stats_por_inicial():
 def criar_usuario(dados: UserCreate, db: Session = Depends(get_db)):
     # ponytail: criação sem senha — o guia de auth evolui isto para o registro real
     return service.criar(db, dados)
+
+
+# Temporária (guia 01, Passo 0): confere o bypass com DEBUG=true e X-User-Id.
+# Apagar no Passo 3, quando GET /auth/eu a substituir.
+@router.get("/eu-temporario")
+def quem_sou(user: User = Depends(get_current_user)):
+    return {"id": user.id, "username": user.username}
