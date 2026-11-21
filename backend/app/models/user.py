@@ -14,6 +14,13 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(80))
     bio: Mapped[str] = mapped_column(String(280), default="")
     avatar_url: Mapped[str] = mapped_column(String(300), default="")
+    # A meta (decisão 3). vestibular e curso são chaves de app/constantes.py,
+    # ou "" se a pessoa não escolheu. Os campos *_outro só valem com "outro".
+    vestibular: Mapped[str] = mapped_column(String(30), default="")
+    curso: Mapped[str] = mapped_column(String(30), default="")
+    vestibular_outro: Mapped[str] = mapped_column(String(60), default="")
+    curso_outro: Mapped[str] = mapped_column(String(60), default="")
+    universidade: Mapped[str] = mapped_column(String(80), default="")
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc)
     )
