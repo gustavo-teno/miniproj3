@@ -36,7 +36,8 @@ trava outra pessoa vira issue, com o link aqui.
     `seguindo` (contados na tabela de follows, que já existe desde o esqueleto);
     `PATCH /usuarios/eu` (bio, avatar e meta); `GET /usuarios/{username}/posts`
     paginado, com filtro opcional por tag.
-- [ ] Tela `/u/[username]`: topo com nome, meta e contadores.
+- [ ] Tela `/u/[username]`: topo com nome, meta (com o texto de quem marcou
+    "Outro", como "quer Geografia") e contadores.
 - [ ] Tirar o `@skip` de `test_perfil_editavel`.
 - **Combinar com D:** o formato do `GET /usuarios/{username}`, que o teste de
     follow também lê.

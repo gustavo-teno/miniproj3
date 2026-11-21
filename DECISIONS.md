@@ -107,7 +107,11 @@ as decisões mudarem.
   perfil.
 - **Escolha:** turmas automáticas. Quem marcou ITA está na Turma ITA, e quem
   marcou Engenharia está na Turma Engenharia, então cada pessoa já entra em
-  duas turmas (vestibular e curso). As turmas ficam numa aba própria, separada
+  duas turmas (vestibular e curso). Quem não acha a própria meta na lista, ou
+  ainda não decidiu o curso, marca "Outro" e entra em "Outros vestibulares" ou
+  "Outros cursos": é ali que quem ficou de fora encontra gente parecida. Para
+  isso, a pessoa pode escrever qual é a meta dela ("quer Geografia"), e o texto
+  aparece no card dela na turma. As turmas ficam numa aba própria, separada
   do feed, e todas são abertas para qualquer pessoa olhar. A página da turma
   mostra os membros, com o botão de seguir, e os posts deles, com filtro por
   matéria. A conversa da turma são os posts de bate-papo e os comentários. O

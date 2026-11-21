@@ -64,14 +64,16 @@ Os pontos em que duas pessoas mexem na mesma coisa estão marcados com
 `ingles`, `espanhol` e `bate-papo`. A lista fica numa constante no backend,
 para que ninguém escreva a sua própria. O mesmo vale para as listas de
 vestibulares e de cursos, que formam as Turmas (decisão 5). A Pessoa A propõe
-essas duas listas no PR do esqueleto, e o time ajusta na revisão.
+essas duas listas no PR do esqueleto, e o time ajusta na revisão. As duas
+terminam em "Outro", que também forma turma: "Outros vestibulares" e "Outros
+cursos" (quem ainda não decidiu o curso entra nesta).
 
 As folgas da ofensiva são fixas (2 por semana, decisão 4), então não há campo
 de folgas no `User`.
 
 | Model | Campos além de `id` e `created_at` |
 |---|---|
-| `User` (existe) | + `vestibular` e `curso` (valores de uma lista fixa, podem ser vazios), `universidade` (texto livre, pode ser vazio) |
+| `User` (existe) | + `vestibular` e `curso` (valores de uma lista fixa, podem ser vazios), `vestibular_outro` e `curso_outro` (texto livre, só quando a escolha foi "Outro"), `universidade` (texto livre, pode ser vazio) |
 | `Post` | `autor_id`, `texto`, `tag` (padrão `bate-papo`), `minutos` (opcional: duração da sessão) |
 | `Follow` | `seguidor_id`, `seguido_id` (par único) |
 | `Like` | `user_id`, `post_id` (par único) |

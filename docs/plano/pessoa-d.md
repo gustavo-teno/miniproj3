@@ -28,6 +28,8 @@ trava outra pessoa vira issue, com o link aqui.
 - [ ] Rotas para listar as turmas (uma por vestibular e uma por curso, com o número
     de membros), os membros de uma turma e os posts deles, com filtro por
     matéria.
+- [ ] "Outro" também é turma: "Outros vestibulares" e "Outros cursos". Nelas, o
+    card do membro mostra o que ele escreveu ("quer Geografia").
 - [ ] Aba Turmas e a página da turma: membros com `<BotaoSeguir />` e posts com
     `<CardPost>`.
 - **Combinar com A:** o cadastro leva para a turma. **Com C:** o seed precisa

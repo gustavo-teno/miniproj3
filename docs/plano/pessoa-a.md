@@ -33,7 +33,8 @@ trava outra pessoa vira issue, com o link aqui.
 
 **Seg 23: auth na tela.**
 - [ ] Páginas `/cadastro` (nome, username, senha e a meta: vestibular e curso em
-    lista, universidade em texto) e `/login`; botão de sair.
+    lista, universidade em texto; quem escolhe "Outro" pode escrever qual é a
+    meta) e `/login`; botão de sair.
 - [ ] Salvar o token e mandá-lo no `Authorization` de `lib/api.ts`; páginas
     protegidas mandam para `/login` sem token.
 - [ ] Depois do cadastro, levar a pessoa para a própria turma (decisão 3). Até a

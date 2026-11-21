@@ -27,7 +27,9 @@ trava outra pessoa vira issue, com o link aqui.
 (rubrica, Produto, pergunta 3).
 - [ ] `seed_fake(db)` em `scripts/seed.py`: pelo menos 20 usuários, 50 posts, 20
     follows e 30 curtidas (o teste do núcleo exige), mais comentários.
-- [ ] Metas espalhadas para que cada turma tenha gente; posts escritos como um
+- [ ] Metas espalhadas para que cada turma tenha gente, inclusive "Outros
+    vestibulares" e "Outros cursos" (com o texto preenchido, como "quer
+    Geografia"); posts escritos como um
     vestibulando escreve, com tag de matéria e duração, nas últimas semanas.
 - [ ] Uns com a ofensiva em dia, outros com ela quebrada e um recorde, para a
     ofensiva aparecer de verdade no vídeo.
