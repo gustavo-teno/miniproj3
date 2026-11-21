@@ -14,8 +14,8 @@ trava outra pessoa vira issue, com o link aqui.
 - [ ] `app/deps.py`: o bypass do guia 01, Passo 0 (`DEBUG=true` + `X-User-Id`).
 - [ ] Os models da tabela do contrato, cada um no seu arquivo em `app/models/`, e
     os campos novos do `User`.
-- [ ] As constantes: tags, vestibulares e cursos (primeira versão das duas
-    últimas listas, para o time revisar).
+- [ ] As constantes: tags, vestibulares e cursos, copiadas das listas do
+    contrato no PLANO.md.
 - [ ] Um router vazio por feature em `app/routers/` (`auth`, `posts`, `follows`,
     `curtidas`, `comentarios`, `feed`, `ofensiva`, `turmas`, `dms`), todos
     registrados no `main.py`.

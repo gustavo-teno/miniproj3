@@ -63,10 +63,19 @@ Os pontos em que duas pessoas mexem na mesma coisa estão marcados com
 `literatura`, `redacao`, `historia`, `geografia`, `filosofia`, `sociologia`,
 `ingles`, `espanhol` e `bate-papo`. A lista fica numa constante no backend,
 para que ninguém escreva a sua própria. O mesmo vale para as listas de
-vestibulares e de cursos, que formam as Turmas (decisão 5). A Pessoa A propõe
-essas duas listas no PR do esqueleto, e o time ajusta na revisão. As duas
-terminam em "Outro", que também forma turma: "Outros vestibulares" e "Outros
-cursos" (quem ainda não decidiu o curso entra nesta).
+vestibulares e de cursos, que formam as Turmas (decisão 5). Cada opção é uma
+turma:
+
+- **Vestibulares:** ENEM, Fuvest, Unicamp, Unesp, UERJ, ITA/IME, Militares
+  (AFA, EFOMM, EsPCEx, Escola Naval) e Outro.
+- **Cursos:** Medicina, Odontologia, Enfermagem, Outras da saúde (Farmácia,
+  Fisioterapia, Nutrição...), Psicologia, Direito, Engenharias, Computação,
+  Arquitetura, Administração e Economia, Relações Internacionais, Comunicação,
+  Licenciaturas e Outro.
+
+"Outro" também forma turma: "Outros vestibulares" e "Outros cursos" (quem ainda
+não decidiu o curso entra nesta). As listas são curtas de propósito: a rede é
+pequena, e opção demais deixaria as turmas vazias.
 
 As folgas da ofensiva são fixas (2 por semana, decisão 4), então não há campo
 de folgas no `User`.
