@@ -3,9 +3,19 @@
 *.sqlite
 *.sqlite3
 
-# segredos
+# segredos: variáveis de ambiente, chaves e credenciais (cada um tem as suas)
 .env
-.env.local
+.env.*
+!.env*.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+credentials*.json
+secrets*.json
+*.secret
 
 # python
 __pycache__/
@@ -30,3 +40,7 @@ instrutor/
 TODO.md
 docs/design.md
 docs/review-painel-v2.md
+
+# configurações pessoais do Claude (cada um tem a sua)
+.claude/settings.local.json
+CLAUDE.local.md
