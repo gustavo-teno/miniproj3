@@ -63,6 +63,9 @@ em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
 
 ## Diário
 
+- **sáb 21:** o Gustavo pegou o esqueleto (#5) para destravar o time, sem
+  ainda ter escolhido o papel A. Quem ficar com o A segue a partir da Auth.
+
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->

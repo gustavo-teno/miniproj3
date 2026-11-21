@@ -118,12 +118,16 @@ Cada papel tem um arquivo com o plano dia a dia, que também serve de diário de
 progresso: a pessoa marca o que fez e anota mudanças e bugs ali, sem mexer no
 arquivo dos outros.
 
-- [Pessoa A (Back)](docs/plano/pessoa-a.md): Esqueleto → Auth → Ofensiva
-- [Pessoa B (Front)](docs/plano/pessoa-b.md): Base visual → Posts → Perfil-diário
-- [Pessoa C (Dados)](docs/plano/pessoa-c.md): Curtidas → Comentários → Seed → Deploy
-- [Pessoa D (Reforço)](docs/plano/pessoa-d.md): Follow → Feed → Turmas
+- [Pessoa A (Back)](docs/plano/pessoa-a.md): Esqueleto (#5) → Auth (#6) → Ofensiva (#7)
+- [Pessoa B (Front)](docs/plano/pessoa-b.md): Base visual (#8) → Posts (#9) → Perfil-diário (#10)
+- [Pessoa C (Dados)](docs/plano/pessoa-c.md): Curtidas (#11) → Comentários (#12) → Seed (#13) → Deploy (#14)
+- [Pessoa D (Reforço)](docs/plano/pessoa-d.md): Follow (#15) → Feed (#16) → Turmas (#17)
+- DMs entre mútuos (#18), opcional: quem terminar antes
 
-Cada dia é uma branch, uma issue e um PR, revisado pela pessoa da área. Os
+Cada feature tem uma issue (o número está ao lado), aberta sem responsável:
+quem escolher o papel se atribui nas issues dele. Cada dia é uma branch e um
+PR, revisado pela pessoa da área. Numa feature de dois dias, o primeiro PR diz
+`Parte de #N` e o último fecha a issue com `Closes #N`. Os
 nomes de rota nos planos são os dos testes do núcleo; o que não está nos testes
 é sugestão, e o dono pode mudar avisando quem usa.
 
