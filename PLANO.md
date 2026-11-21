@@ -123,6 +123,9 @@ arquivo dos outros.
 - [Pessoa C (Dados)](docs/plano/pessoa-c.md): Curtidas (#11) → Comentários (#12) → Seed (#13) → Deploy (#14)
 - [Pessoa D (Reforço)](docs/plano/pessoa-d.md): Follow (#15) → Feed (#16) → Turmas (#17)
 - DMs entre mútuos (#18), opcional: quem terminar antes
+- Entregas: vídeo (#19, Pessoa B), pitch (#20, todos) e DECISIONS final
+  (#21, Pessoa A e todos). Vídeo e pitch não viram PR: quem é responsável
+  fecha a issue à mão quando entregar.
 
 Cada feature tem uma issue (o número está ao lado), aberta sem responsável:
 quem escolher o papel se atribui nas issues dele. Cada dia é uma branch e um
