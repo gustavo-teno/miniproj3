@@ -5,8 +5,10 @@ Quem faz o quê até a entrega (sexta, 27/11). O produto está no
 
 > **Para o Claude de cada pessoa:** descubra quem está usando você com
 > `gh api user -q .login` e procure esse usuário na tabela abaixo. Ajude essa
-> pessoa a seguir o plano da letra dela (A, B, C ou D), na ordem dos dias. Antes
-> de mexer em algo que é de outra pessoa (model, rota ou tela), avise o usuário.
+> pessoa a seguir o plano do papel dela (`docs/plano/pessoa-<letra>.md`), na
+> ordem dos dias, e a marcar o progresso e anotar bugs no diário desse arquivo.
+> Antes de mexer em algo que é de outra pessoa (model, rota ou tela), avise o
+> usuário.
 
 ## Quem faz o quê
 
@@ -101,178 +103,18 @@ funcionando na tela. É ele que a banca testa e que vai para o vídeo.
 
 ## O plano de cada pessoa
 
+Cada papel tem um arquivo com o plano dia a dia, que também serve de diário de
+progresso: a pessoa marca o que fez e anota mudanças e bugs ali, sem mexer no
+arquivo dos outros.
+
+- [Pessoa A (Back)](docs/plano/pessoa-a.md): Esqueleto → Auth → Ofensiva
+- [Pessoa B (Front)](docs/plano/pessoa-b.md): Base visual → Posts → Perfil-diário
+- [Pessoa C (Dados)](docs/plano/pessoa-c.md): Curtidas → Comentários → Seed → Deploy
+- [Pessoa D (Reforço)](docs/plano/pessoa-d.md): Follow → Feed → Turmas
+
 Cada dia é uma branch, uma issue e um PR, revisado pela pessoa da área. Os
-nomes de rota abaixo são os dos testes do núcleo; o que não está nos testes é
-sugestão, e o dono pode mudar avisando quem usa.
-
-### Pessoa A (Back): Esqueleto → Auth → Ofensiva
-
-**Sáb 21: esqueleto.** É o único bloqueio do time, então sai cedo e pequeno.
-- `app/deps.py`: o bypass do guia 01, Passo 0 (`DEBUG=true` + `X-User-Id`).
-- Os models da tabela do contrato, cada um no seu arquivo em `app/models/`, e
-  os campos novos do `User`.
-- As constantes: tags, vestibulares e cursos (primeira versão das duas
-  últimas listas, para o time revisar).
-- Um router vazio por feature em `app/routers/` (`auth`, `posts`, `follows`,
-  `curtidas`, `comentarios`, `feed`, `ofensiva`, `turmas`, `dms`), todos
-  registrados no `main.py`.
-- `make test` continua verde (os testes do núcleo seguem com `@skip`).
-- **Combinar com B:** B revisa e aprova o PR. Avisar no grupo quando entrar na
-  `main`, porque todo mundo parte dele.
-
-**Dom 22: auth no backend** (guia 01, Passos 1 a 3).
-- Model `Session` (token opaco), senha com bcrypt.
-- `POST /auth/registro` (aceita `vestibular`, `curso` e `universidade`
-  opcionais, para o cadastro já trazer a meta), `POST /auth/login`,
-  `GET /auth/eu` e o `get_current_user` real, mantendo o bypass com `DEBUG`.
-- Tirar o `@skip` de `test_auth_registro`, `test_auth_login` e `test_auth_eu`.
-  A partir daqui a fixture `logar` funciona e os outros testes podem destravar.
-
-**Seg 23: auth na tela.**
-- Páginas `/cadastro` (nome, username, senha e a meta: vestibular e curso em
-  lista, universidade em texto) e `/login`; botão de sair.
-- Salvar o token e mandá-lo no `Authorization` de `lib/api.ts`; páginas
-  protegidas mandam para `/login` sem token.
-- Depois do cadastro, levar a pessoa para a própria turma (decisão 3). Até a
-  tela de Turmas existir (quarta), levar para o feed.
-- **Combinar com B:** `lib/api.ts` é da área dela. **Com D:** o endereço da
-  página da turma.
-
-**Ter 24: cálculo da ofensiva.**
-- `app/core/ofensiva.py`, em Python puro: recebe os dias com post de matéria e
-  devolve a ofensiva atual e o recorde, com 2 folgas por semana (segunda a
-  domingo, horário de Brasília).
-- Testes dos casos de borda: semana virando, post perto da meia-noite, folga
-  que não soma, ofensiva quebrada com recorde, post de bate-papo que não conta.
-
-**Qua 25: ofensiva no produto.**
-- `GET /usuarios/{username}/ofensiva` → ofensiva atual, recorde e o resumo da
-  semana (horas desta semana e da passada, somando os `minutos` dos posts).
-- Componente `<Ofensiva username=... />` com o número, o recorde ao lado
-  quando quebrou, e o "esta semana: 12h, semana passada: 9h".
-- **Combinar com B:** onde o componente entra no topo do perfil.
-
-**Qui 26:** escrever a escolha técnica no DECISIONS.md (por que a ofensiva fica
-em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
-
-**Revisa:** PRs que mexem em models, routers, services e `main.py`.
-
-### Pessoa B (Front): Base visual → Posts → Perfil-diário
-
-**Sáb 21: base visual.** Não depende do esqueleto, começa logo.
-- `layout.tsx`: navegação com Feed, Turmas, Perfil e Sair.
-- Identidade de caderno (decisão 2): fonte, cores, fundo de papel e uma cor por
-  matéria, num mapa único `tag → nome e cor` que todas as telas usam.
-- Nome da rede provisório, numa constante só, para trocar em um lugar quando o
-  time decidir (até quarta, antes do vídeo).
-- `lib/api.ts`: enquanto o login não existe, mandar o header `X-User-Id`
-  (de uma variável de ambiente, só em desenvolvimento). Tipos novos: `Post`,
-  `Perfil`.
-
-**Dom 22: posts.**
-- Backend: `POST`, `GET`, `PATCH` e `DELETE /posts` (só o autor edita e
-  apaga), tag validada contra a lista, `minutos` opcional, e o autor no
-  retorno. Tirar o `@skip` de `test_posts_crud` quando a auth do A entrar.
-- Tela: formulário de postar com a tag obrigatória e o campo de duração.
-- Componente `<CardPost>`, usado no feed, no perfil e nas turmas: autor, tag
-  com a cor da matéria, duração, data, e um espaço para os botões de curtir e
-  comentar.
-- **Combinar com C e D:** o `<CardPost>` é a peça que mais gente usa. Avisar
-  no grupo quando ele entrar na `main`.
-
-**Seg 23: perfil (backend e topo).**
-- `GET /usuarios/{username}` com a meta e os contadores `seguidores` e
-  `seguindo` (contados na tabela de follows, que já existe desde o esqueleto);
-  `PATCH /usuarios/eu` (bio, avatar e meta); `GET /usuarios/{username}/posts`
-  paginado, com filtro opcional por tag.
-- Tela `/u/[username]`: topo com nome, meta e contadores.
-- Tirar o `@skip` de `test_perfil_editavel`.
-- **Combinar com D:** o formato do `GET /usuarios/{username}`, que o teste de
-  follow também lê.
-
-**Ter 24: o diário.**
-- Divisórias por matéria: uma aba por tag, com a contagem de posts.
-- Tela de editar o perfil.
-- Colocar no perfil o botão de seguir (D) e, quando sair, o `<Ofensiva />` (A).
-
-**Qua 25:** ajustes visuais nas telas de todo mundo, estados vazios e tela de
-celular.
-
-**Qui 26:** gravar o vídeo (cerca de 4 minutos): cadastro, login, post, follow
-e feed, depois a ofensiva e as Turmas, e uma decisão de produto ("a rede não
-compara por você").
-
-**Revisa:** PRs que mexem em layout, navegação, `lib/api.ts` e componentes
-compartilhados.
-
-### Pessoa C (Dados): Curtidas → Comentários → Seed → Deploy
-
-**Seg 23: curtidas.** Começa com `make check` verde (guia 00).
-- `POST` e `DELETE /posts/{id}/curtir`, idempotentes.
-- O `GET /posts/{id}` ganha `curtidas` e `curtido_por_mim`.
-- Botão de curtir dentro do `<CardPost>`.
-- Tirar o `@skip` de `test_curtidas_idempotentes`.
-- **Combinar com B:** o schema do post e o `<CardPost>` são dela.
-
-**Ter 24: comentários.**
-- `POST` e `GET /posts/{id}/comentarios`, em ordem cronológica e paginados.
-- Tela: lista de comentários e campo para comentar, a partir do card.
-- O post ganha a contagem de comentários.
-- Tirar o `@skip` de `test_comentarios_planos_cronologicos`.
-
-**Qua 25: seed com cara de vestibulando.** O nicho tem que aparecer no seed
-(rubrica, Produto, pergunta 3).
-- `seed_fake(db)` em `scripts/seed.py`: pelo menos 20 usuários, 50 posts, 20
-  follows e 30 curtidas (o teste do núcleo exige), mais comentários.
-- Metas espalhadas para que cada turma tenha gente; posts escritos como um
-  vestibulando escreve, com tag de matéria e duração, nas últimas semanas.
-- Uns com a ofensiva em dia, outros com ela quebrada e um recorde, para a
-  ofensiva aparecer de verdade no vídeo.
-- Um usuário de demonstração com senha conhecida, para o vídeo e para a banca.
-- Tirar o `@skip` de `test_seed_fake_popula_a_rede`.
-- **Combinar com A:** usar a mesma função de hash da auth e as listas do
-  contrato.
-
-**Qui 26: deploy (+10)** seguindo o guia 08: backend no Render, front na
-Vercel, `SEED_ON_BOOT`, CORS com a URL pública e nunca `DEBUG` em produção.
-Testar cadastro → login → post → follow → feed na URL.
-
-**Revisa:** PRs que mexem no seed, em `core/` e na configuração do deploy.
-
-### Pessoa D (Reforço): Follow → Feed → Turmas
-
-**Seg 23: follow.** Começa com `make check` verde (guia 00).
-- `POST` e `DELETE /usuarios/{username}/follow`, idempotentes.
-- Componente `<BotaoSeguir username=... />`, usado no perfil e nas turmas.
-- Tirar o `@skip` de `test_follow_unfollow_com_contadores`.
-- **Combinar com B:** os contadores ficam no `GET /usuarios/{username}` dela.
-
-**Ter 24: feed e núcleo verde.**
-- `GET /feed`, cronológico e paginado, só de quem você segue, com opção de
-  esconder o bate-papo.
-- Tela inicial: feed com "carregar mais", o filtro de bate-papo, e o feed vazio
-  com um convite para conhecer a turma (decisão 3).
-- Tirar o `@skip` de `test_feed_cronologico_dos_seguidos` e conferir se todos
-  os testes do núcleo passam. É a meta da terça à noite.
-
-**Qua 25: Turmas** (decisão 5).
-- Rotas para listar as turmas (uma por vestibular e uma por curso, com o número
-  de membros), os membros de uma turma e os posts deles, com filtro por
-  matéria.
-- Aba Turmas e a página da turma: membros com `<BotaoSeguir />` e posts com
-  `<CardPost>`.
-- **Combinar com A:** o cadastro leva para a turma. **Com C:** o seed precisa
-  encher as turmas.
-
-Turmas fica com D porque a página da turma junta Follow e Feed: uma lista de
-gente para seguir e um feed dos membros.
-
-**Qui 26:** fazer o fluxo inteiro na tela como a banca faria, abrir uma issue
-para cada bug e corrigir os do núcleo primeiro. Se der, um teste autoral de
-follow ou feed (guia 09).
-
-**Revisa:** o fluxo inteiro na tela antes dos merges e os testes. Reforça quem
-estiver mais atrasado.
+nomes de rota nos planos são os dos testes do núcleo; o que não está nos testes
+é sugestão, e o dono pode mudar avisando quem usa.
 
 ## Ordem de prioridade
 

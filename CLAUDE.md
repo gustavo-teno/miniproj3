@@ -6,7 +6,8 @@ Rede social de nicho da Trilha UFPB: FastAPI + SQLite em `backend/`, Next.js em
 `make seed`, `make dev-back`, `make dev-front`.
 
 **Leia o `PLANO.md` no início de cada sessão:** ele diz o papel de quem está
-usando você, o que essa pessoa faz em cada dia e o que é de outra pessoa.
+usando você e o que é de outra pessoa. O plano dia a dia e o diário de
+progresso de cada papel ficam em `docs/plano/`.
 
 ## Fluxo de git (guia 02, obrigatório)
 
