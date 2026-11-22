@@ -29,7 +29,7 @@ def criar_post(
 def ver_post(
     post_id: int,
     # Não é usado aqui dentro: está só para exigir login (a rede é para quem
-    # tem conta). O "_" na frente avisa isso, no mesmo padrão do Gustavo.
+    # tem conta). O "_" na frente avisa isso, no mesmo padrão do logout, em auth.py.
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
