@@ -7,15 +7,21 @@ declara `user: User = Depends(get_current_user)`.
 import os
 
 from fastapi import Depends, Header, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session as DbSession
 
 from app.db import get_db
 from app.models.session import Session
 from app.models.user import User
 
+# Lê "Authorization: Bearer <token>" e liga o botão Authorize do Swagger
+# (/docs). auto_error=False: sem token, quem decide o 401 é get_current_user,
+# para o bypass de DEBUG continuar valendo.
+bearer = HTTPBearer(auto_error=False, description="O token que POST /auth/login devolve.")
+
 
 def get_current_user(
-    authorization: str | None = Header(default=None),
+    credenciais: HTTPAuthorizationCredentials | None = Depends(bearer),
     x_user_id: int | None = Header(default=None),
     db: DbSession = Depends(get_db),
 ) -> User:
@@ -31,16 +37,8 @@ def get_current_user(
     # A auth real (Passo 3): o token que o login entregou, no formato
     # "Authorization: Bearer <token>". Se ele está na tabela sessions, a
     # request é de quem fez aquele login.
-    token = token_do_header(authorization)
-    if token:
-        sessao = db.get(Session, token)
+    if credenciais:
+        sessao = db.get(Session, credenciais.credentials)
         if sessao:
             return db.get(User, sessao.user_id)
     raise HTTPException(status_code=401, detail="não autenticado")
-
-
-def token_do_header(authorization: str | None) -> str | None:
-    """Tira o token de "Bearer <token>". Qualquer outro formato vira None."""
-    if authorization and authorization.startswith("Bearer "):
-        return authorization.removeprefix("Bearer ").strip() or None
-    return None

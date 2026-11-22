@@ -77,3 +77,21 @@ def test_token_inventado_ou_mal_formatado_da_401(client, logar):
     logar("ana")
     for header in ("Bearer inventado", "inventado", "Bearer ", "Basic abc"):
         assert client.get("/auth/eu", headers={"Authorization": header}).status_code == 401
+
+
+def test_registro_recusa_senha_que_o_bcrypt_cortaria(client):
+    # O bcrypt ignora o que passa de 72 bytes: "a"*72 + qualquer coisa entraria.
+    assert registrar(client, password="a" * 73).status_code == 422
+    assert registrar(client, password="ç" * 37).status_code == 422  # 74 bytes
+    assert registrar(client, password="a" * 72).status_code == 201
+
+
+def test_registro_recusa_nome_so_de_espacos(client):
+    assert registrar(client, name="   ").status_code == 422
+    r = registrar(client, name="  Ana  ")
+    assert r.status_code == 201 and r.json()["name"] == "Ana"
+
+
+def test_swagger_tem_o_botao_authorize(client):
+    esquemas = client.get("/openapi.json").json()["components"]["securitySchemes"]
+    assert esquemas["HTTPBearer"]["scheme"] == "bearer"

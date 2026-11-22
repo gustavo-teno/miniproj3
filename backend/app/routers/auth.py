@@ -5,11 +5,12 @@ Rotas previstas:
 - POST /auth/logout: apaga a sessão do token enviado
 """
 
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.deps import get_current_user, token_do_header
+from app.deps import bearer, get_current_user
 from app.models.user import User
 from app.schemas.auth import LoginIn, RegistroIn, TokenOut
 from app.schemas.user import UserOut
@@ -35,11 +36,10 @@ def eu(user: User = Depends(get_current_user)):
 
 @router.post("/logout", status_code=204)
 def logout(
-    authorization: str | None = Header(default=None),
+    credenciais: HTTPAuthorizationCredentials | None = Depends(bearer),
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     # Com o bypass de DEBUG não há token: não há sessão a apagar.
-    token = token_do_header(authorization)
-    if token:
-        service.logout(db, token)
+    if credenciais:
+        service.logout(db, credenciais.credentials)
