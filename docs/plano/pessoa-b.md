@@ -11,9 +11,12 @@ trava outra pessoa vira issue, com o link aqui.
 ## Plano
 
 **Sáb 21: base visual.** Não depende do esqueleto, começa logo.
+- [ ] Revisar e aprovar o PR do esqueleto da Pessoa A (#22), porque todo mundo
+    parte dele.
 - [ ] `layout.tsx`: navegação com Feed, Turmas, Perfil e Sair.
 - [ ] Identidade de caderno (decisão 2): fonte, cores, fundo de papel e uma cor por
-    matéria, num mapa único `tag → nome e cor` que todas as telas usam.
+    matéria, num mapa único `tag → cor` que todas as telas usam. Os nomes das
+    matérias vêm de `GET /opcoes`, não de uma cópia no front.
 - [ ] Nome da rede provisório, numa constante só, para trocar em um lugar quando o
     time decidir (até quarta, antes do vídeo).
 - [ ] `lib/api.ts`: enquanto o login não existe, mandar o header `X-User-Id`
@@ -23,7 +26,10 @@ trava outra pessoa vira issue, com o link aqui.
 **Dom 22: posts.**
 - [ ] Backend: `POST`, `GET`, `PATCH` e `DELETE /posts` (só o autor edita e
     apaga), tag validada contra a lista, `minutos` opcional, e o autor no
-    retorno. Tirar o `@skip` de `test_posts_crud` quando a auth do A entrar.
+    retorno. Aqui nasce o `PostOut`, o formato do post que feed, perfil e
+    turmas usam; a C acrescenta nele as curtidas e os comentários. Ao apagar
+    um post, apagar junto as curtidas e os comentários dele (o SQLite não faz
+    isso sozinho). Tirar o `@skip` de `test_posts_crud` quando a auth do A entrar.
 - [ ] Tela: formulário de postar com a tag obrigatória e o campo de duração.
 - [ ] Componente `<CardPost>`, usado no feed, no perfil e nas turmas: autor, tag
     com a cor da matéria, duração, data, e um espaço para os botões de curtir e
@@ -31,7 +37,9 @@ trava outra pessoa vira issue, com o link aqui.
 - **Combinar com C e D:** o `<CardPost>` é a peça que mais gente usa. Avisar
     no grupo quando ele entrar na `main`.
 
-**Seg 23: perfil (backend e topo).**
+**Seg 23: perfil (backend e topo).** As rotas ficam no `routers/users.py`, que
+é seu. `GET /usuarios/{username}` vai depois de `/stats`, senão captura esse
+caminho.
 - [ ] `GET /usuarios/{username}` com a meta e os contadores `seguidores` e
     `seguindo` (contados na tabela de follows, que já existe desde o esqueleto);
     `PATCH /usuarios/eu` (bio, avatar e meta); `GET /usuarios/{username}/posts`
@@ -48,9 +56,10 @@ trava outra pessoa vira issue, com o link aqui.
 - [ ] Colocar no perfil o botão de seguir (D) e, quando sair, o `<Ofensiva />` (A).
 
 **Qua 25:** ajustes visuais nas telas de todo mundo, estados vazios e tela de
-celular.
+celular. Escrever o roteiro do vídeo.
 
-**Qui 26:** gravar o vídeo (cerca de 4 minutos): cadastro, login, post, follow
+**Qui 26:** gravar o vídeo (cerca de 4 minutos), no seu computador com o seed,
+para não depender do deploy: cadastro, login, post, follow
 e feed, depois a ofensiva e as Turmas, e uma decisão de produto ("a rede não
 compara por você").
 

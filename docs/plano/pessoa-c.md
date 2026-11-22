@@ -15,12 +15,14 @@ trava outra pessoa vira issue, com o link aqui.
 - [ ] O `GET /posts/{id}` ganha `curtidas` e `curtido_por_mim`.
 - [ ] Botão de curtir dentro do `<CardPost>`.
 - [ ] Tirar o `@skip` de `test_curtidas_idempotentes`.
-- **Combinar com B:** o schema do post e o `<CardPost>` são dela.
+- **Combinar com B:** o `PostOut` (formato do post) e o `<CardPost>` são dela;
+    você acrescenta neles as curtidas. Ao apagar um post, a B apaga junto as
+    curtidas e os comentários dele.
 
 **Ter 24: comentários.**
 - [ ] `POST` e `GET /posts/{id}/comentarios`, em ordem cronológica e paginados.
 - [ ] Tela: lista de comentários e campo para comentar, a partir do card.
-- [ ] O post ganha a contagem de comentários.
+- [ ] O `PostOut` da B ganha a contagem de comentários.
 - [ ] Tirar o `@skip` de `test_comentarios_planos_cronologicos`.
 
 **Qua 25: seed com cara de vestibulando.** O nicho tem que aparecer no seed

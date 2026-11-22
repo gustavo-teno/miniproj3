@@ -25,8 +25,8 @@ trava outra pessoa vira issue, com o link aqui.
     os testes do núcleo passam. É a meta da terça à noite.
 
 **Qua 25: Turmas** (decisão 5).
-- [ ] Rotas para listar as turmas (uma por vestibular e uma por curso, com o número
-    de membros), os membros de uma turma e os posts deles, com filtro por
+- [ ] Rotas para listar as turmas (uma por vestibular e uma por curso, tiradas de
+    `app/constantes.py`, com o número de membros), os membros de uma turma e os posts deles, com filtro por
     matéria.
 - [ ] "Outro" também é turma: "Outros vestibulares" e "Outros cursos". Nelas, o
     card do membro mostra o que ele escreveu ("quer Geografia").

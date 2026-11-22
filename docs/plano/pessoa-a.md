@@ -15,7 +15,7 @@ trava outra pessoa vira issue, com o link aqui.
 - [ ] Os models da tabela do contrato, cada um no seu arquivo em `app/models/`, e
     os campos novos do `User`.
 - [ ] As constantes: tags, vestibulares e cursos, copiadas das listas do
-    contrato no PLANO.md.
+    contrato no PLANO.md, e a rota `GET /opcoes`, que as entrega às telas.
 - [ ] Um router vazio por feature em `app/routers/` (`auth`, `posts`, `follows`,
     `curtidas`, `comentarios`, `feed`, `ofensiva`, `turmas`, `dms`), todos
     registrados no `main.py`.
@@ -26,14 +26,15 @@ trava outra pessoa vira issue, com o link aqui.
 **Dom 22: auth no backend** (guia 01, Passos 1 a 3).
 - [ ] Model `Session` (token opaco), senha com bcrypt.
 - [ ] `POST /auth/registro` (aceita `vestibular`, `curso` e `universidade`
-    opcionais, para o cadastro já trazer a meta), `POST /auth/login`,
+    opcionais, para o cadastro já trazer a meta; recusa os usernames `eu` e
+    `stats`, que são caminhos de `/usuarios`), `POST /auth/login`,
     `GET /auth/eu` e o `get_current_user` real, mantendo o bypass com `DEBUG`.
 - [ ] Tirar o `@skip` de `test_auth_registro`, `test_auth_login` e `test_auth_eu`.
     A partir daqui a fixture `logar` funciona e os outros testes podem destravar.
 
 **Seg 23: auth na tela.**
 - [ ] Páginas `/cadastro` (nome, username, senha e a meta: vestibular e curso em
-    lista, universidade em texto; quem escolhe "Outro" pode escrever qual é a
+    lista, vinda de `GET /opcoes`, universidade em texto; quem escolhe "Outro" pode escrever qual é a
     meta) e `/login`; botão de sair.
 - [ ] Salvar o token e mandá-lo no `Authorization` de `lib/api.ts`; páginas
     protegidas mandam para `/login` sem token.
