@@ -28,6 +28,16 @@ else
   fi
 fi
 
+# Banco local mais velho que a última mudança nos models: o SQLite não ganha
+# colunas novas sozinho, e as rotas quebram com "no such column".
+if [ -f backend/app.db ]; then
+  models_em="$(git log -1 --format=%ct -- backend/app/models 2>/dev/null)"
+  banco_em="$(stat -c %Y backend/app.db 2>/dev/null || stat -f %m backend/app.db 2>/dev/null)"
+  if [ -n "$models_em" ] && [ -n "$banco_em" ] && [ "$banco_em" -lt "$models_em" ]; then
+    echo "Fluxo do time: o banco local (backend/app.db) é mais velho que a última mudança nos models, então pode estar sem tabelas ou colunas novas. Avise o usuário e sugira recriar: rm backend/app.db && make seed (os dados são só de teste)."
+  fi
+fi
+
 # Só no clone de quem tem o remote da Trilha (o dono do fork): avisa se a
 # Trilha publicou correções que o fork ainda não tem.
 if git remote get-url upstream >/dev/null 2>&1; then
