@@ -24,5 +24,14 @@ progresso de cada papel ficam em `docs/plano/`.
    (`gh pr view --json reviewDecision` = `APPROVED`): `gh pr merge --merge
    --delete-branch`. Nunca aprove PR em nome do usuário.
 
+## Banco desatualizado
+
+O banco local (`backend/app.db`) não acompanha sozinho as mudanças nos models.
+Depois de um `git pull` que mexeu em `backend/app/models/`, erros como
+`no such column` ou `no such table` querem dizer que o banco ficou velho. A
+correção é apagar e recriar (os dados são só de teste): `rm backend/app.db &&
+make seed`. Explique isso ao usuário antes de apagar. O hook de início de
+sessão avisa quando o banco é mais velho que os models.
+
 Nunca versionar `*.db`, `.env*` (exceto os `.example`) ou chaves. Não edite router/model de outro
 dono sem combinar.

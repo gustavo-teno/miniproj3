@@ -36,7 +36,7 @@ própria parte primeiro pega, a partir de quarta.
 ## Por que essa divisão deixa todo mundo independente
 
 O que costuma travar um time é esperar a auth, esperar o model de outra pessoa
-ou brigar com conflito no `main.py`. O esqueleto da Pessoa A resolve os três de
+ou brigar com conflito no `main.py`. O esqueleto da Pessoa A (Gustavo) resolve os três de
 uma vez no sábado:
 
 - **Bypass da auth** (guia 01, Passo 0): com `DEBUG=true` e o header
@@ -47,11 +47,11 @@ uma vez no sábado:
   mexe no próprio arquivo.
 
 Depois do esqueleto, as únicas dependências são de dados, não de código:
-- **Curtidas e Comentários** precisam de posts no banco. Os Posts da Pessoa B
+- **Curtidas e Comentários** precisam de posts no banco. Os Posts da Pessoa B (Camila)
   saem no fim de semana, mas dá para criar posts direto pelo Swagger.
 - **O Feed** precisa de follows. Follow e Feed ficam com a mesma pessoa (D).
-- **A ofensiva aparece no perfil.** A Pessoa A entrega a rota e um componente
-  `<Ofensiva username=... />`, e a Pessoa B só coloca o componente na página.
+- **A ofensiva aparece no perfil.** A Pessoa A (Gustavo) entrega a rota e um componente
+  `<Ofensiva username=... />`, e a Pessoa B (Camila) só coloca o componente na página.
 
 Os pontos em que duas pessoas mexem na mesma coisa estão marcados com
 **Combinar com** no plano de cada uma.
@@ -98,11 +98,11 @@ com `texto`, continuem passando. **Na tela, escolher a tag é obrigatório**
 (decisão 2).
 
 **Arquivos que mais de uma pessoa usa:**
-- **`routers/users.py` é da Pessoa B**: o perfil (`GET /usuarios/{username}`,
+- **`routers/users.py` é da Pessoa B (Camila)**: o perfil (`GET /usuarios/{username}`,
   `PATCH /usuarios/eu` e os posts do perfil) fica nele. O follow (D, em
   `follows.py`) e a ofensiva (A, em `ofensiva.py`) também começam com
   `/usuarios`, mas cada um no próprio arquivo.
-- **O formato do post é da Pessoa B**: ela define o `PostOut` (o que a API
+- **O formato do post é da Pessoa B (Camila)**: ela define o `PostOut` (o que a API
   devolve de um post) e o `<CardPost>`. A Pessoa C acrescenta nele as
   curtidas e o número de comentários. Feed, perfil e turmas usam esse mesmo
   formato e esse mesmo card, sem criar o seu.
@@ -132,17 +132,18 @@ Cada papel tem um arquivo com o plano dia a dia, que também serve de diário de
 progresso: a pessoa marca o que fez e anota mudanças e bugs ali, sem mexer no
 arquivo dos outros.
 
-- [Pessoa A (Back)](docs/plano/pessoa-a.md): Esqueleto (#5) → Auth (#6) → Ofensiva (#7)
-- [Pessoa B (Front)](docs/plano/pessoa-b.md): Base visual (#8) → Posts (#9) → Perfil-diário (#10)
+- [Pessoa A — Gustavo (Back)](docs/plano/pessoa-a.md): Esqueleto (#5) → Auth (#6) → Ofensiva (#7)
+- [Pessoa B — Camila (Front)](docs/plano/pessoa-b.md): Base visual (#8) → Posts (#9) → Perfil-diário (#10)
 - [Pessoa C (Dados)](docs/plano/pessoa-c.md): Curtidas (#11) → Comentários (#12) → Seed (#13) → Deploy (#14)
 - [Pessoa D (Reforço)](docs/plano/pessoa-d.md): Follow (#15) → Feed (#16) → Turmas (#17)
 - DMs entre mútuos (#18), opcional: quem terminar antes
-- Entregas: vídeo (#19, Pessoa B), pitch (#20, todos) e DECISIONS final
-  (#21, Pessoa A e todos). Vídeo e pitch não viram PR: quem é responsável
+- Entregas: vídeo (#19, Camila), pitch (#20, todos) e DECISIONS final
+  (#21, Gustavo e todos). Vídeo e pitch não viram PR: quem é responsável
   fecha a issue à mão quando entregar.
 
-Cada feature tem uma issue (o número está ao lado), aberta sem responsável:
-quem escolher o papel se atribui nas issues dele. Cada dia é uma branch e um
+Cada feature tem uma issue (o número está ao lado). Quem escolhe o papel se
+atribui nas issues dele: o Gustavo já está nas de A, e a Camila se atribui nas
+de B. Cada dia é uma branch e um
 PR, revisado pela pessoa da área. Numa feature de dois dias, o primeiro PR diz
 `Parte de #N` e o último fecha a issue com `Closes #N`. Os
 nomes de rota nos planos são os dos testes do núcleo; o que não está nos testes

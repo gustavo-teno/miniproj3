@@ -1,7 +1,7 @@
-# Pessoa A (Back): Esqueleto → Auth → Ofensiva
+# Pessoa A — Gustavo (Back): Esqueleto → Auth → Ofensiva
 
-Plano e diário de progresso da Pessoa A. Quem ocupa o papel está na
-tabela "Quem faz o quê" do [PLANO.md](../../PLANO.md), junto com o cronograma
+Plano e diário de progresso da Pessoa A, que é o Gustavo (@gustavo-teno). O
+papel está na tabela "Quem faz o quê" do [PLANO.md](../../PLANO.md), junto com o cronograma
 do time e o contrato.
 
 **Como usar:** marque `[x]` no que ficou pronto, no mesmo PR da tarefa. Anote
@@ -11,15 +11,15 @@ trava outra pessoa vira issue, com o link aqui.
 ## Plano
 
 **Sáb 21: esqueleto.** É o único bloqueio do time, então sai cedo e pequeno.
-- [ ] `app/deps.py`: o bypass do guia 01, Passo 0 (`DEBUG=true` + `X-User-Id`).
-- [ ] Os models da tabela do contrato, cada um no seu arquivo em `app/models/`, e
+- [x] `app/deps.py`: o bypass do guia 01, Passo 0 (`DEBUG=true` + `X-User-Id`).
+- [x] Os models da tabela do contrato, cada um no seu arquivo em `app/models/`, e
     os campos novos do `User`.
-- [ ] As constantes: tags, vestibulares e cursos, copiadas das listas do
+- [x] As constantes: tags, vestibulares e cursos, copiadas das listas do
     contrato no PLANO.md, e a rota `GET /opcoes`, que as entrega às telas.
-- [ ] Um router vazio por feature em `app/routers/` (`auth`, `posts`, `follows`,
+- [x] Um router vazio por feature em `app/routers/` (`auth`, `posts`, `follows`,
     `curtidas`, `comentarios`, `feed`, `ofensiva`, `turmas`, `dms`), todos
     registrados no `main.py`.
-- [ ] `make test` continua verde (os testes do núcleo seguem com `@skip`).
+- [x] `make test` continua verde (os testes do núcleo seguem com `@skip`).
 - **Combinar com B:** B revisa e aprova o PR. Avisar no grupo quando entrar na
     `main`, porque todo mundo parte dele.
 

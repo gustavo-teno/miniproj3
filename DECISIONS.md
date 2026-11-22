@@ -144,20 +144,20 @@ que dê tempo._
 
 ## Features
 
-As letras são os papéis do [PLANO.md](PLANO.md); quem ocupa cada um está na
-tabela "Quem faz o quê" de lá.
+As letras são os papéis do [PLANO.md](PLANO.md); C e D ainda vão ser escolhidos e
+entram na tabela "Quem faz o quê" de lá.
 
 | Feature | Dono | Por quê (1 frase) |
 |---|---|---|
-| Auth (núcleo) | Pessoa A | Cada vestibulando tem o próprio diário e a própria meta. |
-| Posts (núcleo) | Pessoa B | O registro da sessão de estudo, com tag (matéria ou bate-papo) e duração. |
+| Auth (núcleo) | Pessoa A (Gustavo) | Cada vestibulando tem o próprio diário e a própria meta. |
+| Posts (núcleo) | Pessoa B (Camila) | O registro da sessão de estudo, com tag (matéria ou bate-papo) e duração. |
 | Feed (núcleo) | Pessoa D | Cronológico e só de quem você segue, com filtro para esconder o bate-papo. |
-| Perfil (núcleo) | Pessoa B | O diário com divisórias por matéria, com a meta, a ofensiva e o resumo da semana no topo. |
+| Perfil (núcleo) | Pessoa B (Camila) | O diário com divisórias por matéria, com a meta, a ofensiva e o resumo da semana no topo. |
 | Follow (núcleo) | Pessoa D | Acompanhar a jornada de quem tem a mesma meta que você. |
 | Curtidas (núcleo) | Pessoa C | Um apoio rápido para quem estudou hoje. |
 | Comentários (núcleo) | Pessoa C | Dicas e incentivo na sessão do outro, que é o sinal de que a rede funcionou. |
 | Seed fake (núcleo) | Pessoa C | Vestibulandos fictícios com metas e rotinas variadas, para a rede já parecer uma turma. |
-| Ofensiva que perdoa | Pessoa A | Motiva a voltar todo dia sem punir o descanso (decisão 4). |
+| Ofensiva que perdoa | Pessoa A (Gustavo) | Motiva a voltar todo dia sem punir o descanso (decisão 4). |
 | Turmas | Pessoa D | Quem acabou de chegar encontra quem tem a mesma meta e sai do feed vazio (decisão 5). |
 | DMs entre mútuos (opcional) | quem terminar antes | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
 
