@@ -24,14 +24,14 @@ trava outra pessoa vira issue, com o link aqui.
     `Perfil`.
 
 **Dom 22: posts.**
-- [ ] Backend: `POST`, `GET`, `PATCH` e `DELETE /posts` (só o autor edita e
+- [x] Backend: `POST`, `GET`, `PATCH` e `DELETE /posts` (só o autor edita e
     apaga), tag validada contra a lista, `minutos` opcional, e o autor no
     retorno. Aqui nasce o `PostOut`, o formato do post que feed, perfil e
     turmas usam; a C acrescenta nele as curtidas e os comentários. Ao apagar
     um post, apagar junto as curtidas e os comentários dele (o SQLite não faz
     isso sozinho). Tirar o `@skip` de `test_posts_crud` quando a auth do A entrar.
-- [ ] Tela: formulário de postar com a tag obrigatória e o campo de duração.
-- [ ] Componente `<CardPost>`, usado no feed, no perfil e nas turmas: autor, tag
+- [x] Tela: formulário de postar com a tag obrigatória e o campo de duração.
+- [x] Componente `<CardPost>`, usado no feed, no perfil e nas turmas: autor, tag
     com a cor da matéria, duração, data, e um espaço para os botões de curtir e
     comentar.
 - **Combinar com C e D:** o `<CardPost>` é a peça que mais gente usa. Avisar
@@ -71,6 +71,16 @@ compartilhados.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **dom 22:** posts prontos (#9). Backend com o `PostOut` levando o autor
+  dentro, só o autor edita e apaga (403), e apagar um post leva junto as
+  curtidas e os comentários. Na revisão achei dois bugs: a data voltava sem
+  fuso (o card ia mostrar 3 h de diferença) e um texto só com espaços passava
+  como post; corrigi os dois. Escrevi `tests/test_posts.py` com o atalho do
+  `X-User-Id` e estraguei o service de propósito em três pontos para ver os
+  testes pegarem. O `<CardPost>` e o `<FormPost>` saíram do rascunho e viraram
+  componentes; o card tem um `rodape` para a C pôr curtir e comentar. Com a
+  auth do Gustavo na `main`, tirei o `@skip` do `test_posts_crud`. Avisar o
+  Gustavo: o `created_at` de todos os models volta sem fuso do SQLite.
 - **dom 22:** revisão do Gustavo no mockup do feed: a faixa do topo mostrava o
   perfil inteiro (nome, @, foto, bio, turmas e matérias) e espremia o feed. A
   faixa vira uma linha só: foto pequena, caixa de escrever e botão
