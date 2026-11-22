@@ -60,7 +60,6 @@ def test_auth_eu(client, logar):
 # ---------- POSTS ----------
 
 
-@pytest.mark.skip(reason="Remova ao implementar POST/GET/PATCH/DELETE /posts (núcleo; imite o slice)")
 def test_posts_crud(client, logar):
     ana = logar("ana")
     bia = logar("bia")
