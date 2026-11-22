@@ -13,6 +13,9 @@ def _tag_valida(tag: str | None) -> str | None:
 
 
 class PostCriar(BaseModel):
+    # Tira os espaços das pontas antes de validar: "   " vira "" e é recusado.
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     texto: str = Field(min_length=1, max_length=1000)
     # Padrão só na API, para os testes do núcleo. Na tela a tag é obrigatória.
     tag: str = TAG_PADRAO
@@ -24,6 +27,8 @@ class PostCriar(BaseModel):
 
 class PostEditar(BaseModel):
     """Tudo opcional: só muda o que vier no corpo do PATCH."""
+
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     texto: str | None = Field(default=None, min_length=1, max_length=1000)
     tag: str | None = None
