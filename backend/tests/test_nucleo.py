@@ -16,7 +16,6 @@ SENHA = "senha-forte-123"
 # ---------- AUTH (guia 01 — um passo do guia por teste) ----------
 
 
-@pytest.mark.skip(reason="Remova ao implementar POST /auth/registro (núcleo; guia 01, Passo 1)")
 def test_auth_registro(client):
     r = client.post(
         "/auth/registro", json={"username": "ana", "name": "Ana", "password": SENHA}
