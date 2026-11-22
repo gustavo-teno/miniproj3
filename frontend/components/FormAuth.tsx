@@ -1,0 +1,57 @@
+// Peças comuns das telas de entrar e de criar conta, para as duas ficarem
+// iguais: a caixa no meio da tela, os campos e o aviso de erro.
+
+import { NOME_REDE } from "@/lib/rede";
+
+export const estiloCampo =
+  "w-full rounded-lg border border-linha bg-superficie px-3 py-2 text-tinta " +
+  "focus:border-destaque focus:outline-none focus:ring-2 focus:ring-destaque-fundo";
+
+export const estiloBotao =
+  "w-full rounded-lg bg-destaque px-5 py-2.5 font-semibold text-sobre-destaque " +
+  "hover:opacity-90 disabled:opacity-50";
+
+export function CaixaAuth({
+  titulo,
+  children,
+}: {
+  titulo: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="mx-auto max-w-md py-10">
+      <p className="text-center text-sm font-light text-tinta-suave">{NOME_REDE}</p>
+      <h1 className="mt-1 text-center text-2xl font-semibold">{titulo}</h1>
+      <div className="mt-6 rounded-xl border border-linha bg-superficie p-6">{children}</div>
+    </div>
+  );
+}
+
+// Um campo com o rótulo em cima e, se houver, uma dica embaixo.
+export function Campo({
+  rotulo,
+  dica,
+  children,
+}: {
+  rotulo: string;
+  dica?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-sm font-semibold">{rotulo}</span>
+      {children}
+      {dica && <span className="mt-1 block text-xs font-light text-tinta-suave">{dica}</span>}
+    </label>
+  );
+}
+
+// role="alert": o leitor de tela lê o erro assim que ele aparece.
+export function AvisoErro({ texto }: { texto: string | null }) {
+  if (!texto) return null;
+  return (
+    <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+      {texto}
+    </p>
+  );
+}
