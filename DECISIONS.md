@@ -97,8 +97,8 @@ as decisões mudarem.
   O número aparece no perfil, mas nunca numa lista ou ranking. O fogo ao lado
   do número muda de cor com a ofensiva atual, como uma chama esquentando: 1 a
   6 dias vermelho, 7 a 13 laranja, 14 a 29 amarelo, 30 a 59 branco, 60 a 99
-  azul-claro e 100 ou mais azul. Quando a ofensiva quebra, a cor volta ao
-  início junto com o número. Uma legenda (clique no computador, setinha no
+  azul-claro e 100 ou mais azul. Se a ofensiva recomeça, o fogo também volta
+  ao vermelho. Uma legenda (clique no computador, setinha no
   celular) mostra qual cor é qual faixa, para não depender só da cor.
 - **O que cortamos e por quê:** o streak sem folga, porque pune o descanso; e
   a contagem por semanas, porque o número cresce devagar e motiva menos.
