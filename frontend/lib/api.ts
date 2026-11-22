@@ -119,9 +119,17 @@ export async function entrar(username: string, password: string): Promise<void> 
 }
 
 // Cria a conta e já entra, para a pessoa não digitar a senha duas vezes.
-export async function cadastrar(dados: Cadastro): Promise<void> {
+// Devolve false se a conta foi criada mas o login logo depois falhou: aí a
+// tela não pode mostrar erro, senão a pessoa tenta de novo e recebe
+// "username já existe". Erro no cadastro em si continua sendo lançado.
+export async function cadastrar(dados: Cadastro): Promise<boolean> {
   await apiPost<User>("/auth/registro", dados);
-  await entrar(dados.username, dados.password);
+  try {
+    await entrar(dados.username, dados.password);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // Apaga a sessão no backend e o token no navegador. Se o backend falhar (fora

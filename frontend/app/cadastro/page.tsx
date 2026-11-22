@@ -34,7 +34,12 @@ export default function CadastroPage() {
     setEnviando(true);
     setErro(null);
     try {
-      await cadastrar(dados);
+      const entrou = await cadastrar(dados);
+      if (!entrou) {
+        // A conta existe, só o login automático falhou: a pessoa entra à mão.
+        window.location.href = "/login?conta=criada";
+        return;
+      }
       // Por enquanto vai para o feed. Quando a tela de Turmas existir (D, #17),
       // vai para a turma da pessoa (decisão 3). Recarrega a página inteira para
       // o topo descobrir quem entrou.

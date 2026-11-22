@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AvisoErro, CaixaAuth, Campo, estiloBotao, estiloCampo } from "@/components/FormAuth";
 import { entrar } from "@/lib/api";
@@ -11,6 +11,14 @@ export default function LoginPage() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [contaCriada, setContaCriada] = useState(false);
+
+  // Vindo do cadastro em que só o login automático falhou (/login?conta=criada).
+  // Lido no navegador, depois de desenhar: o useSearchParams obrigaria a
+  // embrulhar a página num <Suspense> só por causa disto.
+  useEffect(() => {
+    setContaCriada(new URLSearchParams(window.location.search).get("conta") === "criada");
+  }, []);
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -29,6 +37,11 @@ export default function LoginPage() {
   return (
     <CaixaAuth titulo="Entrar">
       <form onSubmit={enviar} className="space-y-4">
+        {contaCriada && !erro && (
+          <p role="status" className="rounded-lg bg-destaque-fundo p-3 text-sm text-tinta">
+            Conta criada, agora é só entrar.
+          </p>
+        )}
         <Campo rotulo="Nome de usuário">
           <input
             value={username}
