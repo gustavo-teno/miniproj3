@@ -5,6 +5,10 @@ Rede social de nicho da Trilha UFPB: FastAPI + SQLite em `backend/`, Next.js em
 `DECISIONS.md` e `docs/guias/`. Comandos (da raiz): `make check`, `make test`,
 `make seed`, `make dev-back`, `make dev-front`.
 
+**Leia o `PLANO.md` no início de cada sessão:** ele diz o papel de quem está
+usando você e o que é de outra pessoa. O plano dia a dia e o diário de
+progresso de cada papel ficam em `docs/plano/`.
+
 ## Fluxo de git (guia 02, obrigatório)
 
 1. Nunca commitar nem dar push na `main` (um hook bloqueia).
