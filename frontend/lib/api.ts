@@ -1,14 +1,18 @@
 // Fetch tipado, único ponto de contato com o backend.
-// Já preparado para receber o token da auth (guia 01, Parte 2).
+
+import { apagarToken, lerToken, salvarToken } from "@/lib/sessao";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 function headers(): HeadersInit {
   const h: Record<string, string> = { "Content-Type": "application/json" };
-  // Parte 2 do guia 01: leia o token salvo no login e envie em Authorization.
+  // O token do login (guia 01, Passo 4): é ele que diz ao backend quem é você.
+  const token = lerToken();
+  if (token) h["Authorization"] = `Bearer ${token}`;
 
-  // Atalho de desenvolvimento (guia 01, Passo 0): enquanto o login não existe,
+  // Atalho de desenvolvimento (guia 01, Passo 0): para testar sem fazer login,
   // NEXT_PUBLIC_DEV_USER_ID no .env.local diz "finja que sou o usuário N".
+  // Se houver token, o backend usa o token e ignora este header.
   // O prefixo NEXT_PUBLIC_ é o que deixa a variável chegar ao navegador. No
   // deploy ela não existe, e o backend sem DEBUG ignora o header de todo jeito.
   const devUserId = process.env.NEXT_PUBLIC_DEV_USER_ID;
@@ -26,21 +30,31 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 
   // 401 com token salvo = token que não vale mais (ex.: o banco foi apagado ou o
   // servidor do deploy reiniciou). Joga o token fora e volta para o login.
-  if (res.status === 401 && typeof window !== "undefined" && localStorage.getItem("token")) {
-    localStorage.removeItem("token");
+  if (res.status === 401 && lerToken()) {
+    apagarToken();
     if (window.location.pathname !== "/login") window.location.href = "/login";
   }
 
   if (!res.ok) {
     // 422 = corpo inválido; 409 = conflito (ex.: username repetido). Ver guia 04.
     const erro = await res.json().catch(() => null);
-    const detail = typeof erro?.detail === "string" ? erro.detail : null;
-    throw new Error(detail ?? `${method} ${path} → ${res.status}`);
+    throw new Error(mensagemDoErro(erro?.detail) ?? `${method} ${path} → ${res.status}`);
   }
 
   // 204 No Content (seguir, curtir, apagar...) não tem corpo: não há JSON para ler.
   if (res.status === 204) return undefined as T;
   return res.json();
+}
+
+// O "detail" do FastAPI é um texto (erros nossos, como o 409) ou, no 422, uma
+// lista de campos com problema. Da lista, mostra a primeira mensagem, sem o
+// "Value error, " que o Pydantic põe na frente das mensagens escritas por nós.
+function mensagemDoErro(detail: unknown): string | null {
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail) && typeof detail[0]?.msg === "string") {
+    return detail[0].msg.replace(/^Value error, /, "");
+  }
+  return null;
 }
 
 export function apiGet<T>(path: string): Promise<T> {
@@ -83,6 +97,41 @@ export type Eu = { id: number; username: string };
 
 export function buscarEu(): Promise<Eu> {
   return apiGet<Eu>("/auth/eu");
+}
+
+// ---- auth (#6, Pessoa A; espelha backend/app/schemas/auth.py) ----
+
+export type Cadastro = {
+  username: string;
+  name: string;
+  password: string;
+  // A meta, opcional: chaves de /opcoes, ou "" se a pessoa não escolheu.
+  vestibular: string;
+  curso: string;
+  vestibular_outro: string; // texto livre, só quando escolheu "outro"
+  curso_outro: string;
+  universidade: string;
+};
+
+export async function entrar(username: string, password: string): Promise<void> {
+  const { token } = await apiPost<{ token: string }>("/auth/login", { username, password });
+  salvarToken(token);
+}
+
+// Cria a conta e já entra, para a pessoa não digitar a senha duas vezes.
+export async function cadastrar(dados: Cadastro): Promise<void> {
+  await apiPost<User>("/auth/registro", dados);
+  await entrar(dados.username, dados.password);
+}
+
+// Apaga a sessão no backend e o token no navegador. Se o backend falhar (fora
+// do ar, token que já não valia), o token sai do navegador do mesmo jeito.
+export async function sair(): Promise<void> {
+  try {
+    if (lerToken()) await apiPost<void>("/auth/logout");
+  } finally {
+    apagarToken();
+  }
 }
 
 // ---- listas fixas do contrato (GET /opcoes, backend/app/constantes.py) ----
