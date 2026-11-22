@@ -24,12 +24,12 @@ trava outra pessoa vira issue, com o link aqui.
     `main`, porque todo mundo parte dele.
 
 **Dom 22: auth no backend** (guia 01, Passos 1 a 3).
-- [ ] Model `Session` (token opaco), senha com bcrypt.
-- [ ] `POST /auth/registro` (aceita `vestibular`, `curso` e `universidade`
+- [x] Model `Session` (token opaco), senha com bcrypt.
+- [x] `POST /auth/registro` (aceita `vestibular`, `curso` e `universidade`
     opcionais, para o cadastro já trazer a meta; recusa os usernames `eu` e
     `stats`, que são caminhos de `/usuarios`), `POST /auth/login`,
     `GET /auth/eu` e o `get_current_user` real, mantendo o bypass com `DEBUG`.
-- [ ] Tirar o `@skip` de `test_auth_registro`, `test_auth_login` e `test_auth_eu`.
+- [x] Tirar o `@skip` de `test_auth_registro`, `test_auth_login` e `test_auth_eu`.
     A partir daqui a fixture `logar` funciona e os outros testes podem destravar.
 
 **Seg 23: auth na tela.**
@@ -67,3 +67,4 @@ em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **dom 22:** auth no backend pronta. Além do guia: `POST /auth/logout` apaga a sessão no banco, e o cadastro valida a meta contra as listas. Tirei a `/usuarios/eu-temporario` e troquei o `buscarEu()` do `api.ts` para `/auth/eu`, como a Camila tinha deixado combinado no código.
