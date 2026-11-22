@@ -35,8 +35,8 @@ Depois validem o ambiente:
 
 ```bash
 make check      # tudo precisa ficar verde
-make seed       # cria 3 usuários de exemplo
-make test       # deve mostrar "4 passed, 10 skipped"
+make seed       # cria 3 usuários de exemplo (ada, linus, grace; senha: senha-forte-123)
+make test       # deve mostrar "21 passed, 7 skipped"
 ```
 
 Para rodar o projeto, abram dois terminais:

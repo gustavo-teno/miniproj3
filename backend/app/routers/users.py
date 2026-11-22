@@ -3,7 +3,7 @@ follows.py (D) e ofensiva.py (A).
 
 Rotas previstas: GET /usuarios/{username}, PATCH /usuarios/eu e
 GET /usuarios/{username}/posts (testes do núcleo). GET /usuarios/{username}
-vai DEPOIS de /stats e /eu-temporario, senão captura esses caminhos.
+vai DEPOIS de /stats (e de /eu, quando existir), senão captura esses caminhos.
 
 Slice de exemplo completo: model → schema → service → router → página Next.
 
@@ -16,8 +16,6 @@ from sqlalchemy.orm import Session
 
 from app.core.contadores import contador_iniciais
 from app.db import get_db
-from app.deps import get_current_user
-from app.models.user import User
 from app.schemas.user import UserCreate, UserOut, UserPage
 from app.services import users as service
 
@@ -45,9 +43,3 @@ def criar_usuario(dados: UserCreate, db: Session = Depends(get_db)):
     # ponytail: criação sem senha — o guia de auth evolui isto para o registro real
     return service.criar(db, dados)
 
-
-# Temporária (guia 01, Passo 0): confere o bypass com DEBUG=true e X-User-Id.
-# Apagar no Passo 3, quando GET /auth/eu a substituir.
-@router.get("/eu-temporario")
-def quem_sou(user: User = Depends(get_current_user)):
-    return {"id": user.id, "username": user.username}
