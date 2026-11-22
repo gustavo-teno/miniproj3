@@ -4,33 +4,24 @@ import secrets
 
 import bcrypt
 from fastapi import HTTPException
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.contadores import contador_iniciais
-from app.models.session import Session as Sessao
+from app.models.sessao import Sessao
 from app.models.user import User
 from app.schemas.auth import LoginIn, RegistroIn
+from app.services.users import buscar_por_username, salvar_novo
 
 
 def registrar(db: Session, dados: RegistroIn) -> User:
-    if db.scalar(select(User).where(User.username == dados.username)):
-        raise HTTPException(status_code=409, detail="username já existe")
-
     # gensalt() embute um sal aleatório no hash: duas pessoas com a mesma
     # senha ficam com hashes diferentes.
-    hash_ = bcrypt.hashpw(dados.password.encode(), bcrypt.gensalt()).decode()
-    user = User(**dados.model_dump(exclude={"password"}), password_hash=hash_)
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-
-    contador_iniciais.incrementar(user.username)
-    return user
+    senha_hash = bcrypt.hashpw(dados.password.encode(), bcrypt.gensalt()).decode()
+    user = User(**dados.model_dump(exclude={"password"}), password_hash=senha_hash)
+    return salvar_novo(db, user)
 
 
 def login(db: Session, dados: LoginIn) -> str:
-    user = db.scalar(select(User).where(User.username == dados.username))
+    user = buscar_por_username(db, dados.username)
     # Mesmo 401 para usuário que não existe e senha errada: responder "usuário
     # não existe" contaria a quem está chutando quais usuários existem.
     # Hash vazio (usuário criado sem senha) faria o checkpw explodir em 500.
@@ -43,6 +34,12 @@ def login(db: Session, dados: LoginIn) -> str:
     db.add(sessao)
     db.commit()
     return sessao.token
+
+
+def usuario_do_token(db: Session, token: str) -> User | None:
+    """Quem fez o login que entregou este token, ou None se ele não vale."""
+    sessao = db.get(Sessao, token)
+    return db.get(User, sessao.user_id) if sessao else None
 
 
 def logout(db: Session, token: str) -> None:
