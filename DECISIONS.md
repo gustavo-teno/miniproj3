@@ -91,10 +91,9 @@ as decisões mudarem.
   contam. Cada pessoa tem 2 folgas por semana (de segunda a domingo, no horário
   de Brasília), e no máximo 2 dias seguidos sem estudar: o terceiro quebra a
   ofensiva, para a semana virando não permitir 4 dias parados. A folga é usada
-  automaticamente: mantém a ofensiva, mas não soma ao número. Quando a ofensiva
-  quebra, as folgas da semana voltam para a ofensiva nova. O dia de hoje só
+  automaticamente: mantém a ofensiva, mas não soma ao número. O dia de hoje só
   conta depois que acaba. Quando a ofensiva quebra, o perfil mostra o recorde
-  ao lado.
+  ao lado, e as folgas da semana voltam para a ofensiva nova.
   O número aparece no perfil, mas nunca numa lista ou ranking. O fogo ao lado
   do número muda de cor com a ofensiva atual, como uma chama esquentando: 1 a
   6 dias vermelho, 7 a 13 laranja, 14 a 29 amarelo, 30 a 59 branco, 60 a 99
