@@ -6,6 +6,13 @@ const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 function headers(): HeadersInit {
   const h: Record<string, string> = { "Content-Type": "application/json" };
   // Parte 2 do guia 01: leia o token salvo no login e envie em Authorization.
+
+  // Atalho de desenvolvimento (guia 01, Passo 0): enquanto o login não existe,
+  // NEXT_PUBLIC_DEV_USER_ID no .env.local diz "finja que sou o usuário N".
+  // O prefixo NEXT_PUBLIC_ é o que deixa a variável chegar ao navegador. No
+  // deploy ela não existe, e o backend sem DEBUG ignora o header de todo jeito.
+  const devUserId = process.env.NEXT_PUBLIC_DEV_USER_ID;
+  if (devUserId) h["X-User-Id"] = devUserId;
   return h;
 }
 
@@ -68,4 +75,48 @@ export type Page<T> = {
   total: number;
   offset: number;
   limit: number;
+};
+
+// ---- quem está usando (Pessoa A troca para /auth/eu no Passo 3 da auth) ----
+
+export type Eu = { id: number; username: string };
+
+export function buscarEu(): Promise<Eu> {
+  return apiGet<Eu>("/usuarios/eu-temporario");
+}
+
+// ---- listas fixas do contrato (GET /opcoes, backend/app/constantes.py) ----
+
+export type Opcao = { valor: string; nome: string };
+
+export type Opcoes = {
+  tags: Opcao[];
+  vestibulares: Opcao[];
+  cursos: Opcao[];
+};
+
+// ---- post e perfil (Pessoa B; proposta, fechada nos PRs de posts e perfil) ----
+
+// O autor que aparece no card, sem os dados do perfil inteiro.
+export type Autor = Pick<User, "id" | "username" | "name" | "avatar_url">;
+
+// O PostOut do backend. A Pessoa C acrescenta curtidas e comentários.
+export type Post = {
+  id: number;
+  autor: Autor;
+  texto: string;
+  tag: string; // chave de /opcoes, ex.: "matematica" ou "bate-papo"
+  minutos: number | null; // duração da sessão de estudo, opcional
+  created_at: string;
+};
+
+// GET /usuarios/{username}: a meta (decisão 2) e os contadores do follow (D).
+export type Perfil = User & {
+  vestibular: string; // chave de /opcoes, ou "" se não escolheu
+  curso: string;
+  vestibular_outro: string; // texto livre, só quando escolheu "outro"
+  curso_outro: string;
+  universidade: string;
+  seguidores: number;
+  seguindo: number;
 };

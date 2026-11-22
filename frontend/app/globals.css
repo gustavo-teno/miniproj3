@@ -1,1 +1,97 @@
 @import "tailwindcss";
+
+/* Paleta da rede (direção visual decidida em 22/11). Cada cor é uma variável
+   com dois valores, um para o modo claro e outro para o noturno; as telas usam
+   só as classes geradas delas (bg-fundo, bg-superficie, border-linha,
+   text-tinta, text-tinta-suave, text-destaque...), nunca uma cor solta. Assim,
+   trocar de modo é trocar as variáveis, e nenhuma tela precisa saber disso. */
+:root {
+  color-scheme: light;
+  --fundo: #f5f7f6; /* atrás de tudo */
+  --superficie: #ffffff; /* cards e caixas */
+  --linha: #e2e8e5; /* bordas e divisões */
+  --tinta: #1e2a2c; /* texto principal */
+  --tinta-suave: #5a6b6e; /* texto secundário */
+  --destaque: #2b7a78; /* só o que é seu e o item ativo */
+  --destaque-fundo: #e7f1f0; /* fundo suave do item ativo */
+  --sobre-destaque: #ffffff; /* texto em cima do destaque (botões) */
+}
+
+/* Modo noturno. Na primeira visita, segue o sistema da pessoa; depois que ela
+   escolhe no menu de configurações, vale o data-tema do <html>. As duas regras
+   abaixo têm os mesmos valores, porque CSS não deixa juntá-las numa só. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    color-scheme: dark;
+    --fundo: #13171d;
+    --superficie: #1b2028;
+    --linha: #2a313b;
+    --tinta: #e6eaf0;
+    --tinta-suave: #9aa4b2;
+    --destaque: #6cc2bc;
+    --destaque-fundo: #1f3634;
+    --sobre-destaque: #13171d;
+  }
+}
+
+:root[data-tema="noturno"] {
+  color-scheme: dark;
+  --fundo: #13171d;
+  --superficie: #1b2028;
+  --linha: #2a313b;
+  --tinta: #e6eaf0;
+  --tinta-suave: #9aa4b2;
+  --destaque: #6cc2bc;
+  --destaque-fundo: #1f3634;
+  --sobre-destaque: #13171d;
+}
+
+/* A cor de uma matéria (etiqueta, quadrado do símbolo). O elemento recebe as
+   quatro cores da tag por estiloDaTag() (lib/materias.ts) e estas regras
+   escolhem o par do modo atual, do mesmo jeito que a paleta acima. */
+.cor-materia {
+  background-color: var(--materia-fundo);
+  color: var(--materia-texto);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .cor-materia {
+    background-color: var(--materia-fundo-noturno);
+    color: var(--materia-texto-noturno);
+  }
+}
+
+:root[data-tema="noturno"] .cor-materia {
+  background-color: var(--materia-fundo-noturno);
+  color: var(--materia-texto-noturno);
+}
+
+/* Partes que o navegador desenha sozinho também seguem a paleta: o texto
+   selecionado e o contorno de foco de quem navega pelo teclado (Tab). */
+::selection {
+  background-color: var(--destaque-fundo);
+  color: var(--tinta);
+}
+
+:focus-visible {
+  outline: 2px solid var(--destaque);
+  outline-offset: 2px;
+}
+
+/* "inline" faz o Tailwind usar a variável em vez de copiar o valor, então a
+   classe muda sozinha quando o modo muda. */
+@theme inline {
+  --color-fundo: var(--fundo);
+  --color-superficie: var(--superficie);
+  --color-linha: var(--linha);
+  --color-tinta: var(--tinta);
+  --color-tinta-suave: var(--tinta-suave);
+  --color-destaque: var(--destaque);
+  --color-destaque-fundo: var(--destaque-fundo);
+  --color-sobre-destaque: var(--sobre-destaque);
+
+  /* Lexend em tudo (300 no texto corrido, 400 na interface, 600 em nomes e
+     títulos) e uma mono pequena para números e @usuário. */
+  --font-texto: var(--fonte-texto), system-ui, sans-serif;
+  --font-numeros: var(--fonte-numeros), ui-monospace, monospace;
+}

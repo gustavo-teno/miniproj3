@@ -1,0 +1,208 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+
+import { buscarEu, type Eu } from "@/lib/api";
+import { NOME_REDE } from "@/lib/rede";
+
+// As DMs são opcionais (decisão 6). A aba só aparece quando a tela existir.
+const MOSTRAR_MENSAGENS = false;
+
+// O topo da rede: nome à esquerda, abas no centro e configurações à direita.
+export function Navegacao() {
+  const caminho = usePathname();
+  // undefined = carregando; null = ninguém logado.
+  const [eu, setEu] = useState<Eu | null | undefined>(undefined);
+
+  useEffect(() => {
+    buscarEu()
+      .then(setEu)
+      .catch(() => setEu(null));
+  }, []);
+
+  const abas = [
+    { href: "/", rotulo: "Feed" },
+    { href: "/turmas", rotulo: "Turmas" },
+    ...(MOSTRAR_MENSAGENS ? [{ href: "/mensagens", rotulo: "Mensagens" }] : []),
+    ...(eu ? [{ href: `/u/${eu.username}`, rotulo: "Meu diário" }] : []),
+  ];
+
+  return (
+    <header className="border-b border-linha bg-superficie">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:px-6">
+        {/* No celular o nome some para as abas caberem: o Feed já leva ao início. */}
+        <Link href="/" className="hidden justify-self-start text-lg font-semibold text-tinta sm:block">
+          {NOME_REDE}
+        </Link>
+
+        <nav aria-label="Principal" className="flex gap-4 sm:gap-8">
+          {abas.map(({ href, rotulo }) => {
+            // O endereço exato ou uma página dentro dele: /u/ada e /u/ada/editar
+            // acendem "Meu diário", mas /u/ada2 (outra pessoa) não.
+            const ativa =
+              href === "/" ? caminho === "/" : caminho === href || caminho.startsWith(href + "/");
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={ativa ? "page" : undefined}
+                className={
+                  "whitespace-nowrap border-b-[3px] py-4 text-[15px] transition-colors sm:text-[17px] " +
+                  (ativa
+                    ? "border-destaque font-semibold text-destaque"
+                    : "border-transparent text-tinta-suave hover:text-tinta")
+                }
+              >
+                {rotulo}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="flex items-center gap-3 justify-self-end">
+          {eu === null && (
+            <Link href="/login" className="whitespace-nowrap font-semibold text-destaque hover:underline">
+              Entrar
+            </Link>
+          )}
+          {/* O modo noturno vale para todo mundo; o "Sair", só para quem entrou. */}
+          {eu !== undefined && <Configuracoes logado={eu !== null} />}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+// O botão de engrenagem e a caixa que ele abre: modo noturno e sair. Fecha ao
+// clicar fora ou ao apertar Esc (aí o foco volta para a engrenagem, para quem
+// usa o teclado não se perder). É uma lista simples de botões, percorrida com
+// Tab, e não um "menu" de leitor de tela, que exigiria navegar pelas setas.
+function Configuracoes({ logado }: { logado: boolean }) {
+  const [aberto, setAberto] = useState(false);
+  const [noturno, setNoturno] = useState(false);
+  const caixa = useRef<HTMLDivElement>(null);
+  const engrenagem = useRef<HTMLButtonElement>(null);
+
+  // O modo atual: o que a pessoa escolheu antes ou, sem escolha, o do sistema.
+  useEffect(() => {
+    const escolhido = document.documentElement.dataset.tema;
+    setNoturno(
+      escolhido ? escolhido === "noturno" : window.matchMedia("(prefers-color-scheme: dark)").matches,
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!aberto) return;
+    function cliqueFora(e: MouseEvent) {
+      if (caixa.current && !caixa.current.contains(e.target as Node)) setAberto(false);
+    }
+    function esc(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setAberto(false);
+        engrenagem.current?.focus();
+      }
+    }
+    document.addEventListener("mousedown", cliqueFora);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("mousedown", cliqueFora);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [aberto]);
+
+  function trocarModo() {
+    const tema = noturno ? "claro" : "noturno";
+    document.documentElement.dataset.tema = tema;
+    try {
+      localStorage.setItem("tema", tema);
+    } catch {
+      // Navegação anônima pode bloquear o localStorage: o modo vale só agora.
+    }
+    setNoturno(!noturno);
+  }
+
+  function sair() {
+    // A Pessoa A completa isto com a auth (apagar a sessão no backend).
+    try {
+      localStorage.removeItem("token");
+    } catch {
+      // Mesmo caso da troca de modo: sem localStorage, não há token salvo.
+    }
+    window.location.href = "/login";
+  }
+
+  const item =
+    "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm hover:bg-destaque-fundo";
+
+  return (
+    <div ref={caixa} className="relative">
+      <button
+        ref={engrenagem}
+        type="button"
+        aria-label="Configurações"
+        aria-expanded={aberto}
+        aria-controls="configuracoes"
+        onClick={() => setAberto(!aberto)}
+        className={
+          "grid size-9 place-items-center rounded-lg border transition-colors " +
+          (aberto
+            ? "border-destaque bg-destaque-fundo text-destaque"
+            : "border-linha text-tinta-suave hover:text-tinta")
+        }
+      >
+        <Icone d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 8.92a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+      </button>
+
+      {aberto && (
+        <div
+          id="configuracoes"
+          className="absolute right-0 top-11 z-10 w-56 rounded-xl border border-linha bg-superficie p-1.5 shadow-[0_8px_24px_rgb(0_0_0/0.12)]"
+        >
+          <button type="button" role="switch" aria-checked={noturno} onClick={trocarModo} className={item}>
+            <Icone d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+            Modo noturno
+            <span
+              aria-hidden
+              className={
+                "ml-auto flex h-[18px] w-8 items-center rounded-full p-0.5 transition-colors " +
+                (noturno ? "justify-end bg-destaque" : "justify-start bg-tinta-suave")
+              }
+            >
+              <span className="size-3.5 rounded-full bg-superficie" />
+            </span>
+          </button>
+          {/* "Editar perfil" entra aqui quando a edição do perfil existir (ter 24). */}
+          {logado && (
+            <>
+              <div className="my-1 border-t border-linha" />
+              <button type="button" onClick={sair} className={item + " text-tinta-suave"}>
+                <Icone d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                Sair
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Ícone de traço simples, sempre do mesmo tamanho e espessura.
+function Icone({ d }: { d: string }) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="size-[18px] flex-none"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={d} />
+    </svg>
+  );
+}
