@@ -89,8 +89,11 @@ as decisões mudarem.
   sequência contada em semanas, ou dias com folgas semanais.
 - **Escolha:** a ofensiva conta dias estudados, e só posts com tag de matéria
   contam. Cada pessoa tem 2 folgas por semana (de segunda a domingo, no horário
-  de Brasília). A folga é usada automaticamente: mantém a ofensiva, mas não
-  soma ao número. Quando a ofensiva quebra, o perfil mostra o recorde ao lado.
+  de Brasília), e no máximo 2 dias seguidos sem estudar: o terceiro quebra a
+  ofensiva, para a semana virando não permitir 4 dias parados. A folga é usada
+  automaticamente: mantém a ofensiva, mas não soma ao número. O dia de hoje só
+  conta depois que acaba. Quando a ofensiva quebra, o perfil mostra o recorde
+  ao lado.
   O número aparece no perfil, mas nunca numa lista ou ranking.
 - **O que cortamos e por quê:** o streak sem folga, porque pune o descanso; e
   a contagem por semanas, porque o número cresce devagar e motiva menos.
