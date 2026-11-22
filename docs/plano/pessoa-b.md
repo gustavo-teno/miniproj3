@@ -11,15 +11,15 @@ trava outra pessoa vira issue, com o link aqui.
 ## Plano
 
 **Sáb 21: base visual.** Não depende do esqueleto, começa logo.
-- [ ] Revisar e aprovar o PR do esqueleto da Pessoa A (#22), porque todo mundo
+- [x] Revisar e aprovar o PR do esqueleto da Pessoa A (#22), porque todo mundo
     parte dele.
-- [ ] `layout.tsx`: navegação com Feed, Turmas, Perfil e Sair.
-- [ ] Identidade de caderno (decisão 2): fonte, cores, fundo de papel e uma cor por
+- [x] `layout.tsx`: navegação com Feed, Turmas, Perfil e Sair.
+- [x] Identidade de caderno (decisão 2): fonte, cores, fundo de papel e uma cor por
     matéria, num mapa único `tag → cor` que todas as telas usam. Os nomes das
     matérias vêm de `GET /opcoes`, não de uma cópia no front.
-- [ ] Nome da rede provisório, numa constante só, para trocar em um lugar quando o
+- [x] Nome da rede provisório, numa constante só, para trocar em um lugar quando o
     time decidir (até quarta, antes do vídeo).
-- [ ] `lib/api.ts`: enquanto o login não existe, mandar o header `X-User-Id`
+- [x] `lib/api.ts`: enquanto o login não existe, mandar o header `X-User-Id`
     (de uma variável de ambiente, só em desenvolvimento). Tipos novos: `Post`,
     `Perfil`.
 
@@ -71,3 +71,10 @@ compartilhados.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **dom 22:** base visual pronta. Troquei a identidade de caderno pautado por um
+  layout de rede social mais limpo (Lexend, cores suaves, modo noturno e um
+  símbolo e uma cor para cada matéria); o caderno ficou na organização do
+  perfil por matéria. Na navegação, "Perfil" virou "Meu diário" e o "Sair" foi
+  para a engrenagem de configurações; "Mensagens" fica escondida até as DMs
+  existirem. Proposta para o time: tipos de post (#relato, #dica, #dúvida,
+  #desabafo) e uma foto por post, o que muda o contrato do Post.
