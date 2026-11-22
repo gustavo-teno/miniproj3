@@ -77,12 +77,12 @@ export type Page<T> = {
   limit: number;
 };
 
-// ---- quem está usando (Pessoa A troca para /auth/eu no Passo 3 da auth) ----
+// ---- quem está usando (GET /auth/eu: aceita o token do login e o X-User-Id) ----
 
 export type Eu = { id: number; username: string };
 
 export function buscarEu(): Promise<Eu> {
-  return apiGet<Eu>("/usuarios/eu-temporario");
+  return apiGet<Eu>("/auth/eu");
 }
 
 // ---- listas fixas do contrato (GET /opcoes, backend/app/constantes.py) ----
