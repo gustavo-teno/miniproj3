@@ -1,9 +1,7 @@
-from datetime import datetime, timezone
-
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db import Base
+from app.db import Base, CriadoEm
 
 
 class Like(Base):
@@ -13,6 +11,4 @@ class Like(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), index=True)
-    created_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc)
-    )
+    created_at: Mapped[CriadoEm]
