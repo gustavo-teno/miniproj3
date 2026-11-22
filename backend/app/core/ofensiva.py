@@ -13,11 +13,14 @@ As regras:
   dia não soma ao número.
 - São 2 folgas por semana (segunda a domingo); elas renovam toda segunda.
 - No máximo 2 dias seguidos sem estudar: o terceiro quebra a ofensiva, mesmo
-  com folga sobrando (decisão do Gustavo em 22/11, para a semana virando não
-  permitir 4 dias parados).
+  com folga sobrando (para a semana virando não permitir 4 dias parados).
+- Quando a ofensiva quebra, as folgas da semana voltam: a ofensiva nova não
+  herda as folgas que a velha gastou.
 - Hoje fica em aberto: se a pessoa ainda não postou, o dia não gasta folga
   nem quebra nada até acabar.
 - O recorde é a maior ofensiva que a pessoa já teve, inclusive a atual.
+- Se hoje não sobra folga (ou já são 2 dias seguidos sem estudo), a pessoa
+  precisa estudar hoje para não quebrar: a tela usa isso para avisar.
 
 Custo: O(D), em que D é o número de dias entre o primeiro post de matéria e
 hoje. Cada dia é olhado uma vez, e "estudou neste dia?" é consulta num set,
@@ -42,6 +45,8 @@ class Ofensiva:
     recorde: int
     # Folgas que a ofensiva atual já gastou nesta semana (0 se não há ofensiva).
     folgas_usadas_na_semana: int
+    # True se, sem post de matéria hoje, a ofensiva quebra à meia-noite.
+    precisa_estudar_hoje: bool = False
 
 
 def dia_em_brasilia(momento: datetime) -> date:
@@ -50,6 +55,12 @@ def dia_em_brasilia(momento: datetime) -> date:
     if momento.tzinfo is None:
         momento = momento.replace(tzinfo=timezone.utc)
     return momento.astimezone(BRASILIA).date()
+
+
+def hoje_em_brasilia(agora: datetime | None = None) -> date:
+    """O dia de hoje em Brasília. Use isto, e não date.today(): o servidor
+    pode estar em UTC, e depois das 21h de Brasília lá já é o dia seguinte."""
+    return dia_em_brasilia(agora or datetime.now(timezone.utc))
 
 
 def calcular(dias_com_estudo: Iterable[date], hoje: date) -> Ofensiva:
@@ -84,6 +95,7 @@ def calcular(dias_com_estudo: Iterable[date], hoje: date) -> Ofensiva:
             else:
                 atual = 0
                 sem_estudo_seguidos = 0
+                folgas_na_semana = 0  # a próxima ofensiva começa com as folgas
 
         dia += timedelta(days=1)
 
@@ -93,4 +105,18 @@ def calcular(dias_com_estudo: Iterable[date], hoje: date) -> Ofensiva:
     if ultimo < segunda_desta_semana:
         folgas_na_semana = 0
     folgas = folgas_na_semana if atual > 0 else 0
-    return Ofensiva(atual=atual, recorde=recorde, folgas_usadas_na_semana=folgas)
+
+    precisa = (
+        atual > 0
+        and hoje not in dias
+        and (
+            folgas >= FOLGAS_POR_SEMANA
+            or sem_estudo_seguidos >= MAX_DIAS_SEGUIDOS_SEM_ESTUDO
+        )
+    )
+    return Ofensiva(
+        atual=atual,
+        recorde=recorde,
+        folgas_usadas_na_semana=folgas,
+        precisa_estudar_hoje=precisa,
+    )

@@ -48,7 +48,9 @@ trava outra pessoa vira issue, com o link aqui.
     devolve a ofensiva atual e o recorde, com 2 folgas por semana (segunda a
     domingo, horário de Brasília).
 - [x] Testes dos casos de borda: semana virando, post perto da meia-noite, folga
-    que não soma, ofensiva quebrada com recorde, post de bate-papo que não conta.
+    que não soma, ofensiva quebrada com recorde.
+- [ ] Teste do post de bate-papo que não conta (fica para quarta, junto com a
+    rota, que é quem separa matéria de bate-papo).
 
 **Qua 25: ofensiva no produto.**
 - [ ] `GET /usuarios/{username}/ofensiva` → ofensiva atual, recorde e o resumo da
@@ -67,4 +69,5 @@ em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **dom 22:** revisão antes da Camila: a ofensiva nova herdava as folgas gastas pela que quebrou (agora zera), e na segunda depois de sáb e dom parados a tela ia mostrar folga sobrando quando a pessoa precisa postar (novo campo `precisa_estudar_hoje`). Criei `hoje_em_brasilia()` para a rota de quarta não usar o dia do servidor.
 - **dom 22:** cálculo da ofensiva adiantado (era de terça) enquanto o PR da auth espera revisão. Regra nova: no máximo 2 dias seguidos sem estudar, senão sábado, domingo, segunda e terça davam 4 dias parados (DECISIONS, decisão 4). Hoje sem post fica em aberto até a meia-noite. Brasília como UTC-3 fixo, sem `zoneinfo`, que no Windows pede pacote extra. O teste de "bate-papo não conta" fica para quarta: quem separa matéria de bate-papo é a rota, não o cálculo.

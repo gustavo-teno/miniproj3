@@ -5,7 +5,7 @@ Os dias são de novembro de 2026: 16/11 é segunda e 22/11 é domingo.
 
 from datetime import date, datetime, timedelta, timezone
 
-from app.core.ofensiva import calcular, dia_em_brasilia
+from app.core.ofensiva import calcular, dia_em_brasilia, hoje_em_brasilia
 
 
 def nov(*dias: int) -> list[date]:
@@ -95,3 +95,35 @@ def test_post_perto_da_meia_noite_e_do_dia_de_brasilia():
     assert dia_em_brasilia(utc.replace(tzinfo=None)) == date(2026, 11, SEG)
     # 00h10 de terça em Brasília já é terça
     assert dia_em_brasilia(utc + timedelta(minutes=20)) == date(2026, 11, TER)
+
+
+def test_ofensiva_nova_nao_herda_folgas_da_que_quebrou():
+    # seg, (ter, qua, qui: quebra na qui), sex recomeça, (sáb folga), dom
+    o = calcular(nov(SEG, SEX, DOM), hoje=date(2026, 11, DOM))
+    assert (o.atual, o.folgas_usadas_na_semana) == (2, 1)
+
+
+def test_precisa_estudar_hoje_sem_folga_sobrando():
+    # faltou só ter: quinta de manhã ainda sobra 1 folga
+    o = calcular(nov(SEG, QUA), hoje=date(2026, 11, QUI))
+    assert o.precisa_estudar_hoje is False
+    # faltou ter e qui: sexta de manhã, sem folga, precisa postar
+    o = calcular(nov(SEG, QUA), hoje=date(2026, 11, SEX))
+    assert o.precisa_estudar_hoje is True
+
+
+def test_segunda_depois_de_dois_dias_parados_precisa_estudar():
+    # faltou sáb e dom: segunda tem folga nova, mas seria o 3º dia seguido
+    o = calcular(nov(QUA, QUI, SEX), hoje=date(2026, 11, SEG2))
+    assert (o.folgas_usadas_na_semana, o.precisa_estudar_hoje) == (0, True)
+
+
+def test_quem_ja_postou_hoje_nao_precisa_estudar():
+    o = calcular(nov(SEG, QUA, SEX, SAB), hoje=date(2026, 11, SAB))
+    assert o.precisa_estudar_hoje is False
+
+
+def test_hoje_em_brasilia_nao_usa_o_dia_do_servidor():
+    # 22h de domingo em Brasília = 01h de segunda em UTC
+    agora = datetime(2026, 11, 23, 1, 0, tzinfo=timezone.utc)
+    assert hoje_em_brasilia(agora) == date(2026, 11, DOM)
