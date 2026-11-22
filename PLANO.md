@@ -13,9 +13,8 @@ Quem faz o quê até a entrega (sexta, 27/11). O produto está no
 ## Quem faz o quê
 
 O plano tem quatro papéis: A (Back), B (Front), C (Dados) e D (Reforço). Cada
-pessoa escolhe um. Como só o Gustavo e a Camila estão disponíveis no fim de
-semana, **A e B ficam entre os dois**, e **C e D ficam entre a Clarisse e o
-Pedro**, que começam na segunda.
+pessoa escolhe um. O Gustavo e a Camila, disponíveis no fim de semana, ficaram
+com A e B. **C e D ficam entre a Clarisse e o Pedro**, que começam na segunda.
 
 Seguindo o guia 07, ninguém fica só numa camada: cada pessoa faz as próprias
 features de ponta a ponta (backend, tela e testes). A área é o que ela cuida e
@@ -23,10 +22,10 @@ revisa nos PRs dos outros.
 
 | Papel | Quem | GitHub | Começa | Área | Features (na ordem) |
 |---|---|---|---|---|---|
-| A | _a escolher_ | | sáb 21 | Backend: models, routers, services, `main.py` | Esqueleto → Auth → Ofensiva que perdoa |
-| B | _a escolher_ | | sáb 21 | Frontend: layout, navegação, `lib/api.ts`, identidade visual | Base visual → Posts → Perfil-diário |
-| C | _a escolher_ | | seg 23 | Dados: seed, `core/` e deploy | Curtidas → Comentários → Seed fake → Deploy |
-| D | _a escolher_ | | seg 23 | Reforço: testes e o fluxo inteiro na tela | Follow → Feed → Turmas |
+| A | Gustavo | @gustavo-teno | sáb 21 | Backend: models, routers, services, `main.py` | Esqueleto → Auth → Ofensiva que perdoa |
+| B | Camila | @camilaabmf | sáb 21 | Frontend: layout, navegação, `lib/api.ts`, identidade visual | Base visual → Posts → Perfil-diário |
+| C | _a definir_ | | seg 23 | Dados: seed, `core/` e deploy | Curtidas → Comentários → Seed fake → Deploy |
+| D | _a definir_ | | seg 23 | Reforço: testes e o fluxo inteiro na tela | Follow → Feed → Turmas |
 
 GitHub do time: @gustavo-teno, @camilaabmf, @clarissegabriela31-coder,
 @Pedrolk647.
@@ -77,6 +76,11 @@ turma:
 não decidiu o curso entra nesta). As listas são curtas de propósito: a rede é
 pequena, e opção demais deixaria as turmas vazias.
 
+**Uma fonte só para as listas:** o backend guarda as três em
+`app/constantes.py` e as entrega na rota `GET /opcoes`. As telas (cadastro,
+post, perfil e turmas) leem as listas dessa rota em vez de copiá-las. No
+front fica só o que é visual, como a cor de cada matéria.
+
 As folgas da ofensiva são fixas (2 por semana, decisão 4), então não há campo
 de folgas no `User`.
 
@@ -93,6 +97,16 @@ A tag tem padrão `bate-papo` na API para que os testes do núcleo, que postam s
 com `texto`, continuem passando. **Na tela, escolher a tag é obrigatório**
 (decisão 2).
 
+**Arquivos que mais de uma pessoa usa:**
+- **`routers/users.py` é da Pessoa B**: o perfil (`GET /usuarios/{username}`,
+  `PATCH /usuarios/eu` e os posts do perfil) fica nele. O follow (D, em
+  `follows.py`) e a ofensiva (A, em `ofensiva.py`) também começam com
+  `/usuarios`, mas cada um no próprio arquivo.
+- **O formato do post é da Pessoa B**: ela define o `PostOut` (o que a API
+  devolve de um post) e o `<CardPost>`. A Pessoa C acrescenta nele as
+  curtidas e o número de comentários. Feed, perfil e turmas usam esse mesmo
+  formato e esse mesmo card, sem criar o seu.
+
 As rotas e os status seguem os testes em `backend/tests/test_nucleo.py`. A
 tabela "Quem depende de quem" do guia 07 mostra qual teste precisa de qual
 rota.
@@ -101,12 +115,12 @@ rota.
 
 | Dia | A (Back) | B (Front) | C (Dados) | D (Reforço) |
 |---|---|---|---|---|
-| **sáb 21** | Esqueleto (PR pequeno, B revisa) | Base visual | | |
+| **sáb 21** | Esqueleto (PR pequeno, B revisa) | Base visual + revisar o esqueleto | | |
 | **dom 22** | Auth no backend | Posts: backend + tela + card | | |
 | **seg 23** | Auth na tela | Perfil: backend + topo com a meta | Curtidas | Follow |
 | **ter 24** | Ofensiva: cálculo em `core/` + testes | Perfil: divisórias e edição | Comentários | Feed + tirar os `@skip` |
-| **qua 25** | Ofensiva: rota, componente e resumo da semana | Ajustes visuais nas telas de todo mundo | Seed com cara de vestibulando | Turmas |
-| **qui 26** | DECISIONS: escolha técnica | Gravar o vídeo | Deploy (+10) | Revisar o fluxo inteiro na tela |
+| **qua 25** | Ofensiva: rota, componente e resumo da semana | Ajustes visuais nas telas de todo mundo + roteiro do vídeo | Seed com cara de vestibulando | Turmas |
+| **qui 26** | DECISIONS: escolha técnica | Gravar o vídeo (local, com o seed) | Deploy (+10) | Revisar o fluxo inteiro na tela |
 | **sex 27** | **Todos:** pitch, uso de IA no DECISIONS, folga para imprevistos e entrega | | | |
 
 **Meta da terça à noite:** o fluxo cadastro → login → post → follow → feed
