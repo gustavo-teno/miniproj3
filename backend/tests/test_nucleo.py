@@ -45,7 +45,6 @@ def test_auth_login(client):
     assert r.status_code == 401
 
 
-@pytest.mark.skip(reason="Remova ao implementar GET /auth/eu + get_current_user real (núcleo; guia 01, Passo 3)")
 def test_auth_eu(client, logar):
     headers = logar("ana", "Ana")
 

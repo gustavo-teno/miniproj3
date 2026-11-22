@@ -43,3 +43,11 @@ def login(db: Session, dados: LoginIn) -> str:
     db.add(sessao)
     db.commit()
     return sessao.token
+
+
+def logout(db: Session, token: str) -> None:
+    """Sair é apagar a sessão: o token para de valer na hora."""
+    sessao = db.get(Sessao, token)
+    if sessao:
+        db.delete(sessao)
+        db.commit()

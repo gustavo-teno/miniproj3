@@ -64,3 +64,16 @@ def test_cada_login_gera_um_token_diferente(client):
     t1 = client.post("/auth/login", json=corpo).json()["token"]
     t2 = client.post("/auth/login", json=corpo).json()["token"]
     assert t1 != t2
+
+
+def test_logout_invalida_o_token(client, logar):
+    ana = logar("ana")
+    assert client.get("/auth/eu", headers=ana).status_code == 200
+    assert client.post("/auth/logout", headers=ana).status_code == 204
+    assert client.get("/auth/eu", headers=ana).status_code == 401
+
+
+def test_token_inventado_ou_mal_formatado_da_401(client, logar):
+    logar("ana")
+    for header in ("Bearer inventado", "inventado", "Bearer ", "Basic abc"):
+        assert client.get("/auth/eu", headers={"Authorization": header}).status_code == 401
