@@ -1,4 +1,10 @@
+"use client";
+
+import { useExigeLogin } from "@/lib/useExigeLogin";
+
 export default function Home() {
+  // O feed é só de quem entrou: sem login, vai para /login.
+  useExigeLogin();
   return (
     <div className="space-y-3">
       <h1 className="text-2xl font-bold">Feed</h1>

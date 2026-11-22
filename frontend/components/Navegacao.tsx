@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { buscarEu, type Eu } from "@/lib/api";
+import { buscarEu, sair, type Eu } from "@/lib/api";
 import { NOME_REDE } from "@/lib/rede";
 
 // As DMs são opcionais (decisão 6). A aba só aparece quando a tela existir.
@@ -123,14 +123,14 @@ function Configuracoes({ logado }: { logado: boolean }) {
     setNoturno(!noturno);
   }
 
-  function sair() {
-    // A Pessoa A completa isto com a auth (apagar a sessão no backend).
+  async function clicarSair() {
     try {
-      localStorage.removeItem("token");
-    } catch {
-      // Mesmo caso da troca de modo: sem localStorage, não há token salvo.
+      await sair();
+    } finally {
+      // Recarrega a página inteira (e não só troca de tela) para o topo e as
+      // telas esquecerem quem estava logado.
+      window.location.href = "/login";
     }
-    window.location.href = "/login";
   }
 
   const item =
@@ -177,7 +177,7 @@ function Configuracoes({ logado }: { logado: boolean }) {
           {logado && (
             <>
               <div className="my-1 border-t border-linha" />
-              <button type="button" onClick={sair} className={item + " text-tinta-suave"}>
+              <button type="button" onClick={clicarSair} className={item + " text-tinta-suave"}>
                 <Icone d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
                 Sair
               </button>
