@@ -44,18 +44,34 @@ trava outra pessoa vira issue, com o link aqui.
     página da turma.
 
 **Ter 24: cálculo da ofensiva.**
-- [ ] `app/core/ofensiva.py`, em Python puro: recebe os dias com post de matéria e
+- [x] `app/core/ofensiva.py`, em Python puro: recebe os dias com post de matéria e
     devolve a ofensiva atual e o recorde, com 2 folgas por semana (segunda a
     domingo, horário de Brasília).
-- [ ] Testes dos casos de borda: semana virando, post perto da meia-noite, folga
-    que não soma, ofensiva quebrada com recorde, post de bate-papo que não conta.
+- [x] Testes dos casos de borda: semana virando, post perto da meia-noite, folga
+    que não soma, ofensiva quebrada com recorde.
+- [ ] Teste do post de bate-papo que não conta (fica para quarta, junto com a
+    rota, que é quem separa matéria de bate-papo).
 
 **Qua 25: ofensiva no produto.**
 - [ ] `GET /usuarios/{username}/ofensiva` → ofensiva atual, recorde e o resumo da
     semana (horas desta semana e da passada, somando os `minutos` dos posts).
 - [ ] Componente `<Ofensiva username=... />` com o número, o recorde ao lado
     quando quebrou, e o "esta semana: 12h, semana passada: 9h".
-- **Combinar com B:** onde o componente entra no topo do perfil.
+- [ ] O fogo da ofensiva muda de cor com a ofensiva atual, como a temperatura
+    de uma chama (do mais frio ao mais quente): 1 a 6 dias vermelho, 7 a 13
+    laranja, 14 a 29 amarelo, 30 a 59 branco, 60 a 99 azul-claro, 100 ou mais
+    azul (combinado com a Camila em 22/11; os tons exatos ela ajusta para o
+    modo claro e o noturno, cuidado com o branco no fundo claro). Sem nomes
+    de nível, para não virar comparação. Quebrou, a cor volta ao início junto com o número.
+- [ ] Legenda das cores, para não depender só da cor:
+    - Computador: passar o mouse mostra "N dias seguidos"; clicar abre uma
+      telinha com a legenda (qual cor é qual faixa, marcando a da pessoa).
+    - Celular (sem mouse): tocar mostra "N dias seguidos" com uma setinha;
+      tocar na setinha abre a mesma telinha da legenda.
+- **Combinar com B:** onde o componente entra no topo do perfil, e os tons
+    exatos do fogo (não confundir com as cores das matérias).
+- [x] Registrar na decisão 4 do DECISIONS.md, com o porquê de cor em vez de
+    títulos (tipo "Excursionista" e "Patrulheiro")
 
 **Qui 26:** escrever a escolha técnica no DECISIONS.md (por que a ofensiva fica
 em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
@@ -67,4 +83,7 @@ em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **dom 22:** a Camila topou o fogo que muda de cor com a ofensiva (6 faixas, do vermelho ao azul, como a temperatura de uma chama) e a legenda no clique/setinha. Registrado na decisão 4.
+- **dom 22:** revisão antes da Camila: a ofensiva nova herdava as folgas gastas pela que quebrou (agora zera), e na segunda depois de sáb e dom parados a tela ia mostrar folga sobrando quando a pessoa precisa postar (novo campo `precisa_estudar_hoje`). Criei `hoje_em_brasilia()` para a rota de quarta não usar o dia do servidor.
+- **dom 22:** cálculo da ofensiva adiantado (era de terça) enquanto o PR da auth espera revisão. Regra nova: no máximo 2 dias seguidos sem estudar, senão sábado, domingo, segunda e terça davam 4 dias parados (DECISIONS, decisão 4). Hoje sem post fica em aberto até a meia-noite. Brasília como UTC-3 fixo, sem `zoneinfo`, que no Windows pede pacote extra. O teste de "bate-papo não conta" fica para quarta: quem separa matéria de bate-papo é a rota, não o cálculo.
 - **dom 22:** auth no backend pronta. Além do guia: `POST /auth/logout` apaga a sessão no banco, e o cadastro valida a meta contra as listas. Tirei a `/usuarios/eu-temporario` e troquei o `buscarEu()` do `api.ts` para `/auth/eu`, como a Camila tinha deixado combinado no código.
