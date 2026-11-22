@@ -1,7 +1,7 @@
-# Pessoa B (Front): Base visual → Posts → Perfil-diário
+# Pessoa B — Camila (Front): Base visual → Posts → Perfil-diário
 
-Plano e diário de progresso da Pessoa B. Quem ocupa o papel está na
-tabela "Quem faz o quê" do [PLANO.md](../../PLANO.md), junto com o cronograma
+Plano e diário de progresso da Pessoa B, que é a Camila (@camilaabmf). O
+papel está na tabela "Quem faz o quê" do [PLANO.md](../../PLANO.md), junto com o cronograma
 do time e o contrato.
 
 **Como usar:** marque `[x]` no que ficou pronto, no mesmo PR da tarefa. Anote
@@ -11,7 +11,7 @@ trava outra pessoa vira issue, com o link aqui.
 ## Plano
 
 **Sáb 21: base visual.** Não depende do esqueleto, começa logo.
-- [ ] Revisar e aprovar o PR do esqueleto da Pessoa A (#22), porque todo mundo
+- [ ] Revisar e aprovar o PR do esqueleto da Pessoa A (Gustavo, #22), porque todo mundo
     parte dele.
 - [ ] `layout.tsx`: navegação com Feed, Turmas, Perfil e Sair.
 - [ ] Identidade de caderno (decisão 2): fonte, cores, fundo de papel e uma cor por
