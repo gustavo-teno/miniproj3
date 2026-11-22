@@ -8,7 +8,13 @@ import "./globals.css";
 // Lexend: feita para leitura fluente, em três pesos. A mono deixa números
 // (1h30, 45min) e @usuário alinhados e discretos.
 const texto = Lexend({ subsets: ["latin"], weight: ["300", "400", "600"], variable: "--fonte-texto" });
-const numeros = Atkinson_Hyperlegible_Mono({ subsets: ["latin"], weight: ["400"], variable: "--fonte-numeros" });
+const numeros = Atkinson_Hyperlegible_Mono({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--fonte-numeros",
+  // O Next não tem as medidas dessa fonte para ajustar a reserva e avisava no build.
+  adjustFontFallback: false,
+});
 
 export const metadata: Metadata = {
   title: NOME_REDE,

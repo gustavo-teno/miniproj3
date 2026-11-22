@@ -31,12 +31,13 @@ export function Navegacao() {
 
   return (
     <header className="border-b border-linha bg-superficie">
-      <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-6">
-        <Link href="/" className="justify-self-start text-lg font-semibold text-tinta">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:px-6">
+        {/* No celular o nome some para as abas caberem: o Feed já leva ao início. */}
+        <Link href="/" className="hidden justify-self-start text-lg font-semibold text-tinta sm:block">
           {NOME_REDE}
         </Link>
 
-        <nav aria-label="Principal" className="flex gap-8">
+        <nav aria-label="Principal" className="flex gap-4 sm:gap-8">
           {abas.map(({ href, rotulo }) => {
             // O endereço exato ou uma página dentro dele: /u/ada e /u/ada/editar
             // acendem "Meu diário", mas /u/ada2 (outra pessoa) não.
@@ -48,7 +49,7 @@ export function Navegacao() {
                 href={href}
                 aria-current={ativa ? "page" : undefined}
                 className={
-                  "border-b-[3px] py-4 text-[17px] transition-colors " +
+                  "whitespace-nowrap border-b-[3px] py-4 text-[15px] transition-colors sm:text-[17px] " +
                   (ativa
                     ? "border-destaque font-semibold text-destaque"
                     : "border-transparent text-tinta-suave hover:text-tinta")
@@ -60,13 +61,14 @@ export function Navegacao() {
           })}
         </nav>
 
-        <div className="justify-self-end">
+        <div className="flex items-center gap-3 justify-self-end">
           {eu === null && (
-            <Link href="/login" className="font-semibold text-destaque hover:underline">
+            <Link href="/login" className="whitespace-nowrap font-semibold text-destaque hover:underline">
               Entrar
             </Link>
           )}
-          {eu && <Configuracoes />}
+          {/* O modo noturno vale para todo mundo; o "Sair", só para quem entrou. */}
+          {eu !== undefined && <Configuracoes logado={eu !== null} />}
         </div>
       </div>
     </header>
@@ -77,7 +79,7 @@ export function Navegacao() {
 // clicar fora ou ao apertar Esc (aí o foco volta para a engrenagem, para quem
 // usa o teclado não se perder). É uma lista simples de botões, percorrida com
 // Tab, e não um "menu" de leitor de tela, que exigiria navegar pelas setas.
-function Configuracoes() {
+function Configuracoes({ logado }: { logado: boolean }) {
   const [aberto, setAberto] = useState(false);
   const [noturno, setNoturno] = useState(false);
   const caixa = useRef<HTMLDivElement>(null);
@@ -123,7 +125,11 @@ function Configuracoes() {
 
   function sair() {
     // A Pessoa A completa isto com a auth (apagar a sessão no backend).
-    localStorage.removeItem("token");
+    try {
+      localStorage.removeItem("token");
+    } catch {
+      // Mesmo caso da troca de modo: sem localStorage, não há token salvo.
+    }
     window.location.href = "/login";
   }
 
@@ -168,11 +174,15 @@ function Configuracoes() {
             </span>
           </button>
           {/* "Editar perfil" entra aqui quando a edição do perfil existir (ter 24). */}
-          <div className="my-1 border-t border-linha" />
-          <button type="button" onClick={sair} className={item + " text-tinta-suave"}>
-            <Icone d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
-            Sair
-          </button>
+          {logado && (
+            <>
+              <div className="my-1 border-t border-linha" />
+              <button type="button" onClick={sair} className={item + " text-tinta-suave"}>
+                <Icone d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                Sair
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
