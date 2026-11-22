@@ -161,6 +161,13 @@ entram na tabela "Quem faz o quê" de lá.
 | Turmas | Pessoa D | Quem acabou de chegar encontra quem tem a mesma meta e sai do feed vazio (decisão 5). |
 | DMs entre mútuos (opcional) | quem terminar antes | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
 
+**Login sem prazo de validade (escolha consciente).** O token do login vale
+até a pessoa clicar em sair, que apaga a sessão no banco. Uma validade (por
+exemplo, 30 dias) pediria uma data na sessão, uma checagem a mais em toda
+request e uma tela para o "sua sessão expirou". Para uma rede de teste com
+prazo de uma semana, não compensa. Num produto de verdade, seria a primeira
+melhoria da auth.
+
 ## Uma escolha técnica
 
 _(proposta, a confirmar pelo time)_ O cálculo da ofensiva fica em

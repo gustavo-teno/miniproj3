@@ -95,3 +95,26 @@ def test_registro_recusa_nome_so_de_espacos(client):
 def test_swagger_tem_o_botao_authorize(client):
     esquemas = client.get("/openapi.json").json()["components"]["securitySchemes"]
     assert esquemas["HTTPBearer"]["scheme"] == "bearer"
+
+
+def test_token_vale_mais_que_o_atalho_de_teste(client, logar, monkeypatch):
+    # Com NEXT_PUBLIC_DEV_USER_ID ligado, o front manda os dois headers.
+    monkeypatch.setenv("DEBUG", "true")
+    bia = logar("bia")
+    ana = logar("ana")
+    ana_id = client.get("/auth/eu", headers=ana).json()["id"]
+    bia_id = client.get("/auth/eu", headers=bia).json()["id"]
+
+    r = client.get("/auth/eu", headers={**ana, "X-User-Id": str(bia_id)})
+    assert r.json()["id"] == ana_id
+
+    # sem token, o atalho continua valendo
+    r = client.get("/auth/eu", headers={"X-User-Id": str(bia_id)})
+    assert r.json()["id"] == bia_id
+
+    # token que não vale não cai no atalho
+    r = client.get(
+        "/auth/eu",
+        headers={"Authorization": "Bearer inventado", "X-User-Id": str(bia_id)},
+    )
+    assert r.status_code == 401
