@@ -1,4 +1,11 @@
-"""Slice de exemplo completo: model → schema → service → router → página Next.
+"""Usuários e perfil-diário (#10, Pessoa B). Divide o prefixo /usuarios com
+follows.py (D) e ofensiva.py (A).
+
+Rotas previstas: GET /usuarios/{username}, PATCH /usuarios/eu e
+GET /usuarios/{username}/posts (testes do núcleo). GET /usuarios/{username}
+vai DEPOIS de /stats e /eu-temporario, senão captura esses caminhos.
+
+Slice de exemplo completo: model → schema → service → router → página Next.
 
 Toda feature nova imita este caminho. 1 arquivo por router — registre o seu
 com uma linha em main.py.
