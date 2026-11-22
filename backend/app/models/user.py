@@ -14,6 +14,8 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(80))
     bio: Mapped[str] = mapped_column(String(280), default="")
     avatar_url: Mapped[str] = mapped_column(String(300), default="")
+    # A senha nunca é guardada: só o hash bcrypt (guia 01). Nunca sai na API.
+    password_hash: Mapped[str] = mapped_column(String(100), default="")
     # A meta (decisão 3). vestibular e curso são chaves de app/constantes.py,
     # ou "" se a pessoa não escolheu. Os campos *_outro só valem com "outro".
     vestibular: Mapped[str] = mapped_column(String(30), default="")

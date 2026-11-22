@@ -5,4 +5,5 @@ from app.models.follow import Follow  # noqa: F401
 from app.models.like import Like  # noqa: F401
 from app.models.mensagem import Mensagem  # noqa: F401
 from app.models.post import Post  # noqa: F401
+from app.models.sessao import Sessao  # noqa: F401
 from app.models.user import User  # noqa: F401

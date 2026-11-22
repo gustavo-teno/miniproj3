@@ -24,12 +24,12 @@ trava outra pessoa vira issue, com o link aqui.
     `main`, porque todo mundo parte dele.
 
 **Dom 22: auth no backend** (guia 01, Passos 1 a 3).
-- [ ] Model `Session` (token opaco), senha com bcrypt.
-- [ ] `POST /auth/registro` (aceita `vestibular`, `curso` e `universidade`
+- [x] Model `Session` (token opaco), senha com bcrypt.
+- [x] `POST /auth/registro` (aceita `vestibular`, `curso` e `universidade`
     opcionais, para o cadastro já trazer a meta; recusa os usernames `eu` e
     `stats`, que são caminhos de `/usuarios`), `POST /auth/login`,
     `GET /auth/eu` e o `get_current_user` real, mantendo o bypass com `DEBUG`.
-- [ ] Tirar o `@skip` de `test_auth_registro`, `test_auth_login` e `test_auth_eu`.
+- [x] Tirar o `@skip` de `test_auth_registro`, `test_auth_login` e `test_auth_eu`.
     A partir daqui a fixture `logar` funciona e os outros testes podem destravar.
 
 **Seg 23: auth na tela.**
@@ -86,3 +86,4 @@ em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
 - **dom 22:** a Camila topou o fogo que muda de cor com a ofensiva (6 faixas, do vermelho ao azul, como a temperatura de uma chama) e a legenda no clique/setinha. Registrado na decisão 4.
 - **dom 22:** revisão antes da Camila: a ofensiva nova herdava as folgas gastas pela que quebrou (agora zera), e na segunda depois de sáb e dom parados a tela ia mostrar folga sobrando quando a pessoa precisa postar (novo campo `precisa_estudar_hoje`). Criei `hoje_em_brasilia()` para a rota de quarta não usar o dia do servidor.
 - **dom 22:** cálculo da ofensiva adiantado (era de terça) enquanto o PR da auth espera revisão. Regra nova: no máximo 2 dias seguidos sem estudar, senão sábado, domingo, segunda e terça davam 4 dias parados (DECISIONS, decisão 4). Hoje sem post fica em aberto até a meia-noite. Brasília como UTC-3 fixo, sem `zoneinfo`, que no Windows pede pacote extra. O teste de "bate-papo não conta" fica para quarta: quem separa matéria de bate-papo é a rota, não o cálculo.
+- **dom 22:** auth no backend pronta. Além do guia: `POST /auth/logout` apaga a sessão no banco, e o cadastro valida a meta contra as listas. Tirei a `/usuarios/eu-temporario` e troquei o `buscarEu()` do `api.ts` para `/auth/eu`, como a Camila tinha deixado combinado no código.
