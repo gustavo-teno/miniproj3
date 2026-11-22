@@ -1,30 +1,44 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Atkinson_Hyperlegible_Mono, Lexend } from "next/font/google";
+
+import { Navegacao } from "@/components/Navegacao";
+import { NOME_REDE, SLOGAN_REDE } from "@/lib/rede";
 import "./globals.css";
 
+// Lexend: feita para leitura fluente, em três pesos. A mono deixa números
+// (1h30, 45min) e @usuário alinhados e discretos.
+const texto = Lexend({ subsets: ["latin"], weight: ["300", "400", "600"], variable: "--fonte-texto" });
+const numeros = Atkinson_Hyperlegible_Mono({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--fonte-numeros",
+  // O Next não tem as medidas dessa fonte para ajustar a reserva e avisava no build.
+  adjustFontFallback: false,
+});
+
 export const metadata: Metadata = {
-  title: "Rede Social da Trilha",
-  description: "Mini-projeto 3 — troque este título pelo nome do seu nicho",
+  title: NOME_REDE,
+  description: `${NOME_REDE}: ${SLOGAN_REDE}`,
 };
+
+// Roda antes de a página aparecer: se a pessoa já escolheu um modo no menu de
+// configurações, aplica no <html> na hora, para a tela não piscar no modo
+// errado. Sem escolha salva, o CSS segue o modo do sistema.
+const aplicarTemaSalvo = `try{var t=localStorage.getItem("tema");if(t==="claro"||t==="noturno")document.documentElement.dataset.tema=t}catch(e){}`;
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
-      <body className="min-h-screen bg-zinc-50 text-zinc-900">
-        <nav className="border-b bg-white">
-          <div className="mx-auto flex max-w-3xl items-center gap-6 px-4 py-3">
-            <Link href="/" className="font-bold">
-              {/* troque pelo nome/logo do seu nicho */}
-              Rede da Trilha
-            </Link>
-            <Link href="/usuarios" className="text-sm text-zinc-600 hover:text-zinc-900">
-              Usuários
-            </Link>
-          </div>
-        </nav>
-        <main className="mx-auto max-w-3xl px-4 py-6">{children}</main>
+    // suppressHydrationWarning: o script acima muda o data-tema antes do React
+    // chegar, e sem isso o React reclamaria da diferença.
+    <html lang="pt-BR" className={`${texto.variable} ${numeros.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: aplicarTemaSalvo }} />
+      </head>
+      <body className="min-h-screen bg-fundo font-texto text-tinta">
+        <Navegacao />
+        <main className="mx-auto max-w-6xl px-6 py-6">{children}</main>
       </body>
     </html>
   );
