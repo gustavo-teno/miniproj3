@@ -71,10 +71,19 @@ compartilhados.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **dom 22:** revisão do Gustavo no mockup do feed: a faixa do topo mostrava o
+  perfil inteiro (nome, @, foto, bio, turmas e matérias) e espremia o feed. A
+  faixa vira uma linha só: foto pequena, caixa de escrever e botão
+  "Postar". Fiz duas versões (atalho em cima e embaixo) e fiquei
+  com a de cima (o "design 7"); o rascunho está em `/rascunho-feed`. O "há
+  2 h" virou "há 2h", e com menos de 1 hora aparecem só os minutos. A coluna de filtros fica só com as matérias. Testei seis
+  cores de destaque calmas e troquei o verde-água pela lavanda. Os tipos de
+  post (relato, dica, dúvida, desabafo) saíram de vez. O bate-papo (tag de post,
+  não as DMs) continua.
 - **dom 22:** base visual pronta. Troquei a identidade de caderno pautado por um
   layout de rede social mais limpo (Lexend, cores suaves, modo noturno e um
   símbolo e uma cor para cada matéria); o caderno ficou na organização do
   perfil por matéria. Na navegação, "Perfil" virou "Meu diário" e o "Sair" foi
   para a engrenagem de configurações; "Mensagens" fica escondida até as DMs
-  existirem. Proposta para o time: tipos de post (#relato, #dica, #dúvida,
-  #desabafo) e uma foto por post, o que muda o contrato do Post.
+  existirem. Proposta para o time: uma foto por post, o que muda o
+  contrato do Post.
