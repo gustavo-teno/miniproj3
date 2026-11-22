@@ -1,7 +1,5 @@
 """Regras dos posts (#9, Pessoa B). O router só recebe a chamada e chama daqui."""
 
-from datetime import timezone
-
 from fastapi import HTTPException
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
@@ -10,29 +8,7 @@ from app.models.comment import Comment
 from app.models.like import Like
 from app.models.post import Post
 from app.models.user import User
-from app.schemas.post import AutorOut, PostCriar, PostEditar, PostOut
-
-
-def para_out(db: Session, post: Post) -> PostOut:
-    """Monta o PostOut com o autor dentro.
-
-    O model Post só guarda o autor_id, então o autor é buscado à parte. Se um
-    dia o Post ganhar `autor = relationship("User")`, isto fica mais simples.
-    """
-    autor = db.get(User, post.autor_id)
-    # O SQLite não guarda o fuso: a hora volta sem ele, e o navegador acharia
-    # que é horário local (3 h de diferença no Brasil). Ela foi gravada em UTC.
-    criado = post.created_at
-    if criado.tzinfo is None:
-        criado = criado.replace(tzinfo=timezone.utc)
-    return PostOut(
-        id=post.id,
-        texto=post.texto,
-        tag=post.tag,
-        minutos=post.minutos,
-        created_at=criado,
-        autor=AutorOut.model_validate(autor),
-    )
+from app.schemas.post import PostCriar, PostEditar
 
 
 def buscar(db: Session, post_id: int) -> Post:
@@ -50,15 +26,15 @@ def _do_autor(db: Session, user: User, post_id: int) -> Post:
     return post
 
 
-def criar(db: Session, user: User, dados: PostCriar) -> PostOut:
+def criar(db: Session, user: User, dados: PostCriar) -> Post:
     post = Post(autor_id=user.id, **dados.model_dump())
     db.add(post)
     db.commit()
     db.refresh(post)
-    return para_out(db, post)
+    return post
 
 
-def editar(db: Session, user: User, post_id: int, dados: PostEditar) -> PostOut:
+def editar(db: Session, user: User, post_id: int, dados: PostEditar) -> Post:
     post = _do_autor(db, user, post_id)
 
     # exclude_unset: só o que veio no corpo do PATCH muda.
@@ -72,7 +48,7 @@ def editar(db: Session, user: User, post_id: int, dados: PostEditar) -> PostOut:
         setattr(post, campo, valor)
     db.commit()
     db.refresh(post)
-    return para_out(db, post)
+    return post
 
 
 def apagar(db: Session, user: User, post_id: int) -> None:
