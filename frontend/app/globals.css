@@ -46,6 +46,26 @@
   --sobre-destaque: #13171d;
 }
 
+/* A cor de uma matéria (etiqueta, quadrado do símbolo). O elemento recebe as
+   quatro cores da tag por estiloDaTag() (lib/materias.ts) e estas regras
+   escolhem o par do modo atual, do mesmo jeito que a paleta acima. */
+.cor-materia {
+  background-color: var(--materia-fundo);
+  color: var(--materia-texto);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .cor-materia {
+    background-color: var(--materia-fundo-noturno);
+    color: var(--materia-texto-noturno);
+  }
+}
+
+:root[data-tema="noturno"] .cor-materia {
+  background-color: var(--materia-fundo-noturno);
+  color: var(--materia-texto-noturno);
+}
+
 /* Partes que o navegador desenha sozinho também seguem a paleta: o texto
    selecionado e o contorno de foco de quem navega pelo teclado (Tab). */
 ::selection {
