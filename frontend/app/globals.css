@@ -12,8 +12,8 @@
   --linha: #e2e8e5; /* bordas e divisões */
   --tinta: #1e2a2c; /* texto principal */
   --tinta-suave: #5a6b6e; /* texto secundário */
-  --destaque: #2b7a78; /* só o que é seu e o item ativo */
-  --destaque-fundo: #e7f1f0; /* fundo suave do item ativo */
+  --destaque: #665f82; /* lavanda: só o que é seu e o item ativo */
+  --destaque-fundo: #efedf5; /* fundo suave do item ativo */
   --sobre-destaque: #ffffff; /* texto em cima do destaque (botões) */
 }
 
@@ -28,8 +28,8 @@
     --linha: #2a313b;
     --tinta: #e6eaf0;
     --tinta-suave: #9aa4b2;
-    --destaque: #6cc2bc;
-    --destaque-fundo: #1f3634;
+    --destaque: #bdb5d8;
+    --destaque-fundo: #2b2938;
     --sobre-destaque: #13171d;
   }
 }
@@ -41,8 +41,8 @@
   --linha: #2a313b;
   --tinta: #e6eaf0;
   --tinta-suave: #9aa4b2;
-  --destaque: #6cc2bc;
-  --destaque-fundo: #1f3634;
+  --destaque: #bdb5d8;
+  --destaque-fundo: #2b2938;
   --sobre-destaque: #13171d;
 }
 
@@ -63,6 +63,21 @@
 
 :root[data-tema="noturno"] .cor-materia {
   background-color: var(--materia-fundo-noturno);
+  color: var(--materia-texto-noturno);
+}
+
+/* Só o texto na cor da matéria, sem o fundo (o nome da matéria no card). */
+.cor-materia-texto {
+  color: var(--materia-texto);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .cor-materia-texto {
+    color: var(--materia-texto-noturno);
+  }
+}
+
+:root[data-tema="noturno"] .cor-materia-texto {
   color: var(--materia-texto-noturno);
 }
 
