@@ -8,7 +8,10 @@
 
 import { useRef, useState } from "react";
 
+import { CardPost } from "@/components/CardPost";
+import { FormPost } from "@/components/FormPost";
 import { SimboloMateria } from "@/components/SimboloMateria";
+import type { Post } from "@/lib/api";
 import { estiloDaTag } from "@/lib/materias";
 
 // Os nomes ficam aqui só porque o rascunho não fala com o backend. No feed de
@@ -34,6 +37,8 @@ const NOMES: Record<string, string> = Object.fromEntries(
   [...MATERIAS, BATE_PAPO].map((m) => [m.valor, m.nome]),
 );
 
+// Os posts de mentira, mais as curtidas e os comentários que a Pessoa C ainda
+// vai criar. Viram um Post de verdade em paraPost(), para usar o <CardPost>.
 type PostFalso = {
   id: number;
   autor: string;
@@ -45,7 +50,22 @@ type PostFalso = {
   curtidas: number;
 };
 
-const POSTS: PostFalso[] = [
+type PostDoRascunho = Post & { comentarios?: number; curtidas?: number };
+
+function paraPost(p: PostFalso): PostDoRascunho {
+  return {
+    id: -p.id, // negativo para não bater com o id de um post de verdade
+    autor: { id: 0, username: p.autor.split(" ")[0].toLowerCase(), name: p.autor, avatar_url: "" },
+    texto: p.texto,
+    tag: p.tag,
+    minutos: p.minutos ?? null,
+    created_at: new Date(Date.now() - p.minutosAtras * 60000).toISOString(),
+    comentarios: p.comentarios,
+    curtidas: p.curtidas,
+  };
+}
+
+const POSTS_FALSOS: PostFalso[] = [
   { id: 1, autor: "Maria Eduarda", minutosAtras: 25, tag: "biologia", minutos: 90,
     texto: "Revisei genética e fiz 20 questões de heredograma. Errei 6; amanhã refaço as de probabilidade.",
     comentarios: 4, curtidas: 12 },
@@ -61,25 +81,14 @@ const POSTS: PostFalso[] = [
     texto: "Linha do tempo da Era Vargas num papel só, colada na parede. Ajuda demais.", comentarios: 3, curtidas: 14 },
 ];
 
-// Há quanto tempo: com menos de 1 hora, só os minutos ("há 25min"); depois,
-// só as horas, sem os minutos ("há 2h"); depois de um dia, os dias ("há 1d").
-function tempoDesde(minutos: number) {
-  if (minutos < 60) return `há ${minutos}min`;
-  if (minutos < 24 * 60) return `há ${Math.floor(minutos / 60)}h`;
-  return `há ${Math.floor(minutos / (24 * 60))}d`;
-}
-
-function duracao(minutos: number) {
-  const h = Math.floor(minutos / 60);
-  const m = minutos % 60;
-  return h ? `${h}h${m ? String(m).padStart(2, "0") : ""}` : `${m}min`;
-}
-
 export function FeedRascunho() {
   const [materia, setMateria] = useState<string | null>(null);
   const [esconderBatePapo, setEsconderBatePapo] = useState(false);
+  // Começa com os de mentira; o que você posta pelo formulário vai para o
+  // banco de verdade e entra no topo.
+  const [todos, setTodos] = useState<PostDoRascunho[]>(() => POSTS_FALSOS.map(paraPost));
 
-  const posts = POSTS.filter(
+  const posts = todos.filter(
     (p) => (!materia || p.tag === materia) && !(esconderBatePapo && p.tag === "bate-papo"),
   );
 
@@ -94,11 +103,22 @@ export function FeedRascunho() {
         />
 
         <div className="min-w-0 space-y-3">
-          <Postar />
+          <FormPost onPostado={(novo) => setTodos((atuais) => [novo, ...atuais])} />
 
           <section aria-label="Posts" className="overflow-hidden rounded-2xl border border-linha bg-superficie">
             {posts.length ? (
-              posts.map((p) => <CardPost key={p.id} post={p} />)
+              posts.map((p) => (
+                <CardPost
+                  key={p.id}
+                  post={p}
+                  rodape={
+                    <>
+                      <span>{p.comentarios ?? 0} comentários</span>
+                      <span>{p.curtidas ?? 0} curtidas</span>
+                    </>
+                  }
+                />
+              ))
             ) : (
               <p className="p-6 text-sm text-tinta-suave">Nenhum post dessa matéria por enquanto.</p>
             )}
@@ -106,81 +126,6 @@ export function FeedRascunho() {
         </div>
       </div>
     </div>
-  );
-}
-
-// O atalho de postar: uma linha só (foto, caixa e botão). Ao clicar na caixa,
-// ela abre para escrever e mostra a matéria (obrigatória) e os minutos.
-function Postar() {
-  const [aberto, setAberto] = useState(false);
-  const [texto, setTexto] = useState("");
-  const campo = "rounded-lg border border-linha bg-superficie px-2 py-1.5 text-sm text-tinta";
-
-  if (!aberto) {
-    return (
-      <div className="flex items-center gap-3 rounded-2xl border border-linha bg-superficie p-2 pl-3">
-        <Avatar nome="Lara Andrade" />
-        <button
-          type="button"
-          onClick={() => setAberto(true)}
-          className="min-w-0 flex-1 truncate rounded-lg px-2 py-1.5 text-left text-tinta-suave hover:bg-fundo"
-        >
-          O que você estudou agora?
-        </button>
-        <button
-          type="button"
-          onClick={() => setAberto(true)}
-          className="whitespace-nowrap rounded-lg bg-destaque px-3 py-1.5 text-sm font-semibold text-sobre-destaque"
-        >
-          Postar
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        setTexto("");
-        setAberto(false);
-      }}
-      className="space-y-2 rounded-2xl border border-destaque bg-superficie p-3"
-    >
-      <div className="flex gap-3">
-        <Avatar nome="Lara Andrade" />
-        <textarea
-          autoFocus
-          rows={2}
-          value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-          placeholder="O que você estudou agora?"
-          aria-label="O que você estudou agora?"
-          className="min-w-0 flex-1 resize-none bg-transparent py-1 font-light text-tinta outline-none placeholder:text-tinta-suave"
-        />
-      </div>
-      <div className="flex flex-wrap items-center gap-2 pl-11">
-        <select required defaultValue="" aria-label="Matéria" className={campo}>
-          <option value="" disabled>
-            Matéria
-          </option>
-          {[...MATERIAS, BATE_PAPO].map((m) => (
-            <option key={m.valor} value={m.valor}>
-              {m.nome}
-            </option>
-          ))}
-        </select>
-        <input type="number" min={1} placeholder="min" aria-label="Minutos de estudo" className={campo + " w-20 font-numeros"} />
-        <div className="ml-auto flex gap-2">
-          <button type="button" onClick={() => setAberto(false)} className="rounded-lg px-3 py-1.5 text-sm text-tinta-suave hover:text-tinta">
-            Cancelar
-          </button>
-          <button type="submit" className="rounded-lg bg-destaque px-3 py-1.5 text-sm font-semibold text-sobre-destaque">
-            Postar
-          </button>
-        </div>
-      </div>
-    </form>
   );
 }
 
@@ -336,52 +281,5 @@ function Icone({ d }: { d: string }) {
     <svg aria-hidden viewBox="0 0 24 24" className="size-4 flex-none" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round">
       <path d={d} />
     </svg>
-  );
-}
-
-function CardPost({ post }: { post: PostFalso }) {
-  return (
-    <article className="flex gap-3 border-b border-linha p-4 last:border-b-0 sm:gap-4">
-      <span className="cor-materia grid size-11 flex-none place-items-center rounded-xl" style={estiloDaTag(post.tag)}>
-        <SimboloMateria tag={post.tag} className="size-5" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline gap-2">
-          <span className="cor-materia-texto font-semibold" style={estiloDaTag(post.tag)}>
-            {NOMES[post.tag]}
-          </span>
-          {post.minutos && <span className="font-numeros text-sm text-tinta-suave">{duracao(post.minutos)}</span>}
-        </div>
-        <p className="mt-1 flex items-center gap-2 text-sm">
-          <Avatar nome={post.autor} pequeno />
-          <span className="font-semibold">{post.autor}</span>
-          <span className="text-tinta-suave">{tempoDesde(post.minutosAtras)}</span>
-        </p>
-        <p className="mt-1.5 font-light leading-relaxed">{post.texto}</p>
-        <div className="mt-2 flex gap-6 text-sm text-tinta-suave">
-          <span>{post.comentarios} comentários</span>
-          <span>{post.curtidas} curtidas</span>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function Avatar({ nome, pequeno = false }: { nome: string; pequeno?: boolean }) {
-  const iniciais = nome
-    .split(" ")
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("");
-  return (
-    <span
-      aria-hidden
-      className={
-        "grid flex-none place-items-center rounded-full bg-destaque-fundo font-semibold text-destaque " +
-        (pequeno ? "size-6 text-[10px]" : "size-8 text-xs")
-      }
-    >
-      {iniciais}
-    </span>
   );
 }
