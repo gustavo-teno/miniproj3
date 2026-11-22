@@ -50,7 +50,7 @@ export function Campo({
 export function AvisoErro({ texto }: { texto: string | null }) {
   if (!texto) return null;
   return (
-    <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+    <p role="alert" className="rounded-lg border border-erro bg-erro-fundo p-3 text-sm text-erro">
       {texto}
     </p>
   );
