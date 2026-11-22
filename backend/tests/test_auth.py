@@ -41,3 +41,26 @@ def test_registro_guarda_texto_de_outro_so_com_outro(client):
     assert bia.vestibular_outro == "UFPE"
     # a senha vira hash, nunca é guardada como foi digitada
     assert bia.password_hash.startswith("$2") and SENHA not in bia.password_hash
+
+
+def test_login_usuario_inexistente_da_o_mesmo_401(client):
+    registrar(client)
+    errada = client.post("/auth/login", json={"username": "ana", "password": "errada"})
+    sumido = client.post("/auth/login", json={"username": "ninguem", "password": SENHA})
+    assert errada.status_code == sumido.status_code == 401
+    assert errada.json() == sumido.json()
+
+
+def test_login_de_usuario_sem_senha_da_401_e_nao_500(client):
+    # POST /usuarios (slice de exemplo) cria usuário sem senha.
+    client.post("/usuarios", json={"username": "semsenha", "name": "Sem Senha"})
+    r = client.post("/auth/login", json={"username": "semsenha", "password": SENHA})
+    assert r.status_code == 401
+
+
+def test_cada_login_gera_um_token_diferente(client):
+    registrar(client)
+    corpo = {"username": "ana", "password": SENHA}
+    t1 = client.post("/auth/login", json=corpo).json()["token"]
+    t2 = client.post("/auth/login", json=corpo).json()["token"]
+    assert t1 != t2

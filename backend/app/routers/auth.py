@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.schemas.auth import RegistroIn
+from app.schemas.auth import LoginIn, RegistroIn, TokenOut
 from app.schemas.user import UserOut
 from app.services import auth as service
 
@@ -18,3 +18,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/registro", response_model=UserOut, status_code=201)
 def registro(dados: RegistroIn, db: Session = Depends(get_db)):
     return service.registrar(db, dados)
+
+
+@router.post("/login", response_model=TokenOut)
+def login(dados: LoginIn, db: Session = Depends(get_db)):
+    return TokenOut(token=service.login(db, dados))

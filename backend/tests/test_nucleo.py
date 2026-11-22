@@ -32,7 +32,6 @@ def test_auth_registro(client):
     assert r.status_code == 409
 
 
-@pytest.mark.skip(reason="Remova ao implementar POST /auth/login (núcleo; guia 01, Passo 2)")
 def test_auth_login(client):
     client.post(
         "/auth/registro", json={"username": "ana", "name": "Ana", "password": SENHA}
