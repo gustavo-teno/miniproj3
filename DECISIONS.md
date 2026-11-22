@@ -95,11 +95,19 @@ as decisões mudarem.
   quebra, as folgas da semana voltam para a ofensiva nova. O dia de hoje só
   conta depois que acaba. Quando a ofensiva quebra, o perfil mostra o recorde
   ao lado.
-  O número aparece no perfil, mas nunca numa lista ou ranking.
+  O número aparece no perfil, mas nunca numa lista ou ranking. O fogo ao lado
+  do número muda de cor com a ofensiva atual, como uma chama esquentando: 1 a
+  6 dias vermelho, 7 a 13 laranja, 14 a 29 amarelo, 30 a 59 branco, 60 a 99
+  azul-claro e 100 ou mais azul. Quando a ofensiva quebra, a cor volta ao
+  início junto com o número. Uma legenda (clique no computador, setinha no
+  celular) mostra qual cor é qual faixa, para não depender só da cor.
 - **O que cortamos e por quê:** o streak sem folga, porque pune o descanso; e
   a contagem por semanas, porque o número cresce devagar e motiva menos.
   Também deixamos para depois a escolha do número de folgas (de 1 a 3): a regra
   fixa já resolve o problema e cabe no prazo.
+  E os níveis com nome (como "Excursionista" e "Patrulheiro" no Discord):
+  nome cria uma escada que se compara em voz alta ("estou dois níveis abaixo
+  dele"), e a cor dá a sensação de evolução sem virar hierarquia.
 
 ### 5. Turmas formadas pela meta
 
