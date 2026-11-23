@@ -25,16 +25,9 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
       </span>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-baseline gap-2">
-          <span className="cor-materia-texto font-semibold" style={estilo}>
-            {nomeDaOpcao(opcoes?.tags, post.tag)}
-          </span>
-          {post.minutos != null && (
-            <span className="font-numeros text-sm text-tinta-suave">{duracao(post.minutos)}</span>
-          )}
-        </div>
-
-        <p className="mt-1 flex min-w-0 items-center gap-2 text-sm">
+        {/* Quem postou vem primeiro: é uma rede de pessoas. A matéria fica
+            na linha de baixo e no ícone colorido à esquerda. */}
+        <p className="flex min-w-0 items-center gap-2">
           <Avatar autor={post.autor} pequeno />
           <Link href={`/u/${post.autor.username}`} className="truncate font-semibold hover:underline">
             {post.autor.name}
@@ -50,6 +43,15 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
             {tempoDesde(post.created_at)}
           </time>
         </p>
+
+        <div className="mt-0.5 flex items-baseline gap-2 text-sm">
+          <span className="cor-materia-texto font-medium" style={estilo}>
+            {nomeDaOpcao(opcoes?.tags, post.tag)}
+          </span>
+          {post.minutos != null && (
+            <span className="font-numeros text-tinta-suave">{duracao(post.minutos)}</span>
+          )}
+        </div>
 
         {/* whitespace-pre-line: as quebras de linha que a pessoa digitou aparecem. */}
         <p className="mt-1.5 whitespace-pre-line break-words font-light leading-relaxed">{post.texto}</p>
