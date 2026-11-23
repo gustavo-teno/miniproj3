@@ -33,7 +33,7 @@ def ver_post(
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return service.para_out(db, service.buscar(db, post_id))
+    return service.buscar(db, post_id)
 
 
 @router.patch("/{post_id}", response_model=PostOut)

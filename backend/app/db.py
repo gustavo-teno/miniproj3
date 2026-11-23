@@ -1,7 +1,10 @@
 import os
+from datetime import datetime, timezone
+from typing import Annotated
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy import DateTime, create_engine
+from sqlalchemy.orm import DeclarativeBase, Session, mapped_column, sessionmaker
+from sqlalchemy.types import TypeDecorator
 
 # SQLite local, zero setup. O arquivo app.db NUNCA vai para o git (.gitignore).
 # Os testes apontam DATABASE_URL para um banco descartável (ver tests/conftest.py).
@@ -13,6 +16,37 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False
 
 class Base(DeclarativeBase):
     pass
+
+
+class DataHoraUTC(TypeDecorator):
+    """Data e hora sempre em UTC e com o fuso marcado.
+
+    O SQLite não guarda o fuso: a hora gravada em UTC voltava sem ele, e o
+    navegador a lia como horário local (3 h de diferença no Brasil, #28).
+    Na ida, converte para UTC; na volta, marca que é UTC.
+    """
+
+    impl = DateTime
+    cache_ok = True
+
+    def process_bind_param(self, valor: datetime | None, dialect) -> datetime | None:
+        if valor is not None and valor.tzinfo is not None:
+            valor = valor.astimezone(timezone.utc).replace(tzinfo=None)
+        return valor
+
+    def process_result_value(self, valor: datetime | None, dialect) -> datetime | None:
+        if valor is not None:
+            valor = valor.replace(tzinfo=timezone.utc)
+        return valor
+
+
+def agora_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+# O created_at de todas as tabelas: o momento em que a linha foi criada.
+# Nos models: created_at: Mapped[CriadoEm]
+CriadoEm = Annotated[datetime, mapped_column(DataHoraUTC, default=agora_utc)]
 
 
 def get_db():
