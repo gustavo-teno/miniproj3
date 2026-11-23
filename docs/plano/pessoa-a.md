@@ -33,12 +33,12 @@ trava outra pessoa vira issue, com o link aqui.
     A partir daqui a fixture `logar` funciona e os outros testes podem destravar.
 
 **Seg 23: auth na tela.**
-- [ ] Páginas `/cadastro` (nome, username, senha e a meta: vestibular e curso em
+- [x] Páginas `/cadastro` (nome, username, senha e a meta: vestibular e curso em
     lista, vinda de `GET /opcoes`, universidade em texto; quem escolhe "Outro" pode escrever qual é a
     meta) e `/login`; botão de sair.
-- [ ] Salvar o token e mandá-lo no `Authorization` de `lib/api.ts`; páginas
+- [x] Salvar o token e mandá-lo no `Authorization` de `lib/api.ts`; páginas
     protegidas mandam para `/login` sem token.
-- [ ] Depois do cadastro, levar a pessoa para a própria turma (decisão 3). Até a
+- [x] Depois do cadastro, levar a pessoa para a própria turma (decisão 3). Até a
     tela de Turmas existir (quarta), levar para o feed.
 - **Combinar com B:** `lib/api.ts` é da área dela. **Com D:** o endereço da
     página da turma.
@@ -85,6 +85,7 @@ em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
 -->
 - **dom 22:** aviso da Camila na revisão do #30, **para quem pegar Curtidas (#11) e Comentários (#12):** o `PostOut` agora sai direto do model `Post`, sem o `para_out`. Os números de curtidas e de comentários não existem no `Post`, então precisam ser calculados. Sugestão: uma contagem no próprio model (`column_property` com `select(func.count(...))`), que vem na mesma consulta do post e que o `PostOut` lê sozinho. Já o "eu curti este post?" depende de quem está vendo e fica no service. Model é da área da Pessoa A: combinar comigo antes.
 - **dom 22:** #28, combinado na revisão do #27 (posts da Camila): o `created_at` de todas as tabelas sai com o fuso UTC (tipo `DataHoraUTC` e `CriadoEm` em `app/db.py`, no lugar da mesma linha repetida em 7 models), e o `Post` traz o autor na mesma consulta (`relationship` com `lazy="joined"`), o que deixou o `para_out` sem uso. O banco local não precisa ser recriado: a coluna é a mesma.
+- **dom 22:** auth na tela pronta (adiantada de segunda): `/cadastro` com a meta, `/login`, sair apagando a sessão no backend e o feed protegido. O token mora em `lib/sessao.ts` e o `lib/api.ts` (área da Camila) só o lê; ele agora também mostra a mensagem dos erros 422 do backend em vez de "→ 422". Com o atalho de teste (`NEXT_PUBLIC_DEV_USER_ID`) ligado, o feed não pede login. Falta combinar com D o endereço da turma para o cadastro levar até ela.
 - **dom 22:** a Camila topou o fogo que muda de cor com a ofensiva (6 faixas, do vermelho ao azul, como a temperatura de uma chama) e a legenda no clique/setinha. Registrado na decisão 4.
 - **dom 22:** revisão antes da Camila: a ofensiva nova herdava as folgas gastas pela que quebrou (agora zera), e na segunda depois de sáb e dom parados a tela ia mostrar folga sobrando quando a pessoa precisa postar (novo campo `precisa_estudar_hoje`). Criei `hoje_em_brasilia()` para a rota de quarta não usar o dia do servidor.
 - **dom 22:** cálculo da ofensiva adiantado (era de terça) enquanto o PR da auth espera revisão. Regra nova: no máximo 2 dias seguidos sem estudar, senão sábado, domingo, segunda e terça davam 4 dias parados (DECISIONS, decisão 4). Hoje sem post fica em aberto até a meia-noite. Brasília como UTC-3 fixo, sem `zoneinfo`, que no Windows pede pacote extra. O teste de "bate-papo não conta" fica para quarta: quem separa matéria de bate-papo é a rota, não o cálculo.
