@@ -24,7 +24,7 @@ revisa nos PRs dos outros.
 |---|---|---|---|---|---|
 | A | Gustavo | @gustavo-teno | sáb 21 | Backend: models, routers, services, `main.py` | Esqueleto → Auth → Ofensiva que perdoa |
 | B | Camila | @camilaabmf | sáb 21 | Frontend: layout, navegação, `lib/api.ts`, identidade visual | Base visual → Posts → Perfil-diário |
-| C | _a definir_ | | seg 23 | Dados: seed, `core/` e deploy | Curtidas → Comentários → Seed fake → Deploy |
+| C | Clarisse | @clarissegabriela31-coder | seg 23 | Dados: seed, `core/` e deploy | Curtidas → Comentários → Seed fake → Deploy |
 | D | _a definir_ | | seg 23 | Reforço: testes e o fluxo inteiro na tela | Follow → Feed → Turmas |
 
 GitHub do time: @gustavo-teno, @camilaabmf, @clarissegabriela31-coder,
@@ -134,7 +134,7 @@ arquivo dos outros.
 
 - [Pessoa A — Gustavo (Back)](docs/plano/pessoa-a.md): Esqueleto (#5) → Auth (#6) → Ofensiva (#7)
 - [Pessoa B — Camila (Front)](docs/plano/pessoa-b.md): Base visual (#8) → Posts (#9) → Perfil-diário (#10)
-- [Pessoa C (Dados)](docs/plano/pessoa-c.md): Curtidas (#11) → Comentários (#12) → Seed (#13) → Deploy (#14)
+- [Pessoa C — Clarisse (Dados)](docs/plano/pessoa-c.md): Curtidas (#11) → Comentários (#12) → Seed (#13) → Deploy (#14)
 - [Pessoa D (Reforço)](docs/plano/pessoa-d.md): Follow (#15) → Feed (#16) → Turmas (#17)
 - DMs entre mútuos (#18), opcional: quem terminar antes
 - Entregas: vídeo (#19, Camila), pitch (#20, todos) e DECISIONS final
