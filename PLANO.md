@@ -25,7 +25,7 @@ revisa nos PRs dos outros.
 | A | Gustavo | @gustavo-teno | sáb 21 | Backend: models, routers, services, `main.py` | Esqueleto → Auth → Ofensiva que perdoa |
 | B | Camila | @camilaabmf | sáb 21 | Frontend: layout, navegação, `lib/api.ts`, identidade visual | Base visual → Posts → Perfil-diário |
 | C | _a definir_ | | seg 23 | Dados: seed, `core/` e deploy | Curtidas → Comentários → Seed fake → Deploy |
-| D | _a definir_ | | seg 23 | Reforço: testes e o fluxo inteiro na tela | Follow → Feed → Turmas |
+| D | Pedro | @Pedrolk647 | seg 23 | Reforço: testes e o fluxo inteiro na tela | Follow → Feed → Turmas |
 
 GitHub do time: @gustavo-teno, @camilaabmf, @clarissegabriela31-coder,
 @Pedrolk647.

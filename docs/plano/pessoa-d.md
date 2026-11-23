@@ -11,8 +11,8 @@ trava outra pessoa vira issue, com o link aqui.
 ## Plano
 
 **Seg 23: follow.** Começa com `make check` verde (guia 00).
-- [ ] `POST` e `DELETE /usuarios/{username}/follow`, idempotentes.
-- [ ] Componente `<BotaoSeguir username=... />`, usado no perfil e nas turmas.
+- [x] `POST` e `DELETE /usuarios/{username}/follow`, idempotentes.
+- [x] Componente `<BotaoSeguir username=... />`, usado no perfil e nas turmas.
 - [ ] Tirar o `@skip` de `test_follow_unfollow_com_contadores`.
 - **Combinar com B:** os contadores ficam no `GET /usuarios/{username}` dela.
 
@@ -50,3 +50,11 @@ estiver mais atrasado.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **seg 23:** follow pronto (#15). Além do `POST`/`DELETE`, criei
+  `GET /usuarios/{username}/follow` (`seguindo`, `seguidores`, `eu_mesmo`),
+  que o `<BotaoSeguir>` usa para saber o próprio estado. Seguir a si mesmo dá
+  400; usuário inexistente, 404. Os testes estão em `tests/test_follows.py`.
+- **seg 23 (combinar com B):** o `@skip` de `test_follow_unfollow_com_contadores`
+  fica até o `GET /usuarios/{username}` da Camila entrar, porque o teste lê os
+  contadores ali. Para ela não reescrever a contagem: `contar_seguidores(db, id)`
+  e `contar_seguindo(db, id)` em `app/services/follows.py`.
