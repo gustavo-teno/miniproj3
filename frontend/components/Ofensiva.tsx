@@ -2,7 +2,7 @@
 
 // A ofensiva de uma pessoa (#7, Pessoa A; decisão 4): o fogo, o número de dias
 // seguidos, o recorde quando a ofensiva quebrou e as horas da semana. A Pessoa
-// B só põe <Ofensiva username=... /> no topo do perfil.
+// B só põe <Ofensiva username=... meuPerfil={...} /> no topo do perfil.
 //
 // O fogo muda de cor com a ofensiva, como a temperatura de uma chama. Para não
 // depender só da cor, há uma legenda:
@@ -69,11 +69,14 @@ function diasSeguidos(n: number): string {
   return n === 1 ? "1 dia seguido" : `${n} dias seguidos`;
 }
 
-export function Ofensiva({ username }: { username: string }) {
+// meuPerfil: se é o perfil de quem está usando. Os avisos ("estude hoje",
+// folgas) falam com a pessoa, então só aparecem no próprio perfil. A página do
+// perfil já sabe quem entrou e passa a resposta; sem ela, o componente
+// pergunta ao backend (GET /auth/eu).
+export function Ofensiva({ username, meuPerfil }: { username: string; meuPerfil?: boolean }) {
   const [dados, setDados] = useState<DadosOfensiva | null>(null);
   const [erro, setErro] = useState(false);
-  // Os avisos ("estude hoje", folgas) falam com a pessoa: só no próprio perfil.
-  const [meuPerfil, setMeuPerfil] = useState(false);
+  const [souEu, setSouEu] = useState(false);
   const [balao, setBalao] = useState(false); // "N dias seguidos"
   const [legenda, setLegenda] = useState(false);
   const caixa = useRef<HTMLDivElement>(null);
@@ -85,17 +88,19 @@ export function Ofensiva({ username }: { username: string }) {
     let ativo = true;
     setDados(null);
     setErro(false);
-    setMeuPerfil(false);
+    setSouEu(false);
     buscarOfensiva(username)
       .then((d) => ativo && setDados(d))
       .catch(() => ativo && setErro(true));
-    buscarEu()
-      .then((eu) => ativo && setMeuPerfil(eu.username === username))
-      .catch(() => {}); // sem saber quem é, os avisos ficam escondidos
+    if (meuPerfil === undefined) {
+      buscarEu()
+        .then((eu) => ativo && setSouEu(eu.username === username))
+        .catch(() => {}); // sem saber quem é, os avisos ficam escondidos
+    }
     return () => {
       ativo = false;
     };
-  }, [username]);
+  }, [username, meuPerfil]);
 
   // Fecha o balão e a legenda ao tocar fora ou apertar Esc.
   useEffect(() => {
@@ -121,7 +126,7 @@ export function Ofensiva({ username }: { username: string }) {
     };
   }, [balao, legenda]);
 
-  if (erro) return <p className="text-sm text-tinta-suave">Não deu para carregar a ofensiva.</p>;
+  if (erro) return <p className="text-sm text-tinta-suave">Não foi possível carregar a ofensiva.</p>;
   if (!dados) return <div role="status" className="h-14 w-48 animate-pulse rounded-xl bg-linha" aria-label="Carregando a ofensiva" />;
 
   const faixa = faixaDa(dados.atual);
@@ -170,7 +175,7 @@ export function Ofensiva({ username }: { username: string }) {
         {" · "}semana passada: <span className="font-numeros text-tinta">{horas(dados.minutos_semana_passada)}</span>
       </p>
 
-      {meuPerfil &&
+      {(meuPerfil ?? souEu) &&
         (dados.precisa_estudar_hoje ? (
           <p className="text-sm text-destaque">Estude hoje para não perder a ofensiva.</p>
         ) : (
