@@ -120,3 +120,28 @@ def calcular(dias_com_estudo: Iterable[date], hoje: date) -> Ofensiva:
         folgas_usadas_na_semana=folgas,
         precisa_estudar_hoje=precisa,
     )
+
+
+@dataclass(frozen=True)
+class ResumoSemana:
+    minutos_esta_semana: int
+    minutos_semana_passada: int
+
+
+def resumo_da_semana(
+    sessoes: Iterable[tuple[date, int | None]], hoje: date
+) -> ResumoSemana:
+    """Soma os minutos de estudo desta semana e da passada (segunda a domingo).
+
+    Recebe pares (dia em Brasília, minutos); post sem duração conta zero.
+    Custo: O(P), em que P é o número de posts recebidos.
+    """
+    segunda = hoje - timedelta(days=hoje.weekday())
+    segunda_passada = segunda - timedelta(days=7)
+    esta = passada = 0
+    for dia, minutos in sessoes:
+        if segunda <= dia <= hoje:
+            esta += minutos or 0
+        elif segunda_passada <= dia < segunda:
+            passada += minutos or 0
+    return ResumoSemana(minutos_esta_semana=esta, minutos_semana_passada=passada)
