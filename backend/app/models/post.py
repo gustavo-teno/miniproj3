@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, String, func, select
+from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
 from app.constantes import TAG_PADRAO
 from app.db import Base, CriadoEm
+from app.models.like import Like
 
 # Só para o editor conhecer o tipo: importar de verdade daria import circular.
 if TYPE_CHECKING:
@@ -26,3 +27,12 @@ class Post(Base):
     # Duração da sessão de estudo, opcional. Soma no resumo da semana.
     minutos: Mapped[int | None] = mapped_column(default=None)
     created_at: Mapped[CriadoEm]
+    # Quantas curtidas o post tem (#11, Pessoa C). Não é uma coluna da tabela:
+    # é uma contagem calculada na mesma consulta que busca o post, então o
+    # PostOut lê o número sozinho e ele nunca fica desatualizado.
+    curtidas: Mapped[int] = column_property(
+        select(func.count(Like.id))
+        .where(Like.post_id == id)
+        .correlate_except(Like)
+        .scalar_subquery()
+    )

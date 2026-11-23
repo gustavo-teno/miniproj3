@@ -159,7 +159,6 @@ def test_follow_unfollow_com_contadores(client, logar):
 # ---------- CURTIDAS ----------
 
 
-@pytest.mark.skip(reason="Remova ao implementar curtir/descurtir idempotente (núcleo)")
 def test_curtidas_idempotentes(client, logar):
     ana = logar("ana")
     bia = logar("bia")
