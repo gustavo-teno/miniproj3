@@ -84,16 +84,29 @@ const NOMES_DOS_CAMPOS: Record<string, string> = {
   minutos: "Duração",
 };
 
+// A unidade dos campos de número, para "pelo menos 1 minuto" em vez de "pelo
+// menos 1". Campo sem unidade aqui mostra só o número.
+const UNIDADES: Record<string, [singular: string, plural: string]> = {
+  minutos: ["minuto", "minutos"],
+};
+
 function traduzir(p: ProblemaDeCampo): string {
   const chave = String(p.loc?.at(-1) ?? "");
   const campo = NOMES_DOS_CAMPOS[chave] ?? "Este campo";
+  // Sem adjetivo ("obrigatório", "vazio"), a frase serve para campo masculino
+  // e feminino: "Preencha o campo Senha." (DESIGN.md, mensagens do sistema).
+  const preencha = chave in NOMES_DOS_CAMPOS ? `Preencha o campo ${campo}` : "Preencha este campo";
+  const numero = (n: number | undefined) => {
+    const unidade = UNIDADES[chave];
+    return unidade ? `${n} ${n === 1 ? unidade[0] : unidade[1]}` : `${n}`;
+  };
   const ctx = p.ctx ?? {};
   switch (p.type) {
     case "missing":
-      return `${campo} é obrigatório`;
+      return preencha;
     case "string_too_short":
       return ctx.min_length === 1
-        ? `${campo} não pode ficar vazio`
+        ? preencha
         : `${campo} precisa ter pelo menos ${ctx.min_length} caracteres`;
     case "string_too_long":
       return `${campo} pode ter no máximo ${ctx.max_length} caracteres`;
@@ -102,9 +115,9 @@ function traduzir(p: ProblemaDeCampo): string {
         ? "Nome de usuário só aceita letras minúsculas sem acento, números e _"
         : `${campo} tem caracteres que não são aceitos`;
     case "greater_than_equal":
-      return `${campo} precisa ser pelo menos ${ctx.ge}`;
+      return `${campo} precisa ser de pelo menos ${numero(ctx.ge)}`;
     case "less_than_equal":
-      return `${campo} pode ser no máximo ${ctx.le}`;
+      return `${campo} pode ser de no máximo ${numero(ctx.le)}`;
     case "value_error":
       // Mensagem escrita por nós no backend (ex.: "esse nome de usuário é reservado").
       return (p.msg ?? "").replace(/^Value error, /, "");
