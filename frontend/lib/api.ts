@@ -21,12 +21,19 @@ function headers(): HeadersInit {
 }
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    method,
-    headers: headers(),
-    body: body === undefined ? undefined : JSON.stringify(body),
-    cache: "no-store",
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      method,
+      headers: headers(),
+      body: body === undefined ? undefined : JSON.stringify(body),
+      cache: "no-store",
+    });
+  } catch {
+    // Sem resposta nenhuma (backend fora do ar, internet caiu). O navegador
+    // diria "Failed to fetch", em inglês e sem explicar nada.
+    throw new Error("Não foi possível falar com o servidor. Tente de novo em breve.");
+  }
 
   // 401 com token salvo = token que não vale mais (ex.: o banco foi apagado ou o
   // servidor do deploy reiniciou). Joga o token fora e volta para o login.
@@ -38,7 +45,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   if (!res.ok) {
     // 422 = corpo inválido; 409 = conflito (ex.: username repetido). Ver guia 04.
     const erro = await res.json().catch(() => null);
-    throw new Error(mensagemDoErro(erro?.detail) ?? `${method} ${path} → ${res.status}`);
+    throw new Error(mensagemDoErro(erro?.detail) ?? `Não foi possível concluir o pedido (erro ${res.status}).`);
   }
 
   // 204 No Content (seguir, curtir, apagar...) não tem corpo: não há JSON para ler.
@@ -47,14 +54,71 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 }
 
 // O "detail" do FastAPI é um texto (erros nossos, como o 409) ou, no 422, uma
-// lista de campos com problema. Da lista, mostra a primeira mensagem, sem o
-// "Value error, " que o Pydantic põe na frente das mensagens escritas por nós.
+// lista de campos com problema, com as mensagens do Pydantic em inglês. Da
+// lista, mostra o primeiro problema, traduzido. Toda mensagem sai no padrão
+// das telas: impessoal, com maiúscula e ponto final.
 function mensagemDoErro(detail: unknown): string | null {
-  if (typeof detail === "string") return detail;
-  if (Array.isArray(detail) && typeof detail[0]?.msg === "string") {
-    return detail[0].msg.replace(/^Value error, /, "");
-  }
+  if (typeof detail === "string") return frase(detail);
+  if (Array.isArray(detail) && detail[0]) return frase(traduzir(detail[0]));
   return null;
+}
+
+// Um problema de campo, no formato do Pydantic (o que importa dele).
+type ProblemaDeCampo = {
+  type?: string; // ex.: "string_too_short"
+  loc?: (string | number)[]; // ex.: ["body", "name"]
+  msg?: string; // a mensagem em inglês, ou a nossa depois de "Value error, "
+  ctx?: { min_length?: number; max_length?: number; ge?: number; le?: number };
+};
+
+// O nome de cada campo como a tela mostra. Campo novo sem nome aqui aparece
+// como "Este campo".
+const NOMES_DOS_CAMPOS: Record<string, string> = {
+  username: "Nome de usuário",
+  name: "Nome",
+  password: "Senha",
+  universidade: "Universidade",
+  vestibular_outro: "Vestibular",
+  curso_outro: "Curso",
+  texto: "Texto",
+  minutos: "Duração",
+};
+
+function traduzir(p: ProblemaDeCampo): string {
+  const chave = String(p.loc?.at(-1) ?? "");
+  const campo = NOMES_DOS_CAMPOS[chave] ?? "Este campo";
+  const ctx = p.ctx ?? {};
+  switch (p.type) {
+    case "missing":
+      return `${campo} é obrigatório`;
+    case "string_too_short":
+      return ctx.min_length === 1
+        ? `${campo} não pode ficar vazio`
+        : `${campo} precisa ter pelo menos ${ctx.min_length} caracteres`;
+    case "string_too_long":
+      return `${campo} pode ter no máximo ${ctx.max_length} caracteres`;
+    case "string_pattern_mismatch":
+      return chave === "username"
+        ? "Nome de usuário só aceita letras minúsculas sem acento, números e _"
+        : `${campo} tem caracteres que não são aceitos`;
+    case "greater_than_equal":
+      return `${campo} precisa ser pelo menos ${ctx.ge}`;
+    case "less_than_equal":
+      return `${campo} pode ser no máximo ${ctx.le}`;
+    case "value_error":
+      // Mensagem escrita por nós no backend (ex.: "esse nome de usuário é reservado").
+      return (p.msg ?? "").replace(/^Value error, /, "");
+    default:
+      return `${campo} está com um valor que não é aceito`;
+  }
+}
+
+// "usuário ou senha inválidos" → "Usuário ou senha inválidos."
+function frase(texto: string): string {
+  const t = texto.trim();
+  if (!t) return "Não foi possível concluir o pedido.";
+  const comMaiuscula = t[0].toUpperCase() + t.slice(1);
+  return /[.!?]$/.test(comMaiuscula) ? comMaiuscula : `${comMaiuscula}.`;
 }
 
 export function apiGet<T>(path: string): Promise<T> {
