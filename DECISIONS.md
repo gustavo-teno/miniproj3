@@ -134,9 +134,6 @@ as decisões mudarem.
 
 ### 6. DMs só entre quem se segue mutuamente
 
-_Opcional: entra depois do núcleo, da ofensiva e das Turmas. A expectativa é
-que dê tempo._
-
 - **Contexto:** comentários e bate-papo são conversa em público. É na conversa
   privada que dois desconhecidos da mesma turma viram parceiros de estudo:
   combinam horários, cobram um ao outro, desabafam sobre o simulado. Ao mesmo
@@ -147,11 +144,13 @@ que dê tempo._
 - **Escolha:** DMs 1-para-1, liberadas só quando as duas pessoas se seguem. A
   conversa privada vira consequência de conviver na rede (você acompanhou o
   diário da pessoa, ela acompanhou o seu), e não um jeito de abordar
-  desconhecidos.
+  desconhecidos. A aba "Mensagens" mostra quantas mensagens ainda não foram
+  lidas: é o que avisa que o colega respondeu e faz a pessoa voltar para
+  combinar a sessão.
 - **O que cortamos e por quê:** DMs abertas, pela segurança de um público em
-  boa parte menor de idade; e chat em tempo real (WebSocket, "digitando...",
-  contador de não lidas). A conversa se atualiza sozinha a cada poucos
-  segundos, o que basta para combinar uma sessão de estudo e cabe no prazo.
+  boa parte menor de idade; e chat em tempo real (WebSocket, "digitando...").
+  A conversa se atualiza sozinha a cada poucos segundos, o que basta para
+  combinar uma sessão de estudo e cabe no prazo.
 
 ## Features
 
@@ -170,7 +169,8 @@ entram na tabela "Quem faz o quê" de lá.
 | Seed fake (núcleo) | Pessoa C | Vestibulandos fictícios com metas e rotinas variadas, para a rede já parecer uma turma. |
 | Ofensiva que perdoa | Pessoa A (Gustavo) | Motiva a voltar todo dia sem punir o descanso (decisão 4). |
 | Turmas | Pessoa D | Quem acabou de chegar encontra quem tem a mesma meta e sai do feed vazio (decisão 5). |
-| DMs entre mútuos (opcional) | quem terminar antes | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
+| DMs entre mútuos | Pessoa A (Gustavo) | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
+| Busca de pessoas e posts | Pessoa A (Gustavo) | Achar um colega pelo nome ou um post sobre um assunto, sem depender da meta. |
 
 **Login sem prazo de validade (escolha consciente).** O token do login vale
 até a pessoa clicar em sair, que apaga a sessão no banco. Uma validade (por
