@@ -197,8 +197,25 @@ enfeita leva `aria-hidden`; botão só de ícone leva `aria-label`.
 Fala com "você", como colega de turma: acolhedor e informal, nunca coach nem
 cobrança. Nada de ranking ou comparação com os outros ("você está atrás de
 fulano"). Descanso não é fracasso. Exemplos que já estão no app: "O que você
-estudou agora?", "Estude hoje para não perder a ofensiva.", "Não deu para
-carregar a ofensiva."
+estudou agora?" e "Estude hoje para não perder a ofensiva."
+
+### Mensagens do sistema (erros)
+
+Combinado com o Gustavo em 23/11. Quando algo dá errado, quem fala é o
+sistema, não uma pessoa, então a mensagem segue um padrão só em todas as
+telas:
+
+- **impessoal:** sem "eu" ("não consegui") e sem "a gente";
+- **começa com "Não foi possível"**, com maiúscula e ponto final;
+- diz **o que** falhou e, quando a pessoa puder fazer algo, **o que fazer**.
+
+| Certo | Errado |
+|---|---|
+| Não foi possível carregar a ofensiva. | não consegui carregar |
+| Não foi possível postar. Tente de novo. | Não deu para postar |
+| Não foi possível entrar. Confira o usuário e a senha. | não consegui entrar |
+
+As telas antigas vão sendo ajustadas aos poucos, cada pessoa nas próprias.
 
 ## Fazendo algo provisório
 
