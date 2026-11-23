@@ -12,7 +12,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-import { buscarOfensiva, type Ofensiva as DadosOfensiva } from "@/lib/api";
+import { buscarEu, buscarOfensiva, type Ofensiva as DadosOfensiva } from "@/lib/api";
 import { duracao } from "@/lib/tempo";
 
 type Cores = { fogo: string; contorno: string };
@@ -21,7 +21,7 @@ type Faixa = { de: number; ate: number | null; cor: string; claro: Cores; noturn
 // Do mais frio ao mais quente. Sem nomes de nível, para não virar comparação.
 // Tons provisórios: a Camila ajusta (combinado em 22/11). O branco ganha um
 // contorno cinza no modo claro para não sumir no fundo.
-export const FAIXAS: Faixa[] = [
+const FAIXAS: Faixa[] = [
   { de: 1, ate: 6, cor: "vermelho", claro: { fogo: "#e0483a", contorno: "#a8281d" }, noturno: { fogo: "#f0675a", contorno: "#f0675a" } },
   { de: 7, ate: 13, cor: "laranja", claro: { fogo: "#f08a24", contorno: "#b55d0b" }, noturno: { fogo: "#f5a04a", contorno: "#f5a04a" } },
   { de: 14, ate: 29, cor: "amarelo", claro: { fogo: "#f2c230", contorno: "#a37c08" }, noturno: { fogo: "#f5d25c", contorno: "#f5d25c" } },
@@ -36,7 +36,7 @@ const APAGADO: Pick<Faixa, "claro" | "noturno"> = {
   noturno: { fogo: "transparent", contorno: "#6b7480" },
 };
 
-export function faixaDa(dias: number): Faixa | null {
+function faixaDa(dias: number): Faixa | null {
   return FAIXAS.find((f) => dias >= f.de && (f.ate === null || dias <= f.ate)) ?? null;
 }
 
@@ -72,6 +72,8 @@ function diasSeguidos(n: number): string {
 export function Ofensiva({ username }: { username: string }) {
   const [dados, setDados] = useState<DadosOfensiva | null>(null);
   const [erro, setErro] = useState(false);
+  // Os avisos ("estude hoje", folgas) falam com a pessoa: só no próprio perfil.
+  const [meuPerfil, setMeuPerfil] = useState(false);
   const [balao, setBalao] = useState(false); // "N dias seguidos"
   const [legenda, setLegenda] = useState(false);
   const caixa = useRef<HTMLDivElement>(null);
@@ -83,9 +85,13 @@ export function Ofensiva({ username }: { username: string }) {
     let ativo = true;
     setDados(null);
     setErro(false);
+    setMeuPerfil(false);
     buscarOfensiva(username)
       .then((d) => ativo && setDados(d))
       .catch(() => ativo && setErro(true));
+    buscarEu()
+      .then((eu) => ativo && setMeuPerfil(eu.username === username))
+      .catch(() => {}); // sem saber quem é, os avisos ficam escondidos
     return () => {
       ativo = false;
     };
@@ -116,7 +122,7 @@ export function Ofensiva({ username }: { username: string }) {
   }, [balao, legenda]);
 
   if (erro) return <p className="text-sm text-tinta-suave">Não deu para carregar a ofensiva.</p>;
-  if (!dados) return <div className="h-14 w-48 animate-pulse rounded-xl bg-linha" aria-label="Carregando a ofensiva" />;
+  if (!dados) return <div role="status" className="h-14 w-48 animate-pulse rounded-xl bg-linha" aria-label="Carregando a ofensiva" />;
 
   const faixa = faixaDa(dados.atual);
   const quebrou = dados.recorde > dados.atual;
@@ -164,15 +170,16 @@ export function Ofensiva({ username }: { username: string }) {
         {" · "}semana passada: <span className="font-numeros text-tinta">{horas(dados.minutos_semana_passada)}</span>
       </p>
 
-      {dados.precisa_estudar_hoje ? (
-        <p className="text-sm text-destaque">Estude hoje para não perder a ofensiva.</p>
-      ) : (
-        dados.atual > 0 && (
-          <p className="text-sm text-tinta-suave">
-            {folgasSobrando === 1 ? "1 folga sobrando" : `${folgasSobrando} folgas sobrando`} esta semana
-          </p>
-        )
-      )}
+      {meuPerfil &&
+        (dados.precisa_estudar_hoje ? (
+          <p className="text-sm text-destaque">Estude hoje para não perder a ofensiva.</p>
+        ) : (
+          dados.atual > 0 && (
+            <p className="text-sm text-tinta-suave">
+              {folgasSobrando === 1 ? "1 folga sobrando" : `${folgasSobrando} folgas sobrando`} esta semana
+            </p>
+          )
+        ))}
 
       {balao && !legenda && (
         <div role="status" className="absolute left-0 top-full z-10 mt-1 flex items-center gap-1 rounded-lg border border-linha bg-superficie py-1 pl-3 pr-1 text-sm shadow-md">
@@ -224,7 +231,7 @@ export function Ofensiva({ username }: { username: string }) {
             })}
           </ul>
           <p className="mt-2 text-xs text-tinta-suave">
-            Se a ofensiva quebrar, o fogo volta ao vermelho. Folga mantém a ofensiva, mas não soma dia.
+            Se a ofensiva quebrar, o fogo apaga e recomeça no vermelho. Folga mantém a ofensiva, mas não soma dia.
           </p>
         </div>
       )}

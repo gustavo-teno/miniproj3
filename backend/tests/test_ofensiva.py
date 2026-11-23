@@ -5,8 +5,6 @@ Os dias são de novembro de 2026: 16/11 é segunda e 22/11 é domingo.
 
 from datetime import date, datetime, timedelta, timezone
 
-import pytest
-
 from app.core.ofensiva import (
     Ofensiva,
     ResumoSemana,
@@ -152,19 +150,7 @@ def test_resumo_soma_esta_semana_e_a_passada():
 
 
 # --- A rota GET /usuarios/{username}/ofensiva -------------------------------
-# Usa o atalho de desenvolvimento (DEBUG + X-User-Id), como os testes de posts.
-
-
-@pytest.fixture()
-def como(client, monkeypatch):
-    monkeypatch.setenv("DEBUG", "true")
-
-    def _como(username: str) -> dict:
-        r = client.post("/usuarios", json={"username": username, "name": username})
-        assert r.status_code == 201
-        return {"X-User-Id": str(r.json()["id"])}
-
-    return _como
+# Usa a fixture logar do conftest.py: cria a conta e entra de verdade.
 
 
 def postar(client, quem, tag, minutos=None):
@@ -172,8 +158,8 @@ def postar(client, quem, tag, minutos=None):
     assert client.post("/posts", json=corpo, headers=quem).status_code == 201
 
 
-def test_rota_conta_post_de_materia_de_hoje(client, como):
-    ana = como("ana")
+def test_rota_conta_post_de_materia_de_hoje(client, logar):
+    ana = logar("ana")
     postar(client, ana, "fisica", minutos=45)
     postar(client, ana, "quimica", minutos=30)
 
@@ -187,8 +173,8 @@ def test_rota_conta_post_de_materia_de_hoje(client, como):
     assert corpo["minutos_semana_passada"] == 0
 
 
-def test_rota_bate_papo_nao_conta(client, como):
-    ana = como("ana")
+def test_rota_bate_papo_nao_conta(client, logar):
+    ana = logar("ana")
     postar(client, ana, "bate-papo", minutos=60)
 
     corpo = client.get("/usuarios/ana/ofensiva", headers=ana).json()
@@ -196,15 +182,15 @@ def test_rota_bate_papo_nao_conta(client, como):
     assert corpo["minutos_esta_semana"] == 0
 
 
-def test_rota_mostra_a_ofensiva_de_outra_pessoa(client, como):
-    ana, bia = como("ana"), como("bia")
+def test_rota_mostra_a_ofensiva_de_outra_pessoa(client, logar):
+    ana, bia = logar("ana"), logar("bia")
     postar(client, bia, "historia")
     assert client.get("/usuarios/bia/ofensiva", headers=ana).json()["atual"] == 1
 
 
-def test_rota_semana_passada(client, como, monkeypatch):
+def test_rota_semana_passada(client, logar, monkeypatch):
     """Os posts de hoje viram "semana passada" quando hoje é daqui a 7 dias."""
-    ana = como("ana")
+    ana = logar("ana")
     postar(client, ana, "redacao", minutos=50)
 
     daqui_a_uma_semana = hoje_em_brasilia() + timedelta(days=7)
@@ -218,8 +204,8 @@ def test_rota_semana_passada(client, como, monkeypatch):
     assert corpo["recorde"] == 1
 
 
-def test_rota_usuario_que_nao_existe(client, como):
-    r = client.get("/usuarios/ninguem/ofensiva", headers=como("ana"))
+def test_rota_usuario_que_nao_existe(client, logar):
+    r = client.get("/usuarios/ninguem/ofensiva", headers=logar("ana"))
     assert r.status_code == 404
 
 
