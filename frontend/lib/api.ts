@@ -165,6 +165,8 @@ export type Post = {
   tag: string; // chave de /opcoes, ex.: "matematica" ou "bate-papo"
   minutos: number | null; // duração da sessão de estudo, opcional
   created_at: string;
+  curtidas: number;
+  curtido_por_mim: boolean; // depende de quem está vendo
 };
 
 // GET /usuarios/{username}: a meta (decisão 2) e os contadores do follow (D).

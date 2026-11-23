@@ -8,6 +8,7 @@
 
 import { useRef, useState } from "react";
 
+import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { CardPost } from "@/components/CardPost";
 import { FormPost } from "@/components/FormPost";
 import { SimboloMateria } from "@/components/SimboloMateria";
@@ -50,7 +51,7 @@ type PostFalso = {
   curtidas: number;
 };
 
-type PostDoRascunho = Post & { comentarios?: number; curtidas?: number };
+type PostDoRascunho = Post & { comentarios?: number };
 
 function paraPost(p: PostFalso): PostDoRascunho {
   return {
@@ -62,6 +63,7 @@ function paraPost(p: PostFalso): PostDoRascunho {
     created_at: new Date(Date.now() - p.minutosAtras * 60000).toISOString(),
     comentarios: p.comentarios,
     curtidas: p.curtidas,
+    curtido_por_mim: false,
   };
 }
 
@@ -114,7 +116,8 @@ export function FeedRascunho() {
                   rodape={
                     <>
                       <span>{p.comentarios ?? 0} comentários</span>
-                      <span>{p.curtidas ?? 0} curtidas</span>
+                      {/* Os de mentira têm id negativo e não existem no backend. */}
+                      {p.id > 0 ? <BotaoCurtir post={p} /> : <span>{p.curtidas} curtidas</span>}
                     </>
                   }
                 />
