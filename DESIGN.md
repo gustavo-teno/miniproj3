@@ -202,18 +202,34 @@ estudou agora?" e "Estude hoje para não perder a ofensiva."
 ### Mensagens do sistema (erros)
 
 Combinado com o Gustavo em 23/11. Quando algo dá errado, quem fala é o
-sistema, não uma pessoa, então a mensagem segue um padrão só em todas as
-telas:
+sistema, não uma pessoa, então toda mensagem é:
 
 - **impessoal:** sem "eu" ("não consegui") e sem "a gente";
-- **começa com "Não foi possível"**, com maiúscula e ponto final;
-- diz **o que** falhou e, quando a pessoa puder fazer algo, **o que fazer**.
+- **com maiúscula e ponto final**;
+- clara sobre **o que** deu errado e, quando a pessoa puder fazer algo,
+  **o que fazer**.
 
-| Certo | Errado |
-|---|---|
-| Não foi possível carregar a ofensiva. | não consegui carregar |
-| Não foi possível postar. Tente de novo. | Não deu para postar |
-| Não foi possível entrar. Confira o usuário e a senha. | não consegui entrar |
+São dois tipos:
+
+- **Falha do sistema** (não carregou, não salvou, servidor fora do ar):
+  começa com **"Não foi possível"**.
+- **Aviso de campo ou de dado** (algo que a pessoa preencheu): diz o problema
+  direto, sem "Não foi possível" na frente. Prefira frases que não dependam
+  do gênero do campo ("Preencha o campo Senha.", e não "Senha é
+  obrigatório.").
+
+| Tipo | Certo | Errado |
+|---|---|---|
+| Falha | Não foi possível carregar a ofensiva. | não consegui carregar |
+| Falha | Não foi possível postar. Tente de novo. | Não deu para postar |
+| Falha | Não foi possível falar com o servidor. Tente de novo em breve. | Failed to fetch |
+| Aviso | Nome não pode ficar vazio. | String should have at least 1 character |
+| Aviso | Esse nome de usuário já está em uso. | Não foi possível usar esse nome de usuário. |
+| Aviso | Usuário ou senha inválidos. | não consegui entrar |
+
+Os avisos de campo saem traduzidos do `mensagemDoErro()` em
+[`lib/api.ts`](frontend/lib/api.ts) (PR #37): campo novo no backend precisa
+do nome dele em `NOMES_DOS_CAMPOS`.
 
 As telas antigas vão sendo ajustadas aos poucos, cada pessoa nas próprias.
 
