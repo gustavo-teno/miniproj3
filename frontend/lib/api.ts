@@ -177,3 +177,19 @@ export type Perfil = User & {
   seguidores: number;
   seguindo: number;
 };
+
+// ---- ofensiva (#7, Pessoa A; espelha backend/app/schemas/ofensiva.py) ----
+
+export type Ofensiva = {
+  atual: number; // dias seguidos de estudo (folga mantém, mas não soma)
+  recorde: number;
+  folgas_usadas_na_semana: number;
+  folgas_por_semana: number;
+  precisa_estudar_hoje: boolean; // sem post de matéria hoje, a ofensiva quebra
+  minutos_esta_semana: number;
+  minutos_semana_passada: number;
+};
+
+export function buscarOfensiva(username: string): Promise<Ofensiva> {
+  return apiGet<Ofensiva>(`/usuarios/${encodeURIComponent(username)}/ofensiva`);
+}

@@ -49,21 +49,21 @@ trava outra pessoa vira issue, com o link aqui.
     domingo, horário de Brasília).
 - [x] Testes dos casos de borda: semana virando, post perto da meia-noite, folga
     que não soma, ofensiva quebrada com recorde.
-- [ ] Teste do post de bate-papo que não conta (fica para quarta, junto com a
+- [x] Teste do post de bate-papo que não conta (fica para quarta, junto com a
     rota, que é quem separa matéria de bate-papo).
 
 **Qua 25: ofensiva no produto.**
-- [ ] `GET /usuarios/{username}/ofensiva` → ofensiva atual, recorde e o resumo da
+- [x] `GET /usuarios/{username}/ofensiva` → ofensiva atual, recorde e o resumo da
     semana (horas desta semana e da passada, somando os `minutos` dos posts).
-- [ ] Componente `<Ofensiva username=... />` com o número, o recorde ao lado
+- [x] Componente `<Ofensiva username=... />` com o número, o recorde ao lado
     quando quebrou, e o "esta semana: 12h, semana passada: 9h".
-- [ ] O fogo da ofensiva muda de cor com a ofensiva atual, como a temperatura
+- [x] O fogo da ofensiva muda de cor com a ofensiva atual, como a temperatura
     de uma chama (do mais frio ao mais quente): 1 a 6 dias vermelho, 7 a 13
     laranja, 14 a 29 amarelo, 30 a 59 branco, 60 a 99 azul-claro, 100 ou mais
     azul (combinado com a Camila em 22/11; os tons exatos ela ajusta para o
     modo claro e o noturno, cuidado com o branco no fundo claro). Sem nomes
     de nível, para não virar comparação. Quebrou, a cor volta ao início junto com o número.
-- [ ] Legenda das cores, para não depender só da cor:
+- [x] Legenda das cores, para não depender só da cor:
     - Computador: passar o mouse mostra "N dias seguidos"; clicar abre uma
       telinha com a legenda (qual cor é qual faixa, marcando a da pessoa).
     - Celular (sem mouse): tocar mostra "N dias seguidos" com uma setinha;
@@ -83,6 +83,7 @@ em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **seg 23:** rota e componente da ofensiva prontos (adiantados de quarta). `GET /usuarios/{username}/ofensiva` exige login e devolve a ofensiva, o recorde, as folgas, o aviso "estude hoje" e os minutos desta semana e da passada. As horas da semana somam só posts de matéria, como a ofensiva (bate-papo com duração não conta). **Para a Camila:** `<Ofensiva username=... />` está em `components/Ofensiva.tsx`, pronto para o topo do perfil; os tons do fogo são provisórios (lista `FAIXAS` no mesmo arquivo) e a classe `.cor-fogo` entrou no `globals.css`, no esquema da `.cor-materia`.
 - **dom 22:** aviso da Camila na revisão do #30, **para quem pegar Curtidas (#11) e Comentários (#12):** o `PostOut` agora sai direto do model `Post`, sem o `para_out`. Os números de curtidas e de comentários não existem no `Post`, então precisam ser calculados. Sugestão: uma contagem no próprio model (`column_property` com `select(func.count(...))`), que vem na mesma consulta do post e que o `PostOut` lê sozinho. Já o "eu curti este post?" depende de quem está vendo e fica no service. Model é da área da Pessoa A: combinar comigo antes.
 - **dom 22:** #28, combinado na revisão do #27 (posts da Camila): o `created_at` de todas as tabelas sai com o fuso UTC (tipo `DataHoraUTC` e `CriadoEm` em `app/db.py`, no lugar da mesma linha repetida em 7 models), e o `Post` traz o autor na mesma consulta (`relationship` com `lazy="joined"`), o que deixou o `para_out` sem uso. O banco local não precisa ser recriado: a coluna é a mesma.
 - **dom 22:** auth na tela pronta (adiantada de segunda): `/cadastro` com a meta, `/login`, sair apagando a sessão no backend e o feed protegido. O token mora em `lib/sessao.ts` e o `lib/api.ts` (área da Camila) só o lê; ele agora também mostra a mensagem dos erros 422 do backend em vez de "→ 422". Com o atalho de teste (`NEXT_PUBLIC_DEV_USER_ID`) ligado, o feed não pede login. Falta combinar com D o endereço da turma para o cadastro levar até ela.

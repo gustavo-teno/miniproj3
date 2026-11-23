@@ -118,3 +118,22 @@
   --font-texto: var(--fonte-texto), system-ui, sans-serif;
   --font-numeros: var(--fonte-numeros), ui-monospace, monospace;
 }
+
+/* O fogo da ofensiva (#7, Pessoa A): a cor muda com a faixa de dias e vem por
+   estiloDoFogo() (components/Ofensiva.tsx), no mesmo esquema da cor-materia. */
+.cor-fogo {
+  fill: var(--fogo);
+  stroke: var(--fogo-contorno);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .cor-fogo {
+    fill: var(--fogo-noturno);
+    stroke: var(--fogo-contorno-noturno);
+  }
+}
+
+:root[data-tema="noturno"] .cor-fogo {
+  fill: var(--fogo-noturno);
+  stroke: var(--fogo-contorno-noturno);
+}
