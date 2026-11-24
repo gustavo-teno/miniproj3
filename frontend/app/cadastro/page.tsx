@@ -6,6 +6,7 @@ import { useState } from "react";
 import { AvisoErro, CaixaAuth, Campo, estiloBotao, estiloCampo } from "@/components/FormAuth";
 import { cadastrar, type Cadastro, type Opcao } from "@/lib/api";
 import { useOpcoes } from "@/lib/opcoes";
+import { useSoSemLogin } from "@/lib/useExigeLogin";
 
 const VAZIO: Cadastro = {
   username: "",
@@ -19,6 +20,7 @@ const VAZIO: Cadastro = {
 };
 
 export default function CadastroPage() {
+  const liberado = useSoSemLogin();
   const opcoes = useOpcoes();
   const [dados, setDados] = useState<Cadastro>(VAZIO);
   const [erro, setErro] = useState<string | null>(null);
@@ -34,7 +36,15 @@ export default function CadastroPage() {
     setEnviando(true);
     setErro(null);
     try {
-      const entrou = await cadastrar(dados);
+      // Sem os espaços das pontas: "  Ana " vira "Ana", e um nome só de
+      // espaços chega vazio e recebe o aviso certo.
+      const entrou = await cadastrar({
+        ...dados,
+        name: dados.name.trim(),
+        universidade: dados.universidade.trim(),
+        vestibular_outro: dados.vestibular_outro.trim(),
+        curso_outro: dados.curso_outro.trim(),
+      });
       if (!entrou) {
         // A conta existe, só o login automático falhou: a pessoa entra à mão.
         window.location.href = "/login?conta=criada";
@@ -45,10 +55,12 @@ export default function CadastroPage() {
       // o topo descobrir quem entrou.
       window.location.href = "/";
     } catch (err) {
-      setErro(err instanceof Error ? err.message : "não consegui criar a conta");
+      setErro(err instanceof Error ? err.message : "Não foi possível criar a conta.");
       setEnviando(false);
     }
   }
+
+  if (!liberado) return null;
 
   return (
     <CaixaAuth titulo="Criar conta">

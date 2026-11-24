@@ -25,7 +25,7 @@ def salvar_novo(db: Session, user: User) -> User:
     """Guarda um usuário novo. Usado pelo POST /usuarios e pelo cadastro da auth,
     para a regra do username repetido ficar num lugar só."""
     if buscar_por_username(db, user.username):
-        raise HTTPException(status_code=409, detail="username já existe")
+        raise HTTPException(status_code=409, detail="esse nome de usuário já está em uso")
 
     db.add(user)
     db.commit()

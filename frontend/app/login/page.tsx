@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 
 import { AvisoErro, CaixaAuth, Campo, estiloBotao, estiloCampo } from "@/components/FormAuth";
 import { entrar } from "@/lib/api";
+import { useSoSemLogin } from "@/lib/useExigeLogin";
 
 export default function LoginPage() {
+  const liberado = useSoSemLogin();
   const [username, setUsername] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
@@ -29,10 +31,12 @@ export default function LoginPage() {
       // Recarrega a página inteira para o topo descobrir quem entrou.
       window.location.href = "/";
     } catch (err) {
-      setErro(err instanceof Error ? err.message : "não consegui entrar");
+      setErro(err instanceof Error ? err.message : "Não foi possível entrar.");
       setEnviando(false);
     }
   }
+
+  if (!liberado) return null;
 
   return (
     <CaixaAuth titulo="Entrar">

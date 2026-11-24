@@ -14,7 +14,7 @@ Quem faz o quê até a entrega (sexta, 27/11). O produto está no
 
 O plano tem quatro papéis: A (Back), B (Front), C (Dados) e D (Reforço). Cada
 pessoa escolhe um. O Gustavo e a Camila, disponíveis no fim de semana, ficaram
-com A e B. **C e D ficam entre a Clarisse e o Pedro**, que começam na segunda.
+com A e B. A Clarisse ficou com C e o Pedro com D, e os dois começam na segunda.
 
 Seguindo o guia 07, ninguém fica só numa camada: cada pessoa faz as próprias
 features de ponta a ponta (backend, tela e testes). A área é o que ela cuida e
@@ -24,14 +24,18 @@ revisa nos PRs dos outros.
 |---|---|---|---|---|---|
 | A | Gustavo | @gustavo-teno | sáb 21 | Backend: models, routers, services, `main.py` | Esqueleto → Auth → Ofensiva que perdoa |
 | B | Camila | @camilaabmf | sáb 21 | Frontend: layout, navegação, `lib/api.ts`, identidade visual | Base visual → Posts → Perfil-diário |
-| C | _a definir_ | | seg 23 | Dados: seed, `core/` e deploy | Curtidas → Comentários → Seed fake → Deploy |
-| D | _a definir_ | | seg 23 | Reforço: testes e o fluxo inteiro na tela | Follow → Feed → Turmas |
+| C | Clarisse | @clarissegabriela31-coder | seg 23 | Dados: seed, `core/` e deploy | Curtidas → Comentários → Seed fake → Deploy |
+| D | Pedro | @Pedrolk647 | seg 23 | Reforço: testes e o fluxo inteiro na tela | Follow → Feed → Turmas |
 
 GitHub do time: @gustavo-teno, @camilaabmf, @clarissegabriela31-coder,
 @Pedrolk647.
 
-**DMs entre mútuos** (opcional, decisão 6) não têm dono fixo: quem terminar a
-própria parte primeiro pega, a partir de quarta.
+**Extras do Gustavo:** como a parte dele terminou na segunda, ele pega as
+**DMs entre mútuos** (decisão 6, #18) na terça e na quarta e a **Busca** de
+pessoas e de posts (#38) na quinta, cada uma nos próprios arquivos. A aba
+Mensagens, o botão no perfil e o link "Buscar" são da área da Camila, mas vão
+prontos nos PRs dele e ela só revisa. Se alguém travar no núcleo, ajudar vem
+antes das extras.
 
 ## Por que essa divisão deixa todo mundo independente
 
@@ -118,9 +122,9 @@ rota.
 | **sáb 21** | Esqueleto (PR pequeno, B revisa) | Base visual + revisar o esqueleto | | |
 | **dom 22** | Auth no backend | Posts: backend + tela + card | | |
 | **seg 23** | Auth na tela | Perfil: backend + topo com a meta | Curtidas | Follow |
-| **ter 24** | Ofensiva: cálculo em `core/` + testes | Perfil: divisórias e edição | Comentários | Feed + tirar os `@skip` |
-| **qua 25** | Ofensiva: rota, componente e resumo da semana | Ajustes visuais nas telas de todo mundo + roteiro do vídeo | Seed com cara de vestibulando | Turmas |
-| **qui 26** | DECISIONS: escolha técnica | Gravar o vídeo (local, com o seed) | Deploy (+10) | Revisar o fluxo inteiro na tela |
+| **ter 24** | DMs: backend + testes (ofensiva já pronta) | Perfil: divisórias e edição | Comentários | Feed + tirar os `@skip` |
+| **qua 25** | DMs: tela e contador de não lidas | Ajustes visuais nas telas de todo mundo + roteiro do vídeo | Seed com cara de vestibulando | Turmas |
+| **qui 26** | Busca + DECISIONS final | Gravar o vídeo (local, com o seed) | Deploy (+10) | Revisar o fluxo inteiro na tela |
 | **sex 27** | **Todos:** pitch, uso de IA no DECISIONS, folga para imprevistos e entrega | | | |
 
 **Meta da terça à noite:** o fluxo cadastro → login → post → follow → feed
@@ -134,9 +138,9 @@ arquivo dos outros.
 
 - [Pessoa A — Gustavo (Back)](docs/plano/pessoa-a.md): Esqueleto (#5) → Auth (#6) → Ofensiva (#7)
 - [Pessoa B — Camila (Front)](docs/plano/pessoa-b.md): Base visual (#8) → Posts (#9) → Perfil-diário (#10)
-- [Pessoa C (Dados)](docs/plano/pessoa-c.md): Curtidas (#11) → Comentários (#12) → Seed (#13) → Deploy (#14)
-- [Pessoa D (Reforço)](docs/plano/pessoa-d.md): Follow (#15) → Feed (#16) → Turmas (#17)
-- DMs entre mútuos (#18), opcional: quem terminar antes
+- [Pessoa C — Clarisse (Dados)](docs/plano/pessoa-c.md): Curtidas (#11) → Comentários (#12) → Seed (#13) → Deploy (#14)
+- [Pessoa D — Pedro (Reforço)](docs/plano/pessoa-d.md): Follow (#15) → Feed (#16) → Turmas (#17)
+- Extras da Pessoa A (Gustavo): DMs entre mútuos (#18) → Busca (#38)
 - Entregas: vídeo (#19, Camila), pitch (#20, todos) e DECISIONS final
   (#21, Gustavo e todos). Vídeo e pitch não viram PR: quem é responsável
   fecha a issue à mão quando entregar.
@@ -153,11 +157,13 @@ nomes de rota nos planos são os dos testes do núcleo; o que não está nos tes
 
 1. **Núcleo** funcionando na tela até terça. Inegociável.
 2. **Ofensiva e Turmas** (decisões 4 e 5 do DECISIONS.md).
-3. **DMs entre mútuos** (decisão 6). **Opcional**, mas provavelmente entra:
-   quem terminar a própria parte pega.
+3. **DMs entre mútuos** (decisão 6), com o Gustavo.
+4. **Busca** de pessoas e de posts (#38), com o Gustavo. Notificações (alguém
+   curtiu, comentou ou começou a te seguir) só entram se sobrar tempo depois
+   de tudo isso na `main`.
 
-Se a DM não couber, ela vai para o "O que cortamos" no DECISIONS.md, com o
-motivo.
+Se uma extra não couber, ela vai para o "O que cortamos" no DECISIONS.md, com
+o motivo.
 
 ## Combinados
 
