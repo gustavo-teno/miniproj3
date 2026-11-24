@@ -38,11 +38,13 @@ export function TopoPerfil({ perfil, acao }: { perfil: Perfil; acao?: ReactNode 
       <div className="flex min-w-0 flex-1 gap-4 sm:gap-5">
         <FotoDoPerfil perfil={perfil} />
 
-        <div className="min-w-0 flex-1">
+        {/* Para quem visita, as informações vão até 560px (como no esboço) e o
+            painel do fogo fica encostado à direita. */}
+        <div className={`min-w-0 flex-1 ${perfil.meu_perfil ? "" : "sm:max-w-[560px]"}`}>
           <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
             {/* No celular o nome ocupa a linha toda e o botão desce: nada de quebrar
                 o nome no meio da palavra. */}
-            <h1 className="min-w-0 basis-full break-words text-2xl font-semibold sm:basis-0 sm:flex-1">{perfil.name}</h1>
+            <h1 className="min-w-0 basis-full break-words text-[26px] font-semibold sm:basis-0 sm:flex-1">{perfil.name}</h1>
             {acao}
           </div>
           <p className="text-sm text-tinta-suave">
@@ -50,7 +52,7 @@ export function TopoPerfil({ perfil, acao }: { perfil: Perfil; acao?: ReactNode 
           </p>
 
           {(meta.length > 0 || perfil.universidade) && (
-            <p className="mt-2">
+            <p className="mt-2 text-[15px]">
               {meta.map((item, i) => (
                 // A posição como chave: vestibular e curso "Outro" podem ter o mesmo texto.
                 <span key={i}>
@@ -70,10 +72,10 @@ export function TopoPerfil({ perfil, acao }: { perfil: Perfil; acao?: ReactNode 
 
           {perfil.bio && <p className="mt-1 whitespace-pre-line break-words font-light">{perfil.bio}</p>}
 
-          <p className="mt-3 text-sm">
+          <p className="mt-2.5 text-sm">
             <span className="font-numeros font-semibold">{perfil.seguidores}</span>{" "}
             <span className="text-tinta-suave">{perfil.seguidores === 1 ? "seguidor" : "seguidores"}</span>
-            <span className="mx-2 text-tinta-suave">·</span>
+            <span className="mx-2" />
             <span className="font-numeros font-semibold">{perfil.seguindo}</span>{" "}
             <span className="text-tinta-suave">seguindo</span>
           </p>
@@ -86,7 +88,7 @@ export function TopoPerfil({ perfil, acao }: { perfil: Perfil; acao?: ReactNode 
                 type="button"
                 disabled
                 title="Em breve"
-                className="rounded-lg bg-destaque px-5 py-2 text-sm font-semibold text-sobre-destaque disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-w-[200px] rounded-lg bg-destaque px-5 py-2 text-sm font-semibold text-sobre-destaque disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Seguir
               </button>

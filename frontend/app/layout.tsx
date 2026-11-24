@@ -39,7 +39,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-fundo font-texto text-tinta">
         <Navegacao />
-        <main className="mx-auto max-w-6xl px-6 py-6">{children}</main>
+        <main className="mx-auto max-w-[1320px] px-6 py-6">{children}</main>
       </body>
     </html>
   );

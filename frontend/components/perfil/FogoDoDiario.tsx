@@ -138,14 +138,15 @@ export function LegendaFogo({
 
   return (
     <>
-      <IconeFogo dias={dados.atual} className="-mb-1 -mt-3.5 size-[140px]" />
+      {/* No painel de quem visita, tudo menor, para caber na altura do bloco do perfil. */}
+      <IconeFogo dias={dados.atual} className={noPainel ? "-mb-0.5 -mt-2 size-24" : "-mb-1 -mt-3.5 size-[140px]"} />
       <div className="w-full text-center">
-        <p className={`fogo-${faixaDoFogo(dados.atual)} text-[42px] font-bold leading-none tracking-tight`}>
+        <p className={`fogo-${faixaDoFogo(dados.atual)} ${noPainel ? "text-[32px]" : "text-[42px]"} font-bold leading-none tracking-tight`}>
           <span style={{ color: "var(--fogo-texto)" }}>{dados.atual}</span>
         </p>
-        <p className="text-lg font-semibold leading-snug">{dados.atual === 1 ? "dia seguido" : "dias seguidos"}</p>
+        <p className={`${noPainel ? "text-[15px]" : "text-lg"} font-semibold leading-snug`}>{dados.atual === 1 ? "dia seguido" : "dias seguidos"}</p>
         <p
-          className={`fogo-${faixaDoFogo(dados.atual)} mt-1.5 flex items-baseline justify-center gap-1.5 border-t pt-1.5 font-semibold leading-snug ${noPainel ? "" : "border-linha"}`}
+          className={`fogo-${faixaDoFogo(dados.atual)} mt-1.5 flex items-baseline justify-center gap-1.5 border-t pt-1.5 font-semibold leading-snug ${noPainel ? "text-sm" : "border-linha"}`}
           style={noPainel ? { borderColor: "color-mix(in srgb, var(--fogo-texto) 25%, transparent)" } : undefined}
         >
           Recorde:{" "}
@@ -169,12 +170,12 @@ export function CaixaFogo({ dados, erro }: { dados: Ofensiva | null; erro: boole
   return (
     <section
       aria-label="Ofensiva"
-      className="flex flex-col items-center rounded-2xl border border-linha bg-superficie px-4 pb-3.5 pt-3"
+      className="flex h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-linha bg-superficie px-4 py-2"
     >
       {erro ? (
         <p className="text-sm text-tinta-suave">Não foi possível carregar a ofensiva.</p>
       ) : !dados ? (
-        <div role="status" aria-label="Carregando a ofensiva" className="h-52 w-full animate-pulse rounded-xl bg-linha" />
+        <div role="status" aria-label="Carregando a ofensiva" className="h-full w-full animate-pulse rounded-xl bg-linha" />
       ) : (
         <LegendaFogo dados={dados} comAviso />
       )}
@@ -190,7 +191,7 @@ export function PainelFogo({ username }: { username: string }) {
   return (
     <section
       aria-label="Ofensiva"
-      className={`fogo-${faixa} flex flex-col items-center justify-center rounded-[14px] px-4 pb-3.5 pt-3 sm:ml-auto sm:w-52 sm:flex-none sm:self-stretch`}
+      className={`fogo-${faixa} flex flex-col items-center justify-center rounded-[14px] px-4 py-2.5 sm:ml-auto sm:w-48 sm:flex-none sm:self-stretch`}
       style={{ background: "var(--fogo-painel)" }}
     >
       {erro ? (

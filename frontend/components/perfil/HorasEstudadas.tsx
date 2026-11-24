@@ -66,7 +66,7 @@ export function HorasEstudadas({
   const maior = Math.max(1, ...(porDia ?? [0]));
 
   return (
-    <section aria-labelledby="titulo-horas" className="rounded-2xl border border-linha bg-superficie px-4 py-3.5">
+    <section aria-labelledby="titulo-horas" className="flex h-[280px] flex-col rounded-2xl border border-linha bg-superficie px-4 py-3.5">
       <div className="flex items-baseline justify-between">
         <h2 id="titulo-horas" className="text-[15px] font-semibold">
           Horas estudadas
@@ -95,7 +95,7 @@ export function HorasEstudadas({
       )}
 
       {/* As barras: a altura de cada dia em relação ao dia com mais horas. */}
-      <div className="mt-2.5 flex h-16 gap-1.5" role="img" aria-label={porDia ? resumoParaLeitor(porDia) : "Carregando as horas por dia"}>
+      <div className="mt-2.5 flex min-h-16 flex-1 gap-1.5" role="img" aria-label={porDia ? resumoParaLeitor(porDia) : "Carregando as horas por dia"}>
         {DIAS.map((dia, i) => (
           <div key={dia} className="flex flex-1 flex-col items-center gap-1.5">
             <div className="flex w-full flex-1 items-end overflow-hidden rounded-md bg-destaque-fundo">

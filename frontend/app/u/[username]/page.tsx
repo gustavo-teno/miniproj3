@@ -134,7 +134,7 @@ export default function PaginaPerfil() {
   // quando chegar à main. Mensagem só aparece se as DMs existirem (decisão 6).
 
   const principal = (
-    <div className="min-w-0 space-y-5">
+    <div className="min-w-0 space-y-4">
       <TopoPerfil perfil={perfil} acao={acao} />
 
       {semNenhumPost ? (
@@ -164,14 +164,8 @@ export default function PaginaPerfil() {
                 <div role="status" aria-label="Carregando os posts" className="m-4 h-24 animate-pulse rounded-xl bg-linha" />
               )
             ) : posts.length === 0 ? (
-              <div className="px-6 py-10 text-center">
-                <p className="font-semibold">Nenhum post de {nomeDoCaderno} ainda</p>
-                <p className="mx-auto mt-1 max-w-md text-sm text-tinta-suave">
-                  {eu
-                    ? `Quando você postar um estudo de ${nomeDoCaderno}, ele aparece aqui. A matéria já vem marcada no Postar.`
-                    : `Quando houver um estudo de ${nomeDoCaderno}, ele aparece aqui.`}
-                </p>
-              </div>
+              // O mesmo formato da lista vazia do feed (combinado em 24/11).
+              <p className="p-6 text-sm text-tinta-suave">Nenhum post de {nomeDoCaderno} ainda.</p>
             ) : (
               <>
                 {posts.map((p) => (
@@ -201,7 +195,7 @@ export default function PaginaPerfil() {
 
   // No celular, a coluna da direita vem antes dos posts (order) e rola junto.
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_264px] lg:items-start lg:gap-x-12">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_248px] lg:items-start">
       {principal}
       <aside aria-label="Seu diário" className="-order-1 space-y-4 lg:sticky lg:top-4 lg:order-none">
         {/* A matéria do caderno aberto já vem marcada; em "Todas", fica a última escolhida. */}

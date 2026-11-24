@@ -49,7 +49,8 @@ export function EstanteCadernos({ cadernos, aberto, abrir }: Props) {
   }
 
   const caderno =
-    "flex h-28 w-40 flex-none snap-start flex-col justify-between rounded-xl border-2 p-3 text-left transition-colors sm:w-44";
+    "flex h-28 w-40 flex-none snap-start flex-col justify-between rounded-xl border-2 p-3.5 text-left transition-colors lg:w-[calc((100%-48px)/5)]";
+  // No computador, 5 cadernos inteiros por vez (como no esboço); no celular, 2 e um pedaço.
   const marca = (ativo: boolean) => (ativo ? "border-current" : "border-transparent");
 
   return (
@@ -69,8 +70,8 @@ export function EstanteCadernos({ cadernos, aberto, abrir }: Props) {
         >
           <span className="font-numeros text-xl font-semibold">{total}</span>
           <span>
-            <span className="block font-semibold">Todas</span>
-            <span className="block font-numeros text-xs opacity-85">todas as matérias</span>
+            <span className="block text-[15px] font-semibold">Todas</span>
+            <span className="block font-numeros text-xs opacity-85">{total === 1 ? "1 post" : `${total} posts`}</span>
           </span>
         </button>
 
@@ -85,7 +86,7 @@ export function EstanteCadernos({ cadernos, aberto, abrir }: Props) {
           >
             <SimboloMateria tag={c.tag} className="size-6" />
             <span>
-              <span className="block truncate font-semibold">{nome(c.tag)}</span>
+              <span className="block truncate text-[15px] font-semibold">{nome(c.tag)}</span>
               {/* suppressHydrationWarning: o "há 2h" muda entre o servidor e o navegador. */}
               <span className="block font-numeros text-xs opacity-85" suppressHydrationWarning>
                 {c.posts === 1 ? "1 post" : `${c.posts} posts`}
@@ -107,7 +108,7 @@ export function EstanteCadernos({ cadernos, aberto, abrir }: Props) {
           >
             <SimboloMateria tag={t.valor} className="size-6" />
             <span>
-              <span className="block truncate font-semibold">{t.nome}</span>
+              <span className="block truncate text-[15px] font-semibold">{t.nome}</span>
               <span className="block font-numeros text-xs opacity-85">ainda vazio</span>
             </span>
           </button>

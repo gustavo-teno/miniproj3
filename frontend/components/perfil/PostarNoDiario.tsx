@@ -58,7 +58,7 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
     <form
       onSubmit={enviar}
       aria-label="Postar no diário"
-      className="flex flex-col gap-3 rounded-2xl border border-linha bg-superficie p-4"
+      className="flex h-[280px] flex-col gap-3 rounded-2xl border border-linha bg-superficie p-4"
     >
       <h2 className="text-[17px] font-semibold">Postar no diário</h2>
 
@@ -69,7 +69,7 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
         onChange={(e) => setTexto(e.target.value)}
         placeholder="O que você estudou agora?"
         aria-label="O que você estudou agora?"
-        className="min-h-[120px] resize-y rounded-[10px] border border-linha bg-superficie px-3.5 py-3 text-sm font-light text-tinta outline-none placeholder:text-tinta-suave focus:border-destaque"
+        className="min-h-0 flex-1 resize-none rounded-[10px] border border-linha bg-superficie px-3.5 py-3 text-sm font-light text-tinta outline-none placeholder:text-tinta-suave focus:border-destaque"
       />
 
       <div className="flex flex-wrap items-center gap-1.5">
