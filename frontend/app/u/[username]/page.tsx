@@ -206,7 +206,7 @@ export default function PaginaPerfil() {
         {/* A matéria do caderno aberto já vem marcada; em "Todas", fica a última escolhida. */}
         <PostarNoDiario tagInicial={aberto ?? ""} onPostado={aoPostar} />
         <CaixaFogo dados={ofensiva.dados} erro={ofensiva.erro} />
-        <HorasEstudadas username={perfil.username} ofensiva={ofensiva.dados} versao={versao} />
+        <HorasEstudadas ofensiva={ofensiva.dados} />
       </aside>
     </div>
   );

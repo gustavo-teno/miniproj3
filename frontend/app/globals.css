@@ -119,25 +119,6 @@
   --font-numeros: var(--fonte-numeros), ui-monospace, monospace;
 }
 
-/* O fogo da ofensiva (#7, Pessoa A): a cor muda com a faixa de dias e vem por
-   estiloDoFogo() (components/Ofensiva.tsx), no mesmo esquema da cor-materia. */
-.cor-fogo {
-  fill: var(--fogo);
-  stroke: var(--fogo-contorno);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema="claro"]) .cor-fogo {
-    fill: var(--fogo-noturno);
-    stroke: var(--fogo-contorno-noturno);
-  }
-}
-
-:root[data-tema="noturno"] .cor-fogo {
-  fill: var(--fogo-noturno);
-  stroke: var(--fogo-contorno-noturno);
-}
-
 /* O fogo do diário (#10, Pessoa B): o caderno com a chama, que cresce e muda
    de cor com os dias seguidos (0 = apagado; 1 a 6 = as faixas do Ofensiva.tsx,
    do vermelho ao azul, o mais intenso). Cada faixa é uma classe que define as

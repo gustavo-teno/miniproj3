@@ -1,68 +1,24 @@
 "use client";
 
 // "Horas estudadas" (#10, Pessoa B), no desenho aprovado em 24/11: só a dona do
-// diário vê (privado). O total da semana e o da semana anterior vêm da rota da
-// ofensiva (Gustavo); as barras de segunda a domingo somam os minutos dos
-// posts desta semana, com a mesma regra dele: semana de segunda a domingo no
-// horário de Brasília, e bate-papo não conta. Dia sem estudo fica com a barra
-// vazia, sem marca de "falhou": descanso não é fracasso.
+// diário vê (privado). Tudo vem da rota da ofensiva (Gustavo, #44): o total da
+// semana, o da semana anterior e os minutos de cada dia, de segunda a domingo,
+// já com a regra do fuso de Brasília e sem o bate-papo. A rota só manda esses
+// números para a dona; para quem visita vêm null (e esta caixa nem aparece).
+// Dia sem estudo fica com a barra vazia, sem marca de "falhou": descanso não é
+// fracasso.
 
-import { useEffect, useState } from "react";
-
-import { buscarPostsDoPerfil, type Ofensiva } from "@/lib/api";
+import type { Ofensiva } from "@/lib/api";
 import { duracao } from "@/lib/tempo";
 
 const DIAS = ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"];
-const BRASILIA_MS = -3 * 60 * 60 * 1000; // o mesmo fuso fixo do backend (core/ofensiva.py)
 
-// O dia em Brasília de um momento, como número de dias desde 1970 (para comparar).
-function diaEmBrasilia(iso: string | Date): number {
-  const ms = new Date(iso).getTime() + BRASILIA_MS;
-  return Math.floor(ms / 86_400_000);
-}
-
-// A segunda-feira desta semana em Brasília (1/1/1970 foi uma quinta: +3 acerta para segunda).
-function segundaDestaSemana(): number {
-  const hoje = diaEmBrasilia(new Date());
-  return hoje - ((hoje + 3) % 7);
-}
-
-function horas(minutos: number): string {
+function horas(minutos: number | null): string {
   return minutos ? duracao(minutos) : "0h";
 }
 
-export function HorasEstudadas({
-  username,
-  ofensiva,
-  versao,
-}: {
-  username: string;
-  ofensiva: Ofensiva | null;
-  versao: number; // muda quando entra um post novo, para recalcular as barras
-}) {
-  const [porDia, setPorDia] = useState<number[] | null>(null);
-
-  useEffect(() => {
-    let ativo = true;
-    const segunda = segundaDestaSemana();
-    // Os 100 posts mais novos cobrem a semana de quem posta até ~14 vezes por dia.
-    buscarPostsDoPerfil(username, null, 0, 100)
-      .then((pagina) => {
-        if (!ativo) return;
-        const soma = [0, 0, 0, 0, 0, 0, 0];
-        for (const p of pagina.items) {
-          if (p.tag === "bate-papo" || !p.minutos) continue;
-          const i = diaEmBrasilia(p.created_at) - segunda;
-          if (i >= 0 && i < 7) soma[i] += p.minutos;
-        }
-        setPorDia(soma);
-      })
-      .catch(() => ativo && setPorDia(null));
-    return () => {
-      ativo = false;
-    };
-  }, [username, versao]);
-
+export function HorasEstudadas({ ofensiva }: { ofensiva: Ofensiva | null }) {
+  const porDia = ofensiva?.minutos_por_dia ?? null;
   const maior = Math.max(1, ...(porDia ?? [0]));
 
   return (
