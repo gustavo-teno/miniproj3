@@ -73,8 +73,50 @@ trava outra pessoa vira issue, com o link aqui.
 - [x] Registrar na decisão 4 do DECISIONS.md, com o porquê de cor em vez de
     títulos (tipo "Excursionista" e "Patrulheiro")
 
-**Qui 26:** escrever a escolha técnica no DECISIONS.md (por que a ofensiva fica
-em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
+**Qui 26:**
+- [x] Escrever a escolha técnica no DECISIONS.md (por que a ofensiva fica em
+    `core/` e qual o Big O do cálculo). Feito na seg 23.
+
+## Extras (depois que a parte de A ficou pronta, na seg 23)
+
+Antes de cada dia, olhar o grupo: se alguém travou no núcleo, ajudar vem antes.
+
+**Ter 24: DMs no backend** (#18, decisão 6). PR com `Parte de #18`.
+- [ ] Só entre mútuos: as duas pessoas se seguem, senão 403. A regra fica no
+    service, lendo o model `Follow` (só leitura, a área é do Pedro).
+- [ ] Enviar mensagem, listar as conversas (a outra pessoa, a última mensagem e
+    quantas não lidas) e buscar as mensagens de uma conversa, com a opção de
+    pedir só as que vieram depois da última que a tela já tem (pelo `id`, que
+    não repete nem pula mensagem enviada no mesmo segundo).
+- [ ] Não lidas: uma tabela nova que guarda até qual mensagem cada pessoa já
+    leu em cada conversa. Tabela nova o `create_all` cria sozinho, então
+    ninguém precisa apagar o banco local (coluna nova precisaria).
+- [ ] Testes: não mútuos recebem 403, a conversa só aparece para as duas
+    pessoas, o "depois de" traz só as novas, e abrir a conversa zera as não lidas.
+
+**Qua 25: DMs na tela.** PR com `Closes #18`.
+- [ ] `/mensagens`: a lista de conversas; `/mensagens/[username]`: a conversa,
+    que pergunta as novas a cada poucos segundos e para quando a aba fica
+    escondida.
+- [ ] Ligar a aba "Mensagens" (`MOSTRAR_MENSAGENS` em `Navegacao.tsx`) com o
+    número de não lidas.
+- [ ] `<BotaoMensagem username=... />` no perfil, que só aparece entre mútuos.
+- **Combinar com B:** a navegação e o perfil são da área dela, mas na quarta
+    e na quinta ela está nos ajustes visuais e no vídeo. Então a aba, o botão
+    no perfil e o link "Buscar" vão prontos no meu PR, avisando no texto do PR
+    o que mudou na área dela (como no #29), e ela só revisa.
+
+**Qui 26: Busca** (#38). PR com `Closes #38`.
+- [ ] `GET /busca?q=...&tipo=pessoas|posts`, sem diferença de acento nem de
+    maiúscula ("calculo" acha "Cálculo").
+- [ ] `/busca` com as abas Pessoas e Posts, que espera a pessoa parar de
+    digitar antes de buscar.
+- [ ] Link "Buscar" na navegação, pronto no PR para B revisar.
+- De manhã, o DECISIONS final (#21).
+
+**Se sobrar tempo:** notificações (alguém curtiu, comentou ou começou a te
+seguir). Dependem das curtidas, dos comentários e do follow já estarem na
+`main`.
 
 **Revisa:** PRs que mexem em models, routers, services e `main.py`.
 
@@ -83,6 +125,7 @@ em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **seg 23:** peguei as extras: DMs (#18) na terça e na quarta e Busca (#38) na quinta. As DMs ganharam o contador de não lidas, que antes estava no "O que cortamos" da decisão 6 (atualizada).
 - **seg 23:** ajustes que sobraram da revisão do PR 29: os erros 422 saem traduzidos com o nome do campo, toda mensagem segue o padrão impessoal ("Não foi possível...", maiúscula e ponto), backend fora do ar não mostra mais "Failed to fetch", o cadastro tira os espaços das pontas antes de enviar, e quem já entrou e abre /login ou /cadastro vai para o feed (`useSoSemLogin`).
 - **seg 23:** escolha técnica escrita no DECISIONS.md (adiantada de quinta), no PR 32: por que a ofensiva é calculada na hora numa função pura em `core/` em vez de guardada, e o custo (O(D + P) por chamada, com o `set` dando consulta O(1) por dia).
 - **seg 23:** rota e componente da ofensiva prontos (adiantados de quarta). `GET /usuarios/{username}/ofensiva` exige login e devolve a ofensiva, o recorde, as folgas, o aviso "estude hoje" e os minutos desta semana e da passada. As horas da semana somam só posts de matéria, como a ofensiva (bate-papo com duração não conta). **Para a Camila:** `<Ofensiva username=... />` está em `components/Ofensiva.tsx`, pronto para o topo do perfil; os tons do fogo são provisórios (lista `FAIXAS` no mesmo arquivo) e a classe `.cor-fogo` entrou no `globals.css`, no esquema da `.cor-materia`.
