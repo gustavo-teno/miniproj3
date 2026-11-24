@@ -270,3 +270,41 @@ export type Ofensiva = {
 export function buscarOfensiva(username: string): Promise<Ofensiva> {
   return apiGet<Ofensiva>(`/usuarios/${encodeURIComponent(username)}/ofensiva`);
 }
+
+// ---- DMs entre mútuos (#18, Pessoa A; espelha backend/app/schemas/dm.py) ----
+
+export type Mensagem = {
+  id: number;
+  texto: string;
+  created_at: string;
+  minha: boolean; // quem está vendo mandou esta mensagem
+};
+
+// Um item da lista de conversas.
+export type Conversa = { pessoa: Autor; ultima: Mensagem; nao_lidas: number };
+
+// A conversa aberta: as mensagens da mais antiga para a mais nova.
+export type ConversaAberta = {
+  pessoa: Autor;
+  pode_responder: boolean; // só entre mútuos (decisão 6)
+  mensagens: Mensagem[];
+};
+
+export function buscarConversas(): Promise<Conversa[]> {
+  return apiGet<Conversa[]>("/dms");
+}
+
+export async function contarNaoLidas(): Promise<number> {
+  return (await apiGet<{ total: number }>("/dms/nao-lidas")).total;
+}
+
+// Sem depoisDe: as últimas mensagens. Com depoisDe (o id da última que a tela
+// já tem): só as novas. Abrir a conversa marca como lido.
+export function buscarConversa(username: string, depoisDe?: number): Promise<ConversaAberta> {
+  const busca = depoisDe === undefined ? "" : `?depois_de=${depoisDe}`;
+  return apiGet<ConversaAberta>(`/dms/${encodeURIComponent(username)}${busca}`);
+}
+
+export function enviarMensagem(username: string, texto: string): Promise<Mensagem> {
+  return apiPost<Mensagem>(`/dms/${encodeURIComponent(username)}`, { texto });
+}
