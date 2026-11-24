@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { AvisoErro, CaixaAuth, Campo, estiloBotao, estiloCampo } from "@/components/FormAuth";
+import { AVISO_ACABOU_DE_ENTRAR } from "@/components/BoasVindasDeVolta";
 import { entrar } from "@/lib/api";
 import { useSoSemLogin } from "@/lib/useExigeLogin";
 
@@ -28,6 +29,10 @@ export default function LoginPage() {
     setErro(null);
     try {
       await entrar(username, senha);
+      // Avisa o feed para mostrar "Que bom te ver de novo" uma vez.
+      try {
+        sessionStorage.setItem(AVISO_ACABOU_DE_ENTRAR, "1");
+      } catch {}
       // Recarrega a página inteira para o topo descobrir quem entrou.
       window.location.href = "/";
     } catch (err) {
@@ -39,7 +44,8 @@ export default function LoginPage() {
   if (!liberado) return null;
 
   return (
-    <CaixaAuth titulo="Entrar">
+    // A saudação de chegada; o "Que bom te ver de novo" aparece no feed, depois de entrar (24/11).
+    <CaixaAuth titulo="Entrar" saudacao="Seu caderno está te esperando">
       <form onSubmit={enviar} className="space-y-4">
         {contaCriada && !erro && (
           <p role="status" className="rounded-lg bg-destaque-fundo p-3 text-sm text-tinta">
