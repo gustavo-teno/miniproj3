@@ -3,7 +3,7 @@
 // O perfil-diário (#10, Pessoa B): /u/<username>. A mesma página serve para a
 // dona do diário e para quem visita; o backend diz qual é o caso (meu_perfil).
 //
-// - Dona: coluna da direita presa ao rolar, com o postar e a ofensiva.
+// - Dona: coluna da direita presa ao rolar: postar, fogo e horas estudadas.
 // - Quem visita: uma coluna só; o fogo vai para o topo e entra o "Seguir".
 
 import Link from "next/link";
@@ -11,9 +11,10 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CardPost } from "@/components/CardPost";
-import { FormPost } from "@/components/FormPost";
-import { Ofensiva } from "@/components/Ofensiva";
 import { EstanteCadernos } from "@/components/perfil/EstanteCadernos";
+import { CaixaFogo, useOfensiva } from "@/components/perfil/FogoDoDiario";
+import { HorasEstudadas } from "@/components/perfil/HorasEstudadas";
+import { PostarNoDiario } from "@/components/perfil/PostarNoDiario";
 import { TopoPerfil } from "@/components/perfil/TopoPerfil";
 import { buscarPerfil, buscarPostsDoPerfil, type Perfil, type Post } from "@/lib/api";
 import { useOpcoes } from "@/lib/opcoes";
@@ -30,6 +31,9 @@ export default function PaginaPerfil() {
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [total, setTotal] = useState(0);
   const [carregandoMais, setCarregandoMais] = useState(false);
+  // Muda a cada post novo: o fogo e as horas se recalculam.
+  const [versao, setVersao] = useState(0);
+  const ofensiva = useOfensiva(username, versao);
   // Erro ao buscar posts: aparece dentro da lista, sem esconder o perfil.
   const [erroPosts, setErroPosts] = useState<string | null>(null);
 
@@ -98,6 +102,7 @@ export default function PaginaPerfil() {
       setTotal((t) => t + 1);
     }
     carregarPerfil();
+    setVersao((v) => v + 1);
   }
 
   if (!liberado) return null;
@@ -199,14 +204,10 @@ export default function PaginaPerfil() {
     <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_264px] lg:items-start lg:gap-x-12">
       {principal}
       <aside aria-label="Seu diário" className="-order-1 space-y-4 lg:sticky lg:top-4 lg:order-none">
-        <div>
-          <h2 className="mb-2 font-semibold">Postar no diário</h2>
-          {/* A matéria do caderno aberto já vem marcada; em "Todas", nenhuma. */}
-          <FormPost autor={perfil} onPostado={aoPostar} tagInicial={aberto ?? ""} />
-        </div>
-        <div className="rounded-2xl border border-linha bg-superficie p-4">
-          <Ofensiva username={perfil.username} meuPerfil />
-        </div>
+        {/* A matéria do caderno aberto já vem marcada; em "Todas", fica a última escolhida. */}
+        <PostarNoDiario tagInicial={aberto ?? ""} onPostado={aoPostar} />
+        <CaixaFogo dados={ofensiva.dados} erro={ofensiva.erro} />
+        <HorasEstudadas username={perfil.username} ofensiva={ofensiva.dados} versao={versao} />
       </aside>
     </div>
   );

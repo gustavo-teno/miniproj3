@@ -4,7 +4,7 @@
 // Ao clicar, abre para escrever, com a matéria (obrigatória, decisão 2) e a
 // duração da sessão (opcional). Salva de verdade com POST /posts.
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 import { Avatar } from "@/components/Avatar";
 import { apiPost, type Autor, type Post } from "@/lib/api";
@@ -17,18 +17,15 @@ const MAX_MINUTOS = 1440;
 export function FormPost({
   autor,
   onPostado,
-  tagInicial = "",
 }: {
   autor?: Pick<Autor, "name" | "avatar_url">;
   // Quem usa o formulário decide o que fazer com o post novo (ex.: pôr no topo da lista).
   onPostado?: (post: Post) => void;
-  // A matéria que já vem marcada (no diário, a do caderno aberto). Dá para trocar.
-  tagInicial?: string;
 }) {
   const opcoes = useOpcoes();
   const [aberto, setAberto] = useState(false);
   const [texto, setTexto] = useState("");
-  const [tag, setTag] = useState(tagInicial);
+  const [tag, setTag] = useState("");
   const [minutos, setMinutos] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -38,15 +35,10 @@ export function FormPost({
   function fechar() {
     setAberto(false);
     setTexto("");
-    setTag(tagInicial);
+    setTag("");
     setMinutos("");
     setErro(null);
   }
-
-  // Trocou de caderno com o formulário fechado: a matéria marcada acompanha.
-  useEffect(() => {
-    if (!aberto) setTag(tagInicial);
-  }, [tagInicial, aberto]);
 
   async function enviar(e: FormEvent) {
     e.preventDefault();

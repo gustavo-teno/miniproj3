@@ -1,14 +1,14 @@
 "use client";
 
 // O topo do diário (#10, Pessoa B): foto, nome, @, desde quando está na rede,
-// a meta no estilo "Fuvest · Medicina · USP", a bio e os contadores. À direita,
-// o que muda com quem está vendo: "Editar perfil" para a dona; para quem
-// visita, o fogo da ofensiva entra aqui mesmo (no diário da dona ele fica na
-// coluna da direita).
+// a meta no estilo "Fuvest · Medicina · USP", a bio e os contadores. O que
+// muda com quem está vendo: "Editar perfil" para a dona; para quem visita, os
+// botões Seguir e Mensagem e o fogo num painel à direita (no diário da dona o
+// fogo fica na coluna da direita).
 
 import type { ReactNode } from "react";
 
-import { Ofensiva } from "@/components/Ofensiva";
+import { PainelFogo } from "@/components/perfil/FogoDoDiario";
 import type { Perfil } from "@/lib/api";
 import { nomeDaOpcao, useOpcoes } from "@/lib/opcoes";
 import { NOME_REDE } from "@/lib/rede";
@@ -77,15 +77,37 @@ export function TopoPerfil({ perfil, acao }: { perfil: Perfil; acao?: ReactNode 
             <span className="font-numeros font-semibold">{perfil.seguindo}</span>{" "}
             <span className="text-tinta-suave">seguindo</span>
           </p>
+
+          {/* Quem visita: Seguir e Mensagem, como no esboço. Ficam desativados
+              até o BotaoSeguir (Pessoa D, PR #33) e as DMs (decisão 6) existirem. */}
+          {!perfil.meu_perfil && (
+            <div className="mt-3.5 flex gap-2">
+              <button
+                type="button"
+                disabled
+                title="Em breve"
+                className="rounded-lg bg-destaque px-5 py-2 text-sm font-semibold text-sobre-destaque disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Seguir
+              </button>
+              <button
+                type="button"
+                disabled
+                title="Em breve"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-destaque px-4 py-2 text-sm font-semibold text-destaque disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z" />
+                </svg>
+                Mensagem
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Para quem visita, o fogo faz parte das informações da pessoa. */}
-      {!perfil.meu_perfil && (
-        <div className="flex items-center justify-center rounded-xl bg-fundo p-4 sm:w-56 sm:flex-none">
-          <Ofensiva username={perfil.username} meuPerfil={false} />
-        </div>
-      )}
+      {!perfil.meu_perfil && <PainelFogo username={perfil.username} />}
     </section>
   );
 }

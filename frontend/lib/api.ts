@@ -265,8 +265,13 @@ export function buscarPerfil(username: string): Promise<Perfil> {
 }
 
 // Os posts de um caderno (tag) ou de todos (sem tag), do mais novo ao mais antigo.
-export function buscarPostsDoPerfil(username: string, tag: string | null, offset = 0): Promise<Page<Post>> {
-  const busca = new URLSearchParams({ offset: String(offset), limit: "20" });
+export function buscarPostsDoPerfil(
+  username: string,
+  tag: string | null,
+  offset = 0,
+  limit = 20,
+): Promise<Page<Post>> {
+  const busca = new URLSearchParams({ offset: String(offset), limit: String(limit) });
   if (tag) busca.set("tag", tag);
   return apiGet<Page<Post>>(`/usuarios/${encodeURIComponent(username)}/posts?${busca}`);
 }
