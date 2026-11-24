@@ -82,6 +82,8 @@ const NOMES_DOS_CAMPOS: Record<string, string> = {
   curso_outro: "Curso",
   texto: "Texto",
   minutos: "Duração",
+  bio: "Bio",
+  avatar_url: "Foto",
 };
 
 // A unidade dos campos de número, para "pelo menos 1 minuto" em vez de "pelo
@@ -253,7 +255,38 @@ export type Perfil = User & {
   universidade: string;
   seguidores: number;
   seguindo: number;
+  meu_perfil: boolean; // quem está vendo é a dona do diário?
+  cadernos: Caderno[]; // só as tags com post, da mais usada para a menos usada
 };
+
+// Um caderno da estante: quantos posts a pessoa tem numa matéria e quando foi o último.
+export type Caderno = { tag: string; posts: number; ultimo_post: string };
+
+export function buscarPerfil(username: string): Promise<Perfil> {
+  return apiGet<Perfil>(`/usuarios/${encodeURIComponent(username)}`);
+}
+
+// O que dá para mudar no próprio perfil (PATCH /usuarios/eu). Só vai o que mudou.
+export type EdicaoPerfil = Partial<
+  Pick<Perfil, "name" | "bio" | "avatar_url" | "vestibular" | "curso" | "vestibular_outro" | "curso_outro" | "universidade">
+>;
+
+// Devolve o perfil inteiro já atualizado.
+export function editarPerfil(mudancas: EdicaoPerfil): Promise<Perfil> {
+  return apiPatch<Perfil>("/usuarios/eu", mudancas);
+}
+
+// Os posts de um caderno (tag) ou de todos (sem tag), do mais novo ao mais antigo.
+export function buscarPostsDoPerfil(
+  username: string,
+  tag: string | null,
+  offset = 0,
+  limit = 20,
+): Promise<Page<Post>> {
+  const busca = new URLSearchParams({ offset: String(offset), limit: String(limit) });
+  if (tag) busca.set("tag", tag);
+  return apiGet<Page<Post>>(`/usuarios/${encodeURIComponent(username)}/posts?${busca}`);
+}
 
 // ---- ofensiva (#7, Pessoa A; espelha backend/app/schemas/ofensiva.py) ----
 

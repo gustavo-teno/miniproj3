@@ -52,7 +52,9 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
             <span className="cor-materia grid size-6 flex-none place-items-center rounded-md" style={estilo}>
               <SimboloMateria tag={post.tag} className="size-3.5" />
             </span>
-            {nomeDaOpcao(opcoes?.tags, post.tag)}
+            {/* Sem a lista de /opcoes ainda, o nome some em vez de aparecer como a
+                chave ("biologia"); o espaço fica reservado para o texto não pular. */}
+            <span className={opcoes ? "" : "invisible"}>{nomeDaOpcao(opcoes?.tags, post.tag)}</span>
           </span>
           {post.minutos != null && (
             <span className="font-numeros text-tinta-suave">{duracao(post.minutos)}</span>

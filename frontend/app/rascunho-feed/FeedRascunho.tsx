@@ -135,7 +135,7 @@ export function FeedRascunho() {
           setEsconderBatePapo={setEsconderBatePapo}
         />
 
-        <div className="min-w-0 space-y-3">
+        <div className="min-w-0 space-y-4">
           <FormPost onPostado={(novo) => setTodos((atuais) => [novo, ...atuais])} />
 
           <section aria-label="Posts" className="overflow-hidden rounded-2xl border border-linha bg-superficie">
