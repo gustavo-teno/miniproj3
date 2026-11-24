@@ -62,6 +62,24 @@ export function Navegacao() {
         </nav>
 
         <div className="flex items-center gap-3 justify-self-end">
+          {/* A busca (#38): uma lupa, e não mais uma aba, para as abas
+              continuarem cabendo no celular. */}
+          {eu && (
+            <Link
+              href="/busca"
+              aria-label="Buscar"
+              title="Buscar"
+              aria-current={caminho === "/busca" ? "page" : undefined}
+              className={
+                "grid size-9 place-items-center rounded-lg border transition-colors " +
+                (caminho === "/busca"
+                  ? "border-destaque bg-destaque-fundo text-destaque"
+                  : "border-linha text-tinta-suave hover:text-tinta")
+              }
+            >
+              <Icone d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM21 21l-4.35-4.35" />
+            </Link>
+          )}
           {eu === null && (
             <Link href="/login" className="whitespace-nowrap font-semibold text-destaque hover:underline">
               Entrar
