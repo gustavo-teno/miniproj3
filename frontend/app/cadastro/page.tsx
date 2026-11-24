@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { EscolhaMeta } from "@/components/EscolhaMeta";
 import { AvisoErro, CaixaAuth, Campo, estiloBotao, estiloCampo } from "@/components/FormAuth";
-import { cadastrar, type Cadastro, type Opcao } from "@/lib/api";
+import { cadastrar, type Cadastro } from "@/lib/api";
 import { useOpcoes } from "@/lib/opcoes";
+import { NOME_REDE } from "@/lib/rede";
+import { useSoSemLogin } from "@/lib/useExigeLogin";
 
 const VAZIO: Cadastro = {
   username: "",
@@ -19,6 +22,7 @@ const VAZIO: Cadastro = {
 };
 
 export default function CadastroPage() {
+  const liberado = useSoSemLogin();
   const opcoes = useOpcoes();
   const [dados, setDados] = useState<Cadastro>(VAZIO);
   const [erro, setErro] = useState<string | null>(null);
@@ -34,7 +38,15 @@ export default function CadastroPage() {
     setEnviando(true);
     setErro(null);
     try {
-      const entrou = await cadastrar(dados);
+      // Sem os espaços das pontas: "  Ana " vira "Ana", e um nome só de
+      // espaços chega vazio e recebe o aviso certo.
+      const entrou = await cadastrar({
+        ...dados,
+        name: dados.name.trim(),
+        universidade: dados.universidade.trim(),
+        vestibular_outro: dados.vestibular_outro.trim(),
+        curso_outro: dados.curso_outro.trim(),
+      });
       if (!entrou) {
         // A conta existe, só o login automático falhou: a pessoa entra à mão.
         window.location.href = "/login?conta=criada";
@@ -45,13 +57,16 @@ export default function CadastroPage() {
       // o topo descobrir quem entrou.
       window.location.href = "/";
     } catch (err) {
-      setErro(err instanceof Error ? err.message : "não consegui criar a conta");
+      setErro(err instanceof Error ? err.message : "Não foi possível criar a conta.");
       setEnviando(false);
     }
   }
 
+  if (!liberado) return null;
+
   return (
-    <CaixaAuth titulo="Criar conta">
+    // "Boas-vindas" em vez de "bem-vindo": serve para qualquer pessoa (24/11).
+    <CaixaAuth titulo="Criar conta" saudacao={`Olá! Boas-vindas ao ${NOME_REDE}`}>
       <form onSubmit={enviar} className="space-y-4">
         <Campo rotulo="Nome" dica="Como você quer aparecer para a turma.">
           <input
@@ -135,56 +150,5 @@ export default function CadastroPage() {
         </Link>
       </p>
     </CaixaAuth>
-  );
-}
-
-// Uma lista de /opcoes e, se a escolha for "Outro", um campo para escrever qual.
-function EscolhaMeta({
-  rotulo,
-  lista,
-  valor,
-  aoEscolher,
-  outro,
-  aoEscreverOutro,
-  exemploOutro,
-}: {
-  rotulo: string;
-  lista: Opcao[] | undefined;
-  valor: string;
-  aoEscolher: (valor: string) => void;
-  outro: string;
-  aoEscreverOutro: (texto: string) => void;
-  exemploOutro: string;
-}) {
-  return (
-    <>
-      <Campo rotulo={rotulo}>
-        {/* Sem a lista (backend fora do ar), a escolha fica para depois. */}
-        <select
-          value={valor}
-          onChange={(e) => aoEscolher(e.target.value)}
-          disabled={!lista}
-          className={estiloCampo}
-        >
-          <option value="">{lista ? "Ainda não escolhi" : "Carregando..."}</option>
-          {lista?.map((o) => (
-            <option key={o.valor} value={o.valor}>
-              {o.nome}
-            </option>
-          ))}
-        </select>
-      </Campo>
-      {valor === "outro" && (
-        <Campo rotulo={`Qual ${rotulo.toLowerCase()}?`}>
-          <input
-            value={outro}
-            onChange={(e) => aoEscreverOutro(e.target.value)}
-            maxLength={60}
-            placeholder={exemploOutro}
-            className={estiloCampo}
-          />
-        </Campo>
-      )}
-    </>
   );
 }
