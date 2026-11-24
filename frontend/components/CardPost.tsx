@@ -20,15 +20,17 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
 
   return (
     <article className="flex gap-3 border-b border-linha p-4 last:border-b-0 sm:gap-4">
-      <span className="cor-materia grid size-11 flex-none place-items-center rounded-xl" style={estilo}>
-        <SimboloMateria tag={post.tag} className="size-5" />
-      </span>
+      {/* A foto de quem postou em destaque, à esquerda: é uma rede de pessoas.
+          Ela também leva ao perfil (o nome já faz isso, então o leitor de
+          tela e o Tab pulam este link para não repetir). */}
+      <Link href={`/u/${post.autor.username}`} aria-hidden tabIndex={-1} className="flex-none">
+        <Avatar autor={post.autor} grande />
+      </Link>
 
       <div className="min-w-0 flex-1">
-        {/* Quem postou vem primeiro: é uma rede de pessoas. A matéria fica
-            na linha de baixo e no ícone colorido à esquerda. */}
+        {/* Quem postou vem primeiro. A matéria fica na linha de baixo, com o
+            símbolo pequeno e a cor dela. */}
         <p className="flex min-w-0 items-center gap-2">
-          <Avatar autor={post.autor} pequeno />
           <Link href={`/u/${post.autor.username}`} className="truncate font-semibold hover:underline">
             {post.autor.name}
           </Link>
@@ -44,8 +46,12 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
           </time>
         </p>
 
-        <div className="mt-0.5 flex items-baseline gap-2 text-sm">
-          <span className="cor-materia-texto font-medium" style={estilo}>
+        <div className="mt-0.5 flex items-center gap-2 text-sm">
+          <span className="cor-materia-texto flex items-center gap-1.5 font-medium" style={estilo}>
+            {/* O quadradinho com o fundo da cor da matéria, em miniatura. */}
+            <span className="cor-materia grid size-6 flex-none place-items-center rounded-md" style={estilo}>
+              <SimboloMateria tag={post.tag} className="size-3.5" />
+            </span>
             {nomeDaOpcao(opcoes?.tags, post.tag)}
           </span>
           {post.minutos != null && (
