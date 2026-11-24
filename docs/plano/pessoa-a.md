@@ -73,8 +73,9 @@ trava outra pessoa vira issue, com o link aqui.
 - [x] Registrar na decisão 4 do DECISIONS.md, com o porquê de cor em vez de
     títulos (tipo "Excursionista" e "Patrulheiro")
 
-**Qui 26:** escrever a escolha técnica no DECISIONS.md (por que a ofensiva fica
-em `core/` e qual o Big O do cálculo). Se sobrar tempo, pegar as DMs.
+**Qui 26:**
+- [x] Escrever a escolha técnica no DECISIONS.md (por que a ofensiva fica em
+    `core/` e qual o Big O do cálculo). Feito na seg 23.
 
 ## Extras (depois que a parte de A ficou pronta, na seg 23)
 
@@ -99,16 +100,18 @@ Antes de cada dia, olhar o grupo: se alguém travou no núcleo, ajudar vem antes
     escondida.
 - [ ] Ligar a aba "Mensagens" (`MOSTRAR_MENSAGENS` em `Navegacao.tsx`) com o
     número de não lidas.
-- [ ] `<BotaoMensagem username=... />` para o perfil, que só aparece entre mútuos.
-- **Combinar com B:** a navegação e o perfil são da área dela; ela coloca o
-    botão no perfil, como foi com a `<Ofensiva />`.
+- [ ] `<BotaoMensagem username=... />` no perfil, que só aparece entre mútuos.
+- **Combinar com B:** a navegação e o perfil são da área dela, mas na quarta
+    e na quinta ela está nos ajustes visuais e no vídeo. Então a aba, o botão
+    no perfil e o link "Buscar" vão prontos no meu PR, avisando no texto do PR
+    o que mudou na área dela (como no #29), e ela só revisa.
 
 **Qui 26: Busca** (#38). PR com `Closes #38`.
 - [ ] `GET /busca?q=...&tipo=pessoas|posts`, sem diferença de acento nem de
     maiúscula ("calculo" acha "Cálculo").
 - [ ] `/busca` com as abas Pessoas e Posts, que espera a pessoa parar de
     digitar antes de buscar.
-- [ ] Link "Buscar" na navegação (**combinar com B**).
+- [ ] Link "Buscar" na navegação, pronto no PR para B revisar.
 - De manhã, o DECISIONS final (#21).
 
 **Se sobrar tempo:** notificações (alguém curtiu, comentou ou começou a te
