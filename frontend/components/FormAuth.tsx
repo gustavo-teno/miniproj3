@@ -13,14 +13,28 @@ export const estiloBotao =
 
 export function CaixaAuth({
   titulo,
+  saudacao,
   children,
 }: {
   titulo: string;
+  // Uma linha acima do título no lugar do nome da rede (o cadastro usa
+  // "Olá! Boas-vindas ao Caderno"). Sem ela, aparece só o nome da rede.
+  saudacao?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="mx-auto max-w-md py-10">
-      <p className="text-center text-sm font-light text-tinta-suave">{NOME_REDE}</p>
+      {/* A saudação é o destaque da tela: grande, em negrito e em lavanda, maior
+          que o título (combinado em 24/11). Sem ela, o nome da rede pequeno. */}
+      {saudacao ? (
+        // Numa linha só a partir do tablet: passa da largura da caixa e fica
+        // centralizada na tela. No celular, quebra em duas linhas.
+        <p className="saudacao relative left-1/2 w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 text-center text-[30px] font-bold leading-tight tracking-tight [text-wrap:balance] sm:max-w-none sm:whitespace-nowrap sm:text-[44px]">
+          {saudacao}
+        </p>
+      ) : (
+        <p className="text-center text-sm font-light text-tinta-suave">{NOME_REDE}</p>
+      )}
       <h1 className="mt-1 text-center text-2xl font-semibold">{titulo}</h1>
       <div className="mt-6 rounded-xl border border-linha bg-superficie p-6">{children}</div>
     </div>

@@ -247,3 +247,9 @@
 :root[data-tema="noturno"] .fogo-6 {
   --fogo-painel: #243049;
 }
+
+/* A saudação do cadastro, do login e do feed (combinado em 24/11): grande e
+   em lavanda, sem efeito. */
+.saudacao {
+  color: var(--destaque);
+}

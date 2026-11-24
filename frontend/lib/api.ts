@@ -82,6 +82,8 @@ const NOMES_DOS_CAMPOS: Record<string, string> = {
   curso_outro: "Curso",
   texto: "Texto",
   minutos: "Duração",
+  bio: "Bio",
+  avatar_url: "Foto",
 };
 
 // A unidade dos campos de número, para "pelo menos 1 minuto" em vez de "pelo
@@ -262,6 +264,16 @@ export type Caderno = { tag: string; posts: number; ultimo_post: string };
 
 export function buscarPerfil(username: string): Promise<Perfil> {
   return apiGet<Perfil>(`/usuarios/${encodeURIComponent(username)}`);
+}
+
+// O que dá para mudar no próprio perfil (PATCH /usuarios/eu). Só vai o que mudou.
+export type EdicaoPerfil = Partial<
+  Pick<Perfil, "name" | "bio" | "avatar_url" | "vestibular" | "curso" | "vestibular_outro" | "curso_outro" | "universidade">
+>;
+
+// Devolve o perfil inteiro já atualizado.
+export function editarPerfil(mudancas: EdicaoPerfil): Promise<Perfil> {
+  return apiPatch<Perfil>("/usuarios/eu", mudancas);
 }
 
 // Os posts de um caderno (tag) ou de todos (sem tag), do mais novo ao mais antigo.

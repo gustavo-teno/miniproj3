@@ -6,11 +6,11 @@
 // - Dona: coluna da direita presa ao rolar: postar, fogo e horas estudadas.
 // - Quem visita: uma coluna só; o fogo vai para o topo e entra o "Seguir".
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CardPost } from "@/components/CardPost";
+import { EditarPerfil } from "@/components/perfil/EditarPerfil";
 import { EstanteCadernos } from "@/components/perfil/EstanteCadernos";
 import { CaixaFogo, useOfensiva } from "@/components/perfil/FogoDoDiario";
 import { HorasEstudadas } from "@/components/perfil/HorasEstudadas";
@@ -33,6 +33,7 @@ export default function PaginaPerfil() {
   const [carregandoMais, setCarregandoMais] = useState(false);
   // Muda a cada post novo: o fogo e as horas se recalculam.
   const [versao, setVersao] = useState(0);
+  const [editando, setEditando] = useState(false);
   const ofensiva = useOfensiva(username, versao);
   // Erro ao buscar posts: aparece dentro da lista, sem esconder o perfil.
   const [erroPosts, setErroPosts] = useState<string | null>(null);
@@ -122,13 +123,14 @@ export default function PaginaPerfil() {
   const semNenhumPost = perfil.cadernos.length === 0;
 
   const acao = eu ? (
-    // A tela de editar entra na terça (ter 24); o link já fica no lugar.
-    <Link
-      href={`/u/${perfil.username}/editar`}
+    // Abre a caixa de editar por cima do diário (combinado em 24/11).
+    <button
+      type="button"
+      onClick={() => setEditando(true)}
       className="rounded-lg border border-destaque px-3 py-1.5 text-sm font-semibold text-destaque hover:bg-destaque-fundo"
     >
       Editar perfil
-    </Link>
+    </button>
   ) : null;
   // Para quem visita: o BotaoSeguir (Pessoa D, PR #33) entra no lugar de "acao"
   // quando chegar à main. Mensagem só aparece se as DMs existirem (decisão 6).
@@ -136,6 +138,9 @@ export default function PaginaPerfil() {
   const principal = (
     <div className="min-w-0 space-y-4">
       <TopoPerfil perfil={perfil} acao={acao} />
+      {eu && (
+        <EditarPerfil perfil={perfil} aberto={editando} fechar={() => setEditando(false)} aoSalvar={setPerfil} />
+      )}
 
       {semNenhumPost ? (
         <ConviteVazio eu={eu} nome={perfil.name} />
