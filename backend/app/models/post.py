@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 
 from app.constantes import TAG_PADRAO
 from app.db import Base, CriadoEm
+from app.models.comment import Comment
 from app.models.like import Like
 
 # Só para o editor conhecer o tipo: importar de verdade daria import circular.
@@ -34,5 +35,12 @@ class Post(Base):
         select(func.count(Like.id))
         .where(Like.post_id == id)
         .correlate_except(Like)
+        .scalar_subquery()
+    )
+    # Quantos comentários o post tem (#12, Pessoa C), do mesmo jeito.
+    comentarios: Mapped[int] = column_property(
+        select(func.count(Comment.id))
+        .where(Comment.post_id == id)
+        .correlate_except(Comment)
         .scalar_subquery()
     )

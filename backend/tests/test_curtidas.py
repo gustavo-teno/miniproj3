@@ -1,5 +1,16 @@
 """Testes das curtidas (#11, Pessoa C), além do test_curtidas_idempotentes do núcleo."""
 
+from sqlalchemy import func, select
+
+from app.db import SessionLocal
+from app.models.like import Like
+from app.services import curtidas
+
+
+def _curtidas_no_banco(post_id: int) -> int:
+    with SessionLocal() as db:
+        return db.scalar(select(func.count()).select_from(Like).where(Like.post_id == post_id))
+
 
 def test_curtido_por_mim_depende_de_quem_ve(client, logar):
     ana = logar("ana")
@@ -43,3 +54,18 @@ def test_apagar_post_curtido_apaga_as_curtidas(client, logar):
 
     assert client.delete(f"/posts/{post_id}", headers=bia).status_code == 204
     assert client.get(f"/posts/{post_id}", headers=ana).status_code == 404
+    # a curtida não fica apontando para um post que não existe mais
+    assert _curtidas_no_banco(post_id) == 0
+
+
+def test_curtidas_ao_mesmo_tempo_nao_dao_erro(client, logar, monkeypatch):
+    ana = logar("ana")
+    bia = logar("bia")
+    post_id = client.post("/posts", json={"texto": "curte aí"}, headers=bia).json()["id"]
+    client.post(f"/posts/{post_id}/curtir", headers=ana)
+
+    # Imita o segundo de dois pedidos simultâneos: ele não vê a curtida do
+    # primeiro na conferência e tenta gravar de novo.
+    monkeypatch.setattr(curtidas, "_ja_curtiu", lambda *args: False)
+    assert client.post(f"/posts/{post_id}/curtir", headers=ana).status_code == 204
+    assert _curtidas_no_banco(post_id) == 1
