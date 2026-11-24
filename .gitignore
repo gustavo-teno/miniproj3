@@ -44,3 +44,6 @@ docs/review-painel-v2.md
 # configurações pessoais do Claude (cada um tem a sua)
 .claude/settings.local.json
 CLAUDE.local.md
+
+# arquivo de erro que o Git Bash do Windows cria quando trava
+*.stackdump

@@ -55,7 +55,7 @@ export function FormPost({
       fechar();
     } catch (falha) {
       // O texto fica no campo: ninguém perde o que escreveu por causa de um erro.
-      setErro(falha instanceof Error ? falha.message : "Não deu para postar. Tente de novo.");
+      setErro(falha instanceof Error ? falha.message : "Não foi possível postar. Tente de novo.");
     } finally {
       setEnviando(false);
     }

@@ -20,10 +20,10 @@ trava outra pessoa vira issue, com o link aqui.
     curtidas e os comentários dele.
 
 **Ter 24: comentários.**
-- [ ] `POST` e `GET /posts/{id}/comentarios`, em ordem cronológica e paginados.
-- [ ] Tela: lista de comentários e campo para comentar, a partir do card.
-- [ ] O `PostOut` da B ganha a contagem de comentários.
-- [ ] Tirar o `@skip` de `test_comentarios_planos_cronologicos`.
+- [x] `POST` e `GET /posts/{id}/comentarios`, em ordem cronológica e paginados.
+- [x] Tela: lista de comentários e campo para comentar, a partir do card.
+- [x] O `PostOut` da B ganha a contagem de comentários.
+- [x] Tirar o `@skip` de `test_comentarios_planos_cronologicos`.
 
 **Qua 25: seed com cara de vestibulando.** O nicho tem que aparecer no seed
 (rubrica, Produto, pergunta 3).
@@ -52,4 +52,5 @@ Testar cadastro → login → post → follow → feed na URL.
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
 - **ter 24:** seed pronto (#13), um dia antes do plano. São 25 vestibulandos escritos à mão em `scripts/seed_dados.py` (sem o faker, para a rede ter cara de turma), com todas as turmas cheias, inclusive "Outros vestibulares" (PSS da UFPB, PAS da UnB) e "Outros cursos" ("quer Geografia"). Cada um tem uma rotina: **firme** (ofensiva em dia, as folgas respeitam a decisão 4), **quebrou** (parou 6 dias e recomeçou: o perfil mostra o recorde) ou **solta**. As datas contam a partir de hoje, então a ofensiva continua em dia quando o seed rodar no deploy. O usuário de demonstração é o `ada` (senha `senha-forte-123`), com ofensiva de 20 dias e 15 seguidores. Os ada, linus e grace do esqueleto saíram. O hash é o mesmo `bcrypt` da auth. `tests/test_seed.py` confere turmas, login da demo, datas e a ofensiva com o próprio `core/ofensiva.py`.
+- **ter 24:** comentários prontos (#12). A contagem é outro `column_property` no `Post`, como a das curtidas, e o `Comment` traz o autor na mesma consulta (`lazy="joined"`). Na tela, o card ganha `<LinkComentarios post={post} />` no `rodape`, que leva para a página nova `/posts/{id}`: o card com o `<BotaoCurtir>` e a conversa embaixo, com "carregar mais" e o campo de comentar. Escolhi uma página em vez de abrir a conversa dentro do card para o feed não ficar comprido e o post ganhar um link próprio. **Feed (D), perfil (B) e turmas (D):** ponham `<LinkComentarios post={post} />` ao lado do `<BotaoCurtir>`.
 - **seg 23:** curtidas prontas (#11). A contagem é um `column_property` no model `Post` (sugestão do Gustavo), que vem na mesma consulta do post. O `curtido_por_mim` sai de `services/curtidas.py` (`marcar_curtidos`), com uma consulta só para a lista inteira: **feed (D), perfil (B) e turmas (D) chamam `marcar_curtidos(db, user, posts)` antes de devolver os posts** e põem `<BotaoCurtir post={post} />` no `rodape` do card. Por isso o `test_post_traz_o_autor_na_mesma_consulta` passou de 2 para 3 consultas. No rascunho do feed, o botão aparece só nos posts de verdade.
