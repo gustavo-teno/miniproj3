@@ -20,8 +20,8 @@ router = APIRouter(prefix="/usuarios", tags=["ofensiva"])
 @router.get("/{username}/ofensiva", response_model=OfensivaOut)
 def ver_ofensiva(
     username: str,
-    # Só para exigir login, como em GET /posts/{id}.
-    _user: User = Depends(get_current_user),
+    # Exige login e diz se quem pede é a dona (só ela recebe as horas).
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return service.da_pessoa(db, username)
+    return service.da_pessoa(db, username, quem_ve=user)
