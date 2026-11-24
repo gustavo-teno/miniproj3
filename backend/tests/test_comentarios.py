@@ -1,5 +1,10 @@
 """Testes dos comentários (#12, Pessoa C), além do test_comentarios_planos_cronologicos do núcleo."""
 
+from sqlalchemy import func, select
+
+from app.db import SessionLocal
+from app.models.comment import Comment
+
 
 def test_comentario_traz_o_autor_e_conta_no_post(client, logar):
     ana = logar("ana")
@@ -42,3 +47,16 @@ def test_comentar_exige_login(client, logar):
     ana = logar("ana")
     post_id = client.post("/posts", json={"texto": "oi"}, headers=ana).json()["id"]
     assert client.post(f"/posts/{post_id}/comentarios", json={"texto": "oi"}).status_code == 401
+
+
+def test_apagar_post_comentado_apaga_os_comentarios(client, logar):
+    ana = logar("ana")
+    bia = logar("bia")
+    post_id = client.post("/posts", json={"texto": "vou apagar"}, headers=bia).json()["id"]
+    client.post(f"/posts/{post_id}/comentarios", json={"texto": "boa!"}, headers=ana)
+
+    assert client.delete(f"/posts/{post_id}", headers=bia).status_code == 204
+    # o comentário não fica apontando para um post que não existe mais
+    with SessionLocal() as db:
+        restantes = db.scalar(select(func.count()).select_from(Comment).where(Comment.post_id == post_id))
+    assert restantes == 0
