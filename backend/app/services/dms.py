@@ -7,6 +7,7 @@ mensagem cada pessoa já leu em cada conversa.
 
 from fastapi import HTTPException
 from sqlalchemy import and_, case, func, or_, select
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session
 
 from app.models.follow import Follow
@@ -79,14 +80,26 @@ def enviar(db: Session, eu: User, username: str, dados: MensagemCriar) -> Mensag
 
 def _marcar_lida(db: Session, eu: User, outro: User, ate_id: int) -> None:
     """Avança a marca de leitura de "eu" nesta conversa. Nunca volta: abrir uma
-    página antiga não faz mensagem lida virar não lida."""
-    leitura = db.scalar(
-        select(Leitura).where(Leitura.leitor_id == eu.id, Leitura.outro_id == outro.id)
+    página antiga não faz mensagem lida virar não lida.
+
+    Um comando só (INSERT ... ON CONFLICT): com duas abas abrindo a conversa ao
+    mesmo tempo, ler e depois criar a linha deixava as duas criarem, e a
+    segunda batia na UniqueConstraint (500). O max() de dois argumentos do
+    SQLite fica com a marca maior, então ela também não volta nessa corrida.
+    """
+    novo = sqlite_insert(Leitura).values(
+        leitor_id=eu.id, outro_id=outro.id, ultima_lida_id=ate_id
     )
-    if leitura is None:
-        leitura = Leitura(leitor_id=eu.id, outro_id=outro.id)
-        db.add(leitura)
-    leitura.ultima_lida_id = max(leitura.ultima_lida_id or 0, ate_id)
+    db.execute(
+        novo.on_conflict_do_update(
+            index_elements=[Leitura.leitor_id, Leitura.outro_id],
+            set_={
+                "ultima_lida_id": func.max(
+                    Leitura.ultima_lida_id, novo.excluded.ultima_lida_id
+                )
+            },
+        )
+    )
     db.commit()
 
 

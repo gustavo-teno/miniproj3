@@ -122,6 +122,19 @@ def test_abrir_a_conversa_zera_as_nao_lidas(client, logar):
     assert client.get("/dms/nao-lidas", headers=bia).json() == {"total": 1}
 
 
+def test_pagina_antiga_nao_desmarca_as_lidas(client, logar):
+    ana, bia = logar("ana"), logar("bia")
+    mutuos("ana", "bia")
+    for texto in ("1", "2", "3"):
+        mandar(client, ana, "bia", texto)
+
+    client.get("/dms/ana", headers=bia)  # lê as três
+    # Pedir de novo só a primeira (depois_de=0, limite=1) passa pela marca já
+    # gravada e não a faz voltar.
+    client.get("/dms/ana?depois_de=0&limite=1", headers=bia)
+    assert client.get("/dms/nao-lidas", headers=bia).json() == {"total": 0}
+
+
 def test_lista_de_conversas_da_mais_recente(client, logar):
     ana, bia, cris = logar("ana"), logar("bia"), logar("cris")
     mutuos("ana", "bia")
