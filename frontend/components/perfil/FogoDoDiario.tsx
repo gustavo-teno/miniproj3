@@ -69,12 +69,6 @@ export function IconeFogo({ dias, className }: { dias: number; className?: strin
       strokeLinecap="round"
     >
       {tamanho === "grande" && <ellipse cx="24" cy="20" rx="15" ry="14" fill="var(--chama)" opacity=".16" />}
-      {chama && (
-        <>
-          <path transform={escalar(chama.escala)} d={chama.d} fill="var(--chama)" stroke="var(--chama-contorno)" />
-          <path transform={escalar(chama.miolo)} d={MIOLO} fill="var(--chama-miolo)" />
-        </>
-      )}
       {tamanho === "grande" && (
         <>
           <circle cx="36.5" cy="9" r="1.1" fill="var(--chama)" />
@@ -91,6 +85,14 @@ export function IconeFogo({ dias, className }: { dias: number; className?: strin
         stroke="var(--caderno-pauta)"
         strokeWidth={1.1}
       />
+      {/* A chama fica na frente do caderno, inteira, com a base descendo sobre
+          as páginas até mais ou menos o meio delas (como a Camila desenhou em 24/11). */}
+      {chama && (
+        <g transform="translate(0 6)">
+          <path transform={escalar(chama.escala)} d={chama.d} fill="var(--chama)" stroke="var(--chama-contorno)" />
+          <path transform={escalar(chama.miolo)} d={MIOLO} fill="var(--chama-miolo)" />
+        </g>
+      )}
     </svg>
   );
 }
