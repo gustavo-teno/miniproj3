@@ -22,7 +22,11 @@ export default function PaginaDoPost() {
     if (!liberado) return;
     apiGet<Post>(`/posts/${id}`)
       .then(setPost)
-      .catch(() => setErro("Esse post não existe ou foi apagado."));
+      // A mensagem vem do backend: "post não encontrado" no 404, ou o aviso
+      // de servidor fora do ar, em vez de dizer sempre que o post não existe.
+      .catch((falha) =>
+        setErro(falha instanceof Error ? falha.message : "Não foi possível carregar o post."),
+      );
   }, [liberado, id]);
 
   if (!liberado) return null;

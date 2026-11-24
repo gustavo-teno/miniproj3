@@ -56,7 +56,7 @@ export function Comentarios({ postId }: { postId: number }) {
         // Chegou ao fim: o comentário que a pessoa mandou já está na lista.
         if (offset + pagina.items.length >= pagina.total) setEnviadoNoFim(false);
       } catch {
-        setErro("Não deu para carregar os comentários.");
+        setErro("Não foi possível carregar os comentários.");
       } finally {
         setCarregando(false);
       }
@@ -155,7 +155,7 @@ function FormComentario({ postId, onComentou }: { postId: number; onComentou: (c
       setTexto("");
     } catch (falha) {
       // O texto fica no campo: ninguém perde o que escreveu por causa de um erro.
-      setErro(falha instanceof Error ? falha.message : "Não deu para comentar. Tente de novo.");
+      setErro(falha instanceof Error ? falha.message : "Não foi possível comentar. Tente de novo.");
     } finally {
       setEnviando(false);
     }
