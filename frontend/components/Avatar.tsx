@@ -4,11 +4,14 @@ import type { Autor } from "@/lib/api";
 export function Avatar({
   autor,
   pequeno = false,
+  grande = false,
 }: {
   autor: Pick<Autor, "name" | "avatar_url">;
   pequeno?: boolean;
+  // O do card do post: do tamanho do antigo quadrado da matéria.
+  grande?: boolean;
 }) {
-  const tamanho = pequeno ? "size-6 text-[10px]" : "size-8 text-xs";
+  const tamanho = grande ? "size-11 text-sm" : pequeno ? "size-6 text-[10px]" : "size-8 text-xs";
 
   if (autor.avatar_url) {
     return (
