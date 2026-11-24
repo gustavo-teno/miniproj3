@@ -5,10 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { buscarEu, sair, type Eu } from "@/lib/api";
+import { useNaoLidas } from "@/lib/naoLidas";
 import { NOME_REDE } from "@/lib/rede";
-
-// As DMs são opcionais (decisão 6). A aba só aparece quando a tela existir.
-const MOSTRAR_MENSAGENS = false;
 
 // O topo da rede: nome à esquerda, abas no centro e configurações à direita.
 export function Navegacao() {
@@ -22,11 +20,18 @@ export function Navegacao() {
       .catch(() => setEu(null));
   }, []);
 
+  // As DMs (decisão 6): o número de não lidas aparece na aba Mensagens.
+  const naoLidas = useNaoLidas(Boolean(eu));
+
   const abas = [
     { href: "/", rotulo: "Feed" },
     { href: "/turmas", rotulo: "Turmas" },
-    ...(MOSTRAR_MENSAGENS ? [{ href: "/mensagens", rotulo: "Mensagens" }] : []),
-    ...(eu ? [{ href: `/u/${eu.username}`, rotulo: "Meu diário" }] : []),
+    ...(eu
+      ? [
+          { href: "/mensagens", rotulo: "Mensagens", contador: naoLidas },
+          { href: `/u/${eu.username}`, rotulo: "Meu diário" },
+        ]
+      : []),
   ];
 
   return (
@@ -38,7 +43,7 @@ export function Navegacao() {
         </Link>
 
         <nav aria-label="Principal" className="flex gap-4 sm:gap-8">
-          {abas.map(({ href, rotulo }) => {
+          {abas.map(({ href, rotulo, contador }) => {
             // O endereço exato ou uma página dentro dele: /u/ada e /u/ada/editar
             // acendem "Meu diário", mas /u/ada2 (outra pessoa) não.
             const ativa =
@@ -56,6 +61,13 @@ export function Navegacao() {
                 }
               >
                 {rotulo}
+                {/* O leitor de tela lê "Mensagens, 2 não lidas". */}
+                {contador ? (
+                  <span className="ml-1.5 inline-grid min-w-5 place-items-center rounded-full bg-destaque px-1 align-[2px] text-[11px] font-semibold leading-5 text-sobre-destaque">
+                    {contador}
+                    <span className="sr-only">{contador === 1 ? " não lida" : " não lidas"}</span>
+                  </span>
+                ) : null}
               </Link>
             );
           })}
