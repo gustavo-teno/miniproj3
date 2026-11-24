@@ -40,6 +40,8 @@ export function Comentarios({ postId }: { postId: number }) {
   const [total, setTotal] = useState(0);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  // A pessoa comentou antes de carregar a conversa toda (ver adicionar).
+  const [enviadoNoFim, setEnviadoNoFim] = useState(false);
 
   const carregar = useCallback(
     async (offset: number) => {
@@ -51,6 +53,8 @@ export function Comentarios({ postId }: { postId: number }) {
         );
         setComentarios((atuais) => (offset === 0 ? pagina.items : [...atuais, ...pagina.items]));
         setTotal(pagina.total);
+        // Chegou ao fim: o comentário que a pessoa mandou já está na lista.
+        if (offset + pagina.items.length >= pagina.total) setEnviadoNoFim(false);
       } catch {
         setErro("Não deu para carregar os comentários.");
       } finally {
@@ -65,9 +69,16 @@ export function Comentarios({ postId }: { postId: number }) {
   }, [carregar]);
 
   function adicionar(novo: Comentario) {
-    // O novo é o mais recente, então entra no fim da conversa.
-    setComentarios((atuais) => [...atuais, novo]);
     setTotal((t) => t + 1);
+    // O novo é o mais recente, então o lugar dele é o fim da conversa. Se ainda
+    // faltam comentários para carregar, ele não entra agora: o "carregar mais"
+    // pede a partir de quantos a tela tem, e um a mais faria pular o próximo
+    // do servidor e repetir o novo. Ele chega no fim, com a última página.
+    if (comentarios.length < total) {
+      setEnviadoNoFim(true);
+      return;
+    }
+    setComentarios((atuais) => [...atuais, novo]);
   }
 
   return (
@@ -118,6 +129,11 @@ export function Comentarios({ postId }: { postId: number }) {
         </button>
       )}
 
+      {enviadoNoFim && (
+        <p className="px-4 pt-3 text-sm text-tinta-suave">
+          Comentário enviado. Ele aparece no fim da conversa, depois dos que faltam carregar.
+        </p>
+      )}
       <FormComentario postId={postId} onComentou={adicionar} />
     </section>
   );
