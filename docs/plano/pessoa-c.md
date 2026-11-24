@@ -11,10 +11,10 @@ trava outra pessoa vira issue, com o link aqui.
 ## Plano
 
 **Seg 23: curtidas.** Começa com `make check` verde (guia 00).
-- [ ] `POST` e `DELETE /posts/{id}/curtir`, idempotentes.
-- [ ] O `GET /posts/{id}` ganha `curtidas` e `curtido_por_mim`.
-- [ ] Botão de curtir dentro do `<CardPost>`.
-- [ ] Tirar o `@skip` de `test_curtidas_idempotentes`.
+- [x] `POST` e `DELETE /posts/{id}/curtir`, idempotentes.
+- [x] O `GET /posts/{id}` ganha `curtidas` e `curtido_por_mim`.
+- [x] Botão de curtir dentro do `<CardPost>`.
+- [x] Tirar o `@skip` de `test_curtidas_idempotentes`.
 - **Combinar com B:** o `PostOut` (formato do post) e o `<CardPost>` são dela;
     você acrescenta neles as curtidas. Ao apagar um post, a B apaga junto as
     curtidas e os comentários dele.
@@ -51,3 +51,4 @@ Testar cadastro → login → post → follow → feed na URL.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **seg 23:** curtidas prontas (#11). A contagem é um `column_property` no model `Post` (sugestão do Gustavo), que vem na mesma consulta do post. O `curtido_por_mim` sai de `services/curtidas.py` (`marcar_curtidos`), com uma consulta só para a lista inteira: **feed (D), perfil (B) e turmas (D) chamam `marcar_curtidos(db, user, posts)` antes de devolver os posts** e põem `<BotaoCurtir post={post} />` no `rodape` do card. Por isso o `test_post_traz_o_autor_na_mesma_consulta` passou de 2 para 3 consultas. No rascunho do feed, o botão aparece só nos posts de verdade.

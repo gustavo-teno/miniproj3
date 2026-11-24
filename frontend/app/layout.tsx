@@ -5,9 +5,10 @@ import { Navegacao } from "@/components/Navegacao";
 import { NOME_REDE, SLOGAN_REDE } from "@/lib/rede";
 import "./globals.css";
 
-// Lexend: feita para leitura fluente, em três pesos. A mono deixa números
-// (1h30, 45min) e @usuário alinhados e discretos.
-const texto = Lexend({ subsets: ["latin"], weight: ["300", "400", "600"], variable: "--fonte-texto" });
+// Lexend: feita para leitura fluente. 300, 400 e 600 em tudo; 700 só nos
+// números do fogo da ofensiva (os dias seguidos e o recorde). A mono deixa
+// números (1h30, 45min) e @usuário alinhados e discretos.
+const texto = Lexend({ subsets: ["latin"], weight: ["300", "400", "600", "700"], variable: "--fonte-texto" });
 const numeros = Atkinson_Hyperlegible_Mono({
   subsets: ["latin"],
   weight: ["400"],
@@ -38,7 +39,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-fundo font-texto text-tinta">
         <Navegacao />
-        <main className="mx-auto max-w-6xl px-6 py-6">{children}</main>
+        <main className="mx-auto max-w-[1320px] px-6 py-6">{children}</main>
       </body>
     </html>
   );

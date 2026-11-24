@@ -11,6 +11,7 @@ from app.db import get_db
 from app.deps import get_current_user
 from app.models.user import User
 from app.schemas.post import PostCriar, PostEditar, PostOut
+from app.services import curtidas
 from app.services import posts as service
 
 router = APIRouter(prefix="/posts", tags=["posts"])
@@ -28,12 +29,12 @@ def criar_post(
 @router.get("/{post_id}", response_model=PostOut)
 def ver_post(
     post_id: int,
-    # Não é usado aqui dentro: está só para exigir login (a rede é para quem
-    # tem conta). O "_" na frente avisa isso, no mesmo padrão do logout, em auth.py.
-    _user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return service.buscar(db, post_id)
+    post = service.buscar(db, post_id)
+    curtidas.marcar_curtidos(db, user, [post])
+    return post
 
 
 @router.patch("/{post_id}", response_model=PostOut)
@@ -43,7 +44,9 @@ def editar_post(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return service.editar(db, user, post_id, dados)
+    post = service.editar(db, user, post_id, dados)
+    curtidas.marcar_curtidos(db, user, [post])
+    return post
 
 
 @router.delete("/{post_id}", status_code=204)

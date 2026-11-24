@@ -31,7 +31,7 @@ export function Navegacao() {
 
   return (
     <header className="border-b border-linha bg-superficie">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:px-6">
+      <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-3 px-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:px-6">
         {/* No celular o nome some para as abas caberem: o Feed já leva ao início. */}
         <Link href="/" className="hidden justify-self-start text-lg font-semibold text-tinta sm:block">
           {NOME_REDE}

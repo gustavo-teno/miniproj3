@@ -63,6 +63,7 @@ def test_post_traz_o_autor_na_mesma_consulta(client, monkeypatch, contar_consult
         r = client.get(f"/posts/{post['id']}", headers={"X-User-Id": str(bia["id"])})
 
     assert r.json()["autor"]["username"] == "ana"
-    # 1 consulta para saber quem pediu (bia) e 1 para o post com o autor.
-    # Antes eram 3: o autor era buscado à parte, um por post.
-    assert contar_consultas.total == 2
+    # 1 consulta para saber quem pediu (bia), 1 para o post com o autor e as
+    # curtidas, e 1 para saber se a bia curtiu (#11: uma só, mesmo numa lista).
+    # O autor buscado à parte, um por post, daria uma a mais por post.
+    assert contar_consultas.total == 3

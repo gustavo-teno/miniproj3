@@ -146,7 +146,24 @@ def test_resumo_soma_esta_semana_e_a_passada():
         (date(2026, 11, 9), 500),  # duas semanas atrás: fica de fora
     ]
     resumo = resumo_da_semana(sessoes, hoje=date(2026, 11, TER2))
-    assert resumo == ResumoSemana(minutos_esta_semana=90, minutos_semana_passada=90)
+    assert resumo == ResumoSemana(
+        minutos_esta_semana=90,
+        minutos_semana_passada=90,
+        # segunda 90, terça 0 (post sem duração) e o resto da semana ainda vazio
+        minutos_por_dia=(90, 0, 0, 0, 0, 0, 0),
+    )
+
+
+def test_resumo_separa_os_minutos_por_dia():
+    sessoes = [
+        (date(2026, 11, SEG2), 30),
+        (date(2026, 11, SEG2), 15),  # dois posts no mesmo dia somam
+        (date(2026, 11, QUA2), 60),
+        (date(2026, 11, DOM), 40),  # semana passada: não entra nas barras
+    ]
+    resumo = resumo_da_semana(sessoes, hoje=date(2026, 11, QUA2))
+    assert resumo.minutos_por_dia == (45, 0, 60, 0, 0, 0, 0)
+    assert resumo.minutos_esta_semana == 105
 
 
 # --- A rota GET /usuarios/{username}/ofensiva -------------------------------
@@ -186,6 +203,23 @@ def test_rota_mostra_a_ofensiva_de_outra_pessoa(client, logar):
     ana, bia = logar("ana"), logar("bia")
     postar(client, bia, "historia")
     assert client.get("/usuarios/bia/ofensiva", headers=ana).json()["atual"] == 1
+
+
+def test_rota_horas_so_para_a_dona(client, logar):
+    """As horas são privadas (decisão 4): quem visita vê o fogo, não as horas."""
+    ana, bia = logar("ana"), logar("bia")
+    postar(client, bia, "historia", minutos=40)
+
+    da_dona = client.get("/usuarios/bia/ofensiva", headers=bia).json()
+    assert da_dona["minutos_esta_semana"] == 40
+    assert sum(da_dona["minutos_por_dia"]) == 40
+    assert len(da_dona["minutos_por_dia"]) == 7
+
+    de_quem_visita = client.get("/usuarios/bia/ofensiva", headers=ana).json()
+    assert de_quem_visita["atual"] == 1
+    assert de_quem_visita["minutos_esta_semana"] is None
+    assert de_quem_visita["minutos_semana_passada"] is None
+    assert de_quem_visita["minutos_por_dia"] is None
 
 
 def test_rota_semana_passada(client, logar, monkeypatch):
