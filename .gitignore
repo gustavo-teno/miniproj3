@@ -44,3 +44,6 @@ docs/review-painel-v2.md
 # configurações pessoais do Claude (cada um tem a sua)
 .claude/settings.local.json
 CLAUDE.local.md
+
+# cache do tsc (npx tsc --noEmit gera)
+*.tsbuildinfo
