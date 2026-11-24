@@ -105,7 +105,7 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
           placeholder="Tempo de estudo"
           aria-label="Tempo de estudo em minutos (opcional)"
           title="Em minutos (opcional)"
-          className={`${campo} w-36 font-numeros text-tinta placeholder:font-texto placeholder:text-tinta-suave`}
+          className={`${campo} min-w-[9.5rem] flex-1 font-numeros text-tinta placeholder:font-texto placeholder:text-tinta-suave`}
         />
       </div>
 

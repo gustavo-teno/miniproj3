@@ -86,7 +86,7 @@ export function EstanteCadernos({ cadernos, aberto, abrir }: Props) {
           >
             <SimboloMateria tag={c.tag} className="size-6" />
             <span>
-              <span className="block truncate text-[15px] font-semibold">{nome(c.tag)}</span>
+              <span className={`block truncate text-[15px] font-semibold ${opcoes ? "" : "invisible"}`}>{nome(c.tag)}</span>
               {/* suppressHydrationWarning: o "há 2h" muda entre o servidor e o navegador. */}
               <span className="block font-numeros text-xs opacity-85" suppressHydrationWarning>
                 {c.posts === 1 ? "1 post" : `${c.posts} posts`}
