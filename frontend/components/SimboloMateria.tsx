@@ -5,8 +5,14 @@ import type { ReactNode } from "react";
 // (currentColor), então quem decide a cor é quem usa: a etiqueta, o quadrado
 // do card, o filtro. A forma ajuda quem não distingue bem as cores.
 const DESENHOS: Record<string, ReactNode> = {
-  // Σ, o somatório
-  matematica: <path d="M18 5H6l6 7-6 7h12" />,
+  // as quatro operações (+ − × ÷), como numa calculadora
+  matematica: (
+    <>
+      <path d="M7 3.5v7M3.5 7h7M13.5 7h7M4.5 14.5l5 5M9.5 14.5l-5 5M13.5 17h7" />
+      <circle cx="17" cy="14" r=".6" fill="currentColor" />
+      <circle cx="17" cy="20" r=".6" fill="currentColor" />
+    </>
+  ),
   // átomo: três órbitas e o núcleo
   fisica: (
     <>
@@ -23,12 +29,16 @@ const DESENHOS: Record<string, ReactNode> = {
       <path d="M7.5 15h9" />
     </>
   ),
-  // fita de DNA
+  // dupla hélice de DNA: duas fitas que se cruzam, com degraus (as bases)
+  // onde elas se afastam. A fita de trás é interrompida em cada cruzamento,
+  // para dar a ideia de uma passando por cima da outra.
   biologia: (
     <>
-      <path d="M7 3c0 5 10 4 10 9s-10 4-10 9" />
-      <path d="M17 3c0 5-10 4-10 9s10 4 10 9" />
-      <path d="M9.5 6.5h5M9.5 17.5h5" />
+      <path d="M7.0 3.0 7.7 4.5 9.5 6.0 11.9 7.5 14.4 8.9 16.3 10.4 17.0 11.9 16.4 13.4 14.6 14.9" />
+      <path d="M9.4 18.1 8.8 18.5 8.4 18.8 8.0 19.2 7.6 19.6 7.4 19.9 7.2 20.3 7.0 20.6 7.0 21.0" />
+      <path d="M17.0 3.0 17.0 3.4 16.8 3.7 16.6 4.1 16.4 4.5 16.0 4.8 15.6 5.2 15.2 5.5 14.6 5.9" />
+      <path d="M9.4 9.1 7.6 10.6 7.0 12.1 7.7 13.6 9.6 15.1 12.1 16.5 14.5 18.0 16.3 19.5 17.0 21.0" />
+      <path d="M9 4.5h6M8.3 12h7.4M9 19.5h6" />
     </>
   ),
   // "Aa"

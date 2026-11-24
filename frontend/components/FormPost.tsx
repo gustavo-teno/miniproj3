@@ -55,7 +55,7 @@ export function FormPost({
       fechar();
     } catch (falha) {
       // O texto fica no campo: ninguém perde o que escreveu por causa de um erro.
-      setErro(falha instanceof Error ? falha.message : "Não deu para postar. Tente de novo.");
+      setErro(falha instanceof Error ? falha.message : "Não foi possível postar. Tente de novo.");
     } finally {
       setEnviando(false);
     }
@@ -123,9 +123,10 @@ export function FormPost({
           max={MAX_MINUTOS}
           value={minutos}
           onChange={(e) => setMinutos(e.target.value)}
-          placeholder="min"
-          aria-label="Minutos de estudo (opcional)"
-          className={campo + " w-20 font-numeros"}
+          placeholder="Tempo de estudo"
+          aria-label="Tempo de estudo em minutos (opcional)"
+          title="Em minutos (opcional)"
+          className={campo + " w-40 font-numeros placeholder:font-texto"}
         />
         <div className="ml-auto flex gap-2">
           <button

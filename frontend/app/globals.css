@@ -118,3 +118,119 @@
   --font-texto: var(--fonte-texto), system-ui, sans-serif;
   --font-numeros: var(--fonte-numeros), ui-monospace, monospace;
 }
+
+/* O fogo do diário (#10, Pessoa B): o caderno com a chama, que cresce e muda
+   de cor com os dias seguidos (0 = apagado; 1 a 6 = as faixas do Ofensiva.tsx,
+   do vermelho ao azul, o mais intenso). Cada faixa é uma classe que define as
+   cores da chama, do número e do painel de quem visita, no claro e no noturno,
+   no mesmo esquema da paleta acima. Quem usa: components/perfil/FogoDoDiario.tsx.
+   Combinado em 24/11: no noturno, só a caixa (o painel) muda; o caderno, a
+   chama e os números ficam com as mesmas cores do claro. */
+:root {
+  --caderno-capa: #dfe5e3;
+  --caderno-pagina: #ffffff;
+  --caderno-traco: #5a6b6e;
+  --caderno-pauta: #cdd5d3;
+}
+
+.fogo-0 {
+  --chama: transparent;
+  --chama-contorno: #9aa4a6;
+  --chama-miolo: transparent;
+  --fogo-texto: #5a6b6e;
+  --fogo-painel: #eef0f0;
+}
+.fogo-1 {
+  --chama: #e0483a;
+  --chama-contorno: #a8281d;
+  --chama-miolo: #ffc2b8;
+  --fogo-texto: #a8281d;
+  --fogo-painel: #fdecea;
+}
+.fogo-2 {
+  --chama: #f08a24;
+  --chama-contorno: #b55d0b;
+  --chama-miolo: #ffe0a3;
+  --fogo-texto: #b55d0b;
+  --fogo-painel: #fdf1e4;
+}
+.fogo-3 {
+  --chama: #f2c230;
+  --chama-contorno: #a37c08;
+  --chama-miolo: #fff6c9;
+  --fogo-texto: #a37c08;
+  --fogo-painel: #fdf7e0;
+}
+.fogo-4 {
+  --chama: #ffffff;
+  --chama-contorno: #8f979c;
+  --chama-miolo: #dfe9f5;
+  --fogo-texto: #5a6b6e;
+  --fogo-painel: #f0f3f6;
+}
+.fogo-5 {
+  --chama: #7cc8f0;
+  --chama-contorno: #2f86b8;
+  --chama-miolo: #e6f6fe;
+  --fogo-texto: #2f86b8;
+  --fogo-painel: #e8f5fc;
+}
+.fogo-6 {
+  --chama: #2f6fe0;
+  --chama-contorno: #1d4ea8;
+  --chama-miolo: #b9d0fb;
+  --fogo-texto: #1d4ea8;
+  --fogo-painel: #e6eefc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .fogo-0 {
+    --fogo-painel: #262c35;
+  }
+  :root:not([data-tema="claro"]) .fogo-1 {
+    --fogo-painel: #3a2224;
+  }
+  :root:not([data-tema="claro"]) .fogo-2 {
+    --fogo-painel: #3d2b1a;
+  }
+  :root:not([data-tema="claro"]) .fogo-3 {
+    --fogo-painel: #383019;
+  }
+  :root:not([data-tema="claro"]) .fogo-4 {
+    --fogo-painel: #2a313b;
+  }
+  :root:not([data-tema="claro"]) .fogo-5 {
+    --fogo-painel: #1c3442;
+  }
+  :root:not([data-tema="claro"]) .fogo-6 {
+    --fogo-painel: #243049;
+  }
+}
+
+:root[data-tema="noturno"] .fogo-0 {
+  --fogo-painel: #262c35;
+}
+:root[data-tema="noturno"] .fogo-1 {
+  --fogo-painel: #3a2224;
+}
+:root[data-tema="noturno"] .fogo-2 {
+  --fogo-painel: #3d2b1a;
+}
+:root[data-tema="noturno"] .fogo-3 {
+  --fogo-painel: #383019;
+}
+:root[data-tema="noturno"] .fogo-4 {
+  --fogo-painel: #2a313b;
+}
+:root[data-tema="noturno"] .fogo-5 {
+  --fogo-painel: #1c3442;
+}
+:root[data-tema="noturno"] .fogo-6 {
+  --fogo-painel: #243049;
+}
+
+/* A saudação do cadastro, do login e do feed (combinado em 24/11): grande e
+   em lavanda, sem efeito. */
+.saudacao {
+  color: var(--destaque);
+}

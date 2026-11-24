@@ -134,9 +134,6 @@ as decisões mudarem.
 
 ### 6. DMs só entre quem se segue mutuamente
 
-_Opcional: entra depois do núcleo, da ofensiva e das Turmas. A expectativa é
-que dê tempo._
-
 - **Contexto:** comentários e bate-papo são conversa em público. É na conversa
   privada que dois desconhecidos da mesma turma viram parceiros de estudo:
   combinam horários, cobram um ao outro, desabafam sobre o simulado. Ao mesmo
@@ -147,11 +144,13 @@ que dê tempo._
 - **Escolha:** DMs 1-para-1, liberadas só quando as duas pessoas se seguem. A
   conversa privada vira consequência de conviver na rede (você acompanhou o
   diário da pessoa, ela acompanhou o seu), e não um jeito de abordar
-  desconhecidos.
+  desconhecidos. A aba "Mensagens" mostra quantas mensagens ainda não foram
+  lidas: é o que avisa que o colega respondeu e faz a pessoa voltar para
+  combinar a sessão.
 - **O que cortamos e por quê:** DMs abertas, pela segurança de um público em
-  boa parte menor de idade; e chat em tempo real (WebSocket, "digitando...",
-  contador de não lidas). A conversa se atualiza sozinha a cada poucos
-  segundos, o que basta para combinar uma sessão de estudo e cabe no prazo.
+  boa parte menor de idade; e chat em tempo real (WebSocket, "digitando...").
+  A conversa se atualiza sozinha a cada poucos segundos, o que basta para
+  combinar uma sessão de estudo e cabe no prazo.
 
 ## Features
 
@@ -170,7 +169,8 @@ entram na tabela "Quem faz o quê" de lá.
 | Seed fake (núcleo) | Pessoa C | Vestibulandos fictícios com metas e rotinas variadas, para a rede já parecer uma turma. |
 | Ofensiva que perdoa | Pessoa A (Gustavo) | Motiva a voltar todo dia sem punir o descanso (decisão 4). |
 | Turmas | Pessoa D | Quem acabou de chegar encontra quem tem a mesma meta e sai do feed vazio (decisão 5). |
-| DMs entre mútuos (opcional) | quem terminar antes | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
+| DMs entre mútuos | Pessoa A (Gustavo) | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
+| Busca de pessoas e posts | Pessoa A (Gustavo) | Achar um colega pelo nome ou um post sobre um assunto, sem depender da meta. |
 
 **Login sem prazo de validade (escolha consciente).** O token do login vale
 até a pessoa clicar em sair, que apaga a sessão no banco. Uma validade (por
@@ -181,11 +181,41 @@ melhoria da auth.
 
 ## Uma escolha técnica
 
-_(proposta, a confirmar pelo time)_ O cálculo da ofensiva fica em
-`backend/app/core/ofensiva.py`, em Python puro: recebe os dias com post de
-matéria e devolve a ofensiva atual e o recorde, aplicando as folgas de cada
-semana. Separado do banco, ele é fácil de testar com casos de borda (semana
-virando, post perto da meia-noite) e o endpoint do perfil só chama a função.
+**A ofensiva é calculada na hora, numa função pura em `core/`.** O arquivo
+`backend/app/core/ofensiva.py` não conhece o banco nem o FastAPI. Ele recebe
+os dias em que a pessoa postou matéria e o dia de hoje, e devolve a ofensiva
+atual, o recorde e as folgas usadas. A rota `GET /usuarios/{username}/ofensiva`
+busca no banco só a data e a duração dos posts de matéria da pessoa e entrega
+esses dados à função.
+
+Por que assim:
+
+- **Fácil de testar.** A regra tem muitos casos de borda: a semana virando
+  no meio de uma folga, o post às 23h50 de Brasília que em UTC já é do dia
+  seguinte, a ofensiva nova que não herda as folgas da que quebrou. Como a
+  função só recebe datas, cada caso vira um teste de poucas linhas, sem
+  servidor nem banco (`backend/tests/test_ofensiva.py`).
+- **O número nunca fica velho.** Pensamos em guardar a ofensiva pronta (num
+  campo do usuário ou numa estrutura em memória, como o `contadores.py`) e
+  somar 1 a cada post. Só que um post pode ser apagado ou trocar de matéria
+  para bate-papo, e isso muda dias do passado: a ofensiva guardada teria de
+  ser refeita nesses casos, e um caso esquecido deixaria o número errado.
+  Calculando a partir dos posts a cada vez, ela sempre bate com o que está
+  no banco.
+
+**Custo.** O cálculo passa uma vez por cada dia entre o primeiro post de
+matéria e hoje: O(D), em que D é esse número de dias. Para saber se a pessoa
+estudou num dia, os dias com post ficam num `set`, e cada consulta é O(1).
+Numa lista, cada consulta seria O(P), em que P é o número de posts, e o total
+iria para O(D × P). O resumo de horas da semana passa uma vez por cada post,
+O(P). A rota inteira custa O(D + P) por chamada, e a busca no banco usa o
+índice de `autor_id` dos posts. Mesmo com três anos de uso, D fica perto de
+1.100 dias, o que é pouco para refazer a cada vez que o perfil abre.
+
+**O que mudaria num produto grande.** Com muita gente abrindo perfis o tempo
+todo, valeria guardar o resultado e jogá-lo fora quando a pessoa cria, edita
+ou apaga um post. A função em `core/` continuaria a mesma; mudaria só quando
+ela é chamada.
 
 ## Uso de IA
 

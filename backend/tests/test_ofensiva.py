@@ -5,7 +5,14 @@ Os dias são de novembro de 2026: 16/11 é segunda e 22/11 é domingo.
 
 from datetime import date, datetime, timedelta, timezone
 
-from app.core.ofensiva import Ofensiva, calcular, dia_em_brasilia, hoje_em_brasilia
+from app.core.ofensiva import (
+    Ofensiva,
+    ResumoSemana,
+    calcular,
+    dia_em_brasilia,
+    hoje_em_brasilia,
+    resumo_da_semana,
+)
 
 
 def nov(*dias: int) -> list[date]:
@@ -128,3 +135,113 @@ def test_hoje_em_brasilia_nao_usa_o_dia_do_servidor():
     # 22h de domingo em Brasília = 01h de segunda em UTC
     agora = datetime(2026, 11, 23, 1, 0, tzinfo=timezone.utc)
     assert hoje_em_brasilia(agora) == date(2026, 11, DOM)
+
+
+def test_resumo_soma_esta_semana_e_a_passada():
+    sessoes = [
+        (date(2026, 11, SEG), 60),
+        (date(2026, 11, DOM), 30),  # domingo ainda é da semana passada
+        (date(2026, 11, SEG2), 90),  # segunda já é desta
+        (date(2026, 11, TER2), None),  # post sem duração soma zero
+        (date(2026, 11, 9), 500),  # duas semanas atrás: fica de fora
+    ]
+    resumo = resumo_da_semana(sessoes, hoje=date(2026, 11, TER2))
+    assert resumo == ResumoSemana(
+        minutos_esta_semana=90,
+        minutos_semana_passada=90,
+        # segunda 90, terça 0 (post sem duração) e o resto da semana ainda vazio
+        minutos_por_dia=(90, 0, 0, 0, 0, 0, 0),
+    )
+
+
+def test_resumo_separa_os_minutos_por_dia():
+    sessoes = [
+        (date(2026, 11, SEG2), 30),
+        (date(2026, 11, SEG2), 15),  # dois posts no mesmo dia somam
+        (date(2026, 11, QUA2), 60),
+        (date(2026, 11, DOM), 40),  # semana passada: não entra nas barras
+    ]
+    resumo = resumo_da_semana(sessoes, hoje=date(2026, 11, QUA2))
+    assert resumo.minutos_por_dia == (45, 0, 60, 0, 0, 0, 0)
+    assert resumo.minutos_esta_semana == 105
+
+
+# --- A rota GET /usuarios/{username}/ofensiva -------------------------------
+# Usa a fixture logar do conftest.py: cria a conta e entra de verdade.
+
+
+def postar(client, quem, tag, minutos=None):
+    corpo = {"texto": "estudei", "tag": tag, "minutos": minutos}
+    assert client.post("/posts", json=corpo, headers=quem).status_code == 201
+
+
+def test_rota_conta_post_de_materia_de_hoje(client, logar):
+    ana = logar("ana")
+    postar(client, ana, "fisica", minutos=45)
+    postar(client, ana, "quimica", minutos=30)
+
+    r = client.get("/usuarios/ana/ofensiva", headers=ana)
+    assert r.status_code == 200
+    corpo = r.json()
+    assert corpo["atual"] == 1  # dois posts no mesmo dia contam um
+    assert corpo["recorde"] == 1
+    assert corpo["folgas_por_semana"] == 2
+    assert corpo["minutos_esta_semana"] == 75
+    assert corpo["minutos_semana_passada"] == 0
+
+
+def test_rota_bate_papo_nao_conta(client, logar):
+    ana = logar("ana")
+    postar(client, ana, "bate-papo", minutos=60)
+
+    corpo = client.get("/usuarios/ana/ofensiva", headers=ana).json()
+    assert corpo["atual"] == 0
+    assert corpo["minutos_esta_semana"] == 0
+
+
+def test_rota_mostra_a_ofensiva_de_outra_pessoa(client, logar):
+    ana, bia = logar("ana"), logar("bia")
+    postar(client, bia, "historia")
+    assert client.get("/usuarios/bia/ofensiva", headers=ana).json()["atual"] == 1
+
+
+def test_rota_horas_so_para_a_dona(client, logar):
+    """As horas são privadas (decisão 4): quem visita vê o fogo, não as horas."""
+    ana, bia = logar("ana"), logar("bia")
+    postar(client, bia, "historia", minutos=40)
+
+    da_dona = client.get("/usuarios/bia/ofensiva", headers=bia).json()
+    assert da_dona["minutos_esta_semana"] == 40
+    assert sum(da_dona["minutos_por_dia"]) == 40
+    assert len(da_dona["minutos_por_dia"]) == 7
+
+    de_quem_visita = client.get("/usuarios/bia/ofensiva", headers=ana).json()
+    assert de_quem_visita["atual"] == 1
+    assert de_quem_visita["minutos_esta_semana"] is None
+    assert de_quem_visita["minutos_semana_passada"] is None
+    assert de_quem_visita["minutos_por_dia"] is None
+
+
+def test_rota_semana_passada(client, logar, monkeypatch):
+    """Os posts de hoje viram "semana passada" quando hoje é daqui a 7 dias."""
+    ana = logar("ana")
+    postar(client, ana, "redacao", minutos=50)
+
+    daqui_a_uma_semana = hoje_em_brasilia() + timedelta(days=7)
+    monkeypatch.setattr(
+        "app.services.ofensiva.calculo.hoje_em_brasilia", lambda: daqui_a_uma_semana
+    )
+    corpo = client.get("/usuarios/ana/ofensiva", headers=ana).json()
+    assert corpo["minutos_semana_passada"] == 50
+    assert corpo["minutos_esta_semana"] == 0
+    assert corpo["atual"] == 0  # 6 dias sem estudo quebraram
+    assert corpo["recorde"] == 1
+
+
+def test_rota_usuario_que_nao_existe(client, logar):
+    r = client.get("/usuarios/ninguem/ofensiva", headers=logar("ana"))
+    assert r.status_code == 404
+
+
+def test_rota_exige_login(client):
+    assert client.get("/usuarios/ana/ofensiva").status_code == 401
