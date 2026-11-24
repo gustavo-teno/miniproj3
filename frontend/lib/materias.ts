@@ -11,24 +11,29 @@ import type { CSSProperties } from "react";
 type Par = { fundo: string; texto: string };
 export type CorTag = { claro: Par; noturno: Par };
 
-// Paleta de 24/11 (feedback do Gustavo): cada matéria com uma cor própria e
-// viva, espalhada pela roda de cores e fora da faixa do lavanda/roxo, que fica
-// só para a rede (botões, "Todas"). Todas passam no contraste de leitura (4,5)
-// nos dois modos.
+// Paleta por área de conhecimento (24/11, ideia da Camila): uma cor por área,
+// igual para todas as matérias dela (o símbolo e o nome diferenciam uma da
+// outra). O lavanda e o roxo ficam só para a rede (botões, "Todas"). Todas as
+// cores passam no contraste de leitura (4,5) nos dois modos.
+//   Exatas (azul escuro): matemática
+//   Natureza (verde): física, química, biologia
+//   Linguagens (vermelho): português, literatura, redação
+//   Humanas (amarelo): história, geografia, filosofia, sociologia
+//   Idiomas (laranja): inglês, espanhol
 const CORES: Record<string, CorTag> = {
-  matematica: { claro: { fundo: "#bdd7ff", texto: "#0052cc" }, noturno: { fundo: "#192a43", texto: "#5193f6" } },
-  fisica: { claro: { fundo: "#bdffff", texto: "#007a7a" }, noturno: { fundo: "#194343", texto: "#47f5f5" } },
-  quimica: { claro: { fundo: "#bdffe3", texto: "#007a47" }, noturno: { fundo: "#194331", texto: "#47f5ad" } },
-  biologia: { claro: { fundo: "#bdffbd", texto: "#007f00" }, noturno: { fundo: "#194319", texto: "#47f547" } },
-  portugues: { claro: { fundo: "#ffbfbd", texto: "#b20600" }, noturno: { fundo: "#431b19", texto: "#f65b55" } },
-  literatura: { claro: { fundo: "#ffbdd5", texto: "#b20041" }, noturno: { fundo: "#431928", texto: "#f6518d" } },
-  redacao: { claro: { fundo: "#ffd5bd", texto: "#a83e00" }, noturno: { fundo: "#432819", texto: "#f58747" } },
-  historia: { claro: { fundo: "#fff9bd", texto: "#7a7000" }, noturno: { fundo: "#433f19", texto: "#f5e747" } },
-  geografia: { claro: { fundo: "#e7ffbd", texto: "#4e7a00" }, noturno: { fundo: "#334319", texto: "#b5f547" } },
-  filosofia: { claro: { fundo: "#f1d8c6", texto: "#8a5328" }, noturno: { fundo: "#3c2c20", texto: "#ca9872" } },
-  sociologia: { claro: { fundo: "#ffbdeb", texto: "#a80076" }, noturno: { fundo: "#431936", texto: "#f64cc3" } },
-  ingles: { claro: { fundo: "#bdebff", texto: "#006b99" }, noturno: { fundo: "#193643", texto: "#47c1f5" } },
-  espanhol: { claro: { fundo: "#ffe9bd", texto: "#8f5f00" }, noturno: { fundo: "#433519", texto: "#f5bb47" } },
+  matematica: { claro: { fundo: "#8fc1ff", texto: "#0048a1" }, noturno: { fundo: "#17304f", texto: "#4a99fa" } },
+  fisica: { claro: { fundo: "#bdffcd", texto: "#007d1f" }, noturno: { fundo: "#194324", texto: "#47f572" } },
+  quimica: { claro: { fundo: "#bdffcd", texto: "#007d1f" }, noturno: { fundo: "#194324", texto: "#47f572" } },
+  biologia: { claro: { fundo: "#bdffcd", texto: "#007d1f" }, noturno: { fundo: "#194324", texto: "#47f572" } },
+  portugues: { claro: { fundo: "#ffbdbf", texto: "#b20006" }, noturno: { fundo: "#43191b", texto: "#f6555b" } },
+  literatura: { claro: { fundo: "#ffbdbf", texto: "#b20006" }, noturno: { fundo: "#43191b", texto: "#f6555b" } },
+  redacao: { claro: { fundo: "#ffbdbf", texto: "#b20006" }, noturno: { fundo: "#43191b", texto: "#f6555b" } },
+  historia: { claro: { fundo: "#fff4bd", texto: "#826c00" }, noturno: { fundo: "#433c19", texto: "#f5d847" } },
+  geografia: { claro: { fundo: "#fff4bd", texto: "#826c00" }, noturno: { fundo: "#433c19", texto: "#f5d847" } },
+  filosofia: { claro: { fundo: "#fff4bd", texto: "#826c00" }, noturno: { fundo: "#433c19", texto: "#f5d847" } },
+  sociologia: { claro: { fundo: "#fff4bd", texto: "#826c00" }, noturno: { fundo: "#433c19", texto: "#f5d847" } },
+  ingles: { claro: { fundo: "#ffd9bd", texto: "#a34700" }, noturno: { fundo: "#432b19", texto: "#f59247" } },
+  espanhol: { claro: { fundo: "#ffd9bd", texto: "#a34700" }, noturno: { fundo: "#432b19", texto: "#f59247" } },
   "bate-papo": { claro: { fundo: "#eef0f0", texto: "#4f5a5c" }, noturno: { fundo: "#262c35", texto: "#c3cad4" } },
 };
 
