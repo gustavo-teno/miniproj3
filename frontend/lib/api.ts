@@ -296,8 +296,10 @@ export type Ofensiva = {
   folgas_usadas_na_semana: number;
   folgas_por_semana: number;
   precisa_estudar_hoje: boolean; // sem post de matéria hoje, a ofensiva quebra
-  minutos_esta_semana: number;
-  minutos_semana_passada: number;
+  // As horas são privadas: só vêm para a dona do perfil; para quem visita, null.
+  minutos_esta_semana: number | null;
+  minutos_semana_passada: number | null;
+  minutos_por_dia: number[] | null; // os 7 dias desta semana, de segunda a domingo
 };
 
 export function buscarOfensiva(username: string): Promise<Ofensiva> {
