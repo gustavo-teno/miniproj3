@@ -40,13 +40,13 @@ trava outra pessoa vira issue, com o link aqui.
 **Seg 23: perfil (backend e topo).** As rotas ficam no `routers/users.py`, que
 é seu. `GET /usuarios/{username}` vai depois de `/stats`, senão captura esse
 caminho.
-- [ ] `GET /usuarios/{username}` com a meta e os contadores `seguidores` e
+- [x] `GET /usuarios/{username}` com a meta e os contadores `seguidores` e
     `seguindo` (contados na tabela de follows, que já existe desde o esqueleto);
     `PATCH /usuarios/eu` (bio, avatar e meta); `GET /usuarios/{username}/posts`
     paginado, com filtro opcional por tag.
-- [ ] Tela `/u/[username]`: topo com nome, meta (com o texto de quem marcou
+- [x] Tela `/u/[username]`: topo com nome, meta (com o texto de quem marcou
     "Outro", como "quer Geografia") e contadores.
-- [ ] Tirar o `@skip` de `test_perfil_editavel`.
+- [x] Tirar o `@skip` de `test_perfil_editavel`.
 - **Combinar com D:** o formato do `GET /usuarios/{username}`, que o teste de
     follow também lê.
 
@@ -71,6 +71,31 @@ compartilhados.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **seg 23:** perfil, backend e tela (#10, parte 1). Antes do código, desenhei
+  o diário com a skill impeccable: escolhi a "estante de cadernos" (cada
+  matéria é um caderno com quantos posts tem e quando foi o último, numa barra
+  que passa para o lado), a meta no estilo LinkedIn ("Fuvest · Medicina ·
+  USP") e, no meu diário, uma coluna presa ao rolar com o postar e a ofensiva.
+  Para quem visita, uma coluna só, com o fogo no topo. Os esboços estão em
+  `.impeccable/mocks/decision/`. No backend, o `GET /usuarios/{username}`
+  devolve a meta, os contadores, `meu_perfil` e os `cadernos`; o PATCH
+  devolve o perfil inteiro; a foto só aceita link `https` (sem o "s", a página
+  publicada bloqueia a imagem). Decidi tirar as horas por matéria do perfil:
+  num perfil que os outros visitam, isso vira comparação (princípio 3). As
+  horas da semana são privadas. Escrevi `tests/test_perfil.py` e tirei o
+  `@skip` do `test_perfil_editavel`. Também abri o PR #41 com ajustes do card
+  (a foto de quem postou em destaque, "Tempo de estudo" no lugar de "min",
+  símbolos novos de Biologia e Matemática e filtro por várias matérias no
+  rascunho do feed). Bugs achados na revisão da tela: trocar de pessoa sem
+  sair da página guardava o caderno da anterior, e o "Ver mais" podia
+  misturar cadernos; corrigi os dois.
+- **seg 23, para combinar:** com o Gustavo, o `<Ofensiva />` mostra as horas
+  para quem visita, mas decidimos que as horas são privadas; o ícone novo do
+  fogo (caderno aberto com a chama que cresce e muda de cor, ideia dele) fica
+  para a `feat/icone-ofensiva`; e as horas por dia, para as barras da semana.
+  Com a D, os endereços das turmas (a meta vira link) e o `BotaoSeguir` no
+  perfil. Ideias para depois: post com várias matérias (muda o contrato do
+  Post) e upload de foto em vez de link.
 - **dom 22:** posts prontos (#9). Backend com o `PostOut` levando o autor
   dentro, só o autor edita e apaga (403), e apagar um post leva junto as
   curtidas e os comentários. Na revisão achei dois bugs: a data voltava sem

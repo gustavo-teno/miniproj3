@@ -37,7 +37,8 @@ app = FastAPI(title="Rede Social da Trilha", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # A 3001 é para quando a 3000 já está ocupada e o Next sobe na seguinte.
+    allow_origins=["http://localhost:3000", "http://localhost:3001"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
