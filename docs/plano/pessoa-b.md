@@ -51,9 +51,9 @@ caminho.
     follow também lê.
 
 **Ter 24: o diário.**
-- [ ] Divisórias por matéria: uma aba por tag, com a contagem de posts.
-- [ ] Tela de editar o perfil.
-- [ ] Colocar no perfil o botão de seguir (D) e, quando sair, o `<Ofensiva />` (A).
+- [x] Divisórias por matéria: uma aba por tag, com a contagem de posts.
+- [x] Tela de editar o perfil.
+- [x] Colocar no perfil o botão de seguir (D) e, quando sair, o `<Ofensiva />` (A).
 
 **Qua 25:** ajustes visuais nas telas de todo mundo, estados vazios e tela de
 celular. Escrever o roteiro do vídeo.
@@ -71,6 +71,28 @@ compartilhados.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **ter 24:** feedback de design do Gustavo e botão de seguir. O DESIGN.md (#35)
+  e os ajustes do feedback (#52) entraram na `main`: uma cor por área de matéria
+  (Exatas azul, Natureza verde, Linguagens vermelho, Humanas amarelo, Idiomas
+  laranja), o lavanda do site mais vivo, o fogo da ofensiva em recorte de
+  papel saindo do caderno e os posts como folhas de caderno com dobra e listra
+  lavanda. Na revisão, o Gustavo pediu uma cor guardada por área no
+  `materias.ts` (feito, sem repetir a cor em cada matéria) e viu que a página
+  do post, da Clarisse, fica com borda dupla: combinei que ela tira a caixa no
+  próximo PR dela. Com o Follow (#33) na `main`, abri o #50: o `BotaoSeguir` do
+  Pedro no perfil, com o contador de seguidores ao vivo. Nele fiz os pontos da
+  revisão que faltavam (textos de erro no padrão do DESIGN.md e tirei o
+  `aria-pressed`, porque o texto "Seguir/Seguindo" já diz o estado); o Pedro
+  vai revisar. O #49 dele mexe nos mesmos pontos, então os dois precisam ser
+  combinados. Revisei e aprovei o #46 (busca) e o #45 (DMs, backend) do
+  Gustavo. A Clarisse passou dicas de "cara de IA": já corrigi os pequenos
+  erros (singular em "1 comentário" e "1 curtida" no rascunho do feed, campo
+  "Tempo de estudo" cortado, número repetido no card "Todas" e a comemoração
+  do recorde na legenda do fogo). As mudanças maiores (cor da matéria nos
+  posts, fonte e avatares, feed e topo) ficam para a `fix/refinamento-visual`,
+  com esboços para o time escolher; os esboços estão em
+  `.impeccable/mocks/decision/`. As barras das horas por matéria dependem de o
+  backend entregar as horas divididas por matéria (hoje só vem o total por dia).
 - **seg 23:** perfil, backend e tela (#10, parte 1). Antes do código, desenhei
   o diário com a skill impeccable: escolhi a "estante de cadernos" (cada
   matéria é um caderno com quantos posts tem e quando foi o último, numa barra

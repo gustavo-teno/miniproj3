@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
-import { Atkinson_Hyperlegible_Mono, Lexend } from "next/font/google";
+import { Lexend } from "next/font/google";
 
 import { Navegacao } from "@/components/Navegacao";
 import { NOME_REDE, SLOGAN_REDE } from "@/lib/rede";
 import "./globals.css";
 
 // Lexend: feita para leitura fluente. 300, 400 e 600 em tudo; 700 só nos
-// números do fogo da ofensiva (os dias seguidos e o recorde). A mono deixa
-// números (1h30, 45min) e @usuário alinhados e discretos.
+// números do fogo da ofensiva (os dias seguidos e o recorde). Os números
+// (1h30, 45min) e o @usuário usam a mesma Lexend, com algarismos de largura
+// igual (ver .font-numeros no globals.css): nada de fonte de terminal.
 const texto = Lexend({ subsets: ["latin"], weight: ["300", "400", "600", "700"], variable: "--fonte-texto" });
-const numeros = Atkinson_Hyperlegible_Mono({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--fonte-numeros",
-  // O Next não tem as medidas dessa fonte para ajustar a reserva e avisava no build.
-  adjustFontFallback: false,
-});
 
 export const metadata: Metadata = {
   title: NOME_REDE,
@@ -33,7 +27,7 @@ export default function RootLayout({
   return (
     // suppressHydrationWarning: o script acima muda o data-tema antes do React
     // chegar, e sem isso o React reclamaria da diferença.
-    <html lang="pt-BR" className={`${texto.variable} ${numeros.variable}`} suppressHydrationWarning>
+    <html lang="pt-BR" className={texto.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: aplicarTemaSalvo }} />
       </head>

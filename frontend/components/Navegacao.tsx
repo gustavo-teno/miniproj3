@@ -5,10 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { buscarEu, sair, type Eu } from "@/lib/api";
+import { useNaoLidas } from "@/lib/naoLidas";
 import { NOME_REDE } from "@/lib/rede";
-
-// As DMs são opcionais (decisão 6). A aba só aparece quando a tela existir.
-const MOSTRAR_MENSAGENS = false;
 
 // O topo da rede: nome à esquerda, abas no centro e configurações à direita.
 export function Navegacao() {
@@ -22,11 +20,20 @@ export function Navegacao() {
       .catch(() => setEu(null));
   }, []);
 
+  // As DMs (decisão 6): o número de não lidas aparece na aba Mensagens.
+  const naoLidas = useNaoLidas(Boolean(eu));
+
   const abas = [
     { href: "/", rotulo: "Feed" },
     { href: "/turmas", rotulo: "Turmas" },
-    ...(MOSTRAR_MENSAGENS ? [{ href: "/mensagens", rotulo: "Mensagens" }] : []),
-    ...(eu ? [{ href: `/u/${eu.username}`, rotulo: "Meu diário" }] : []),
+    ...(eu
+      ? [
+          // No celular, só o balão: com a palavra e o número, as abas passavam
+          // de 375px e empurravam a lupa e a engrenagem para fora da tela.
+          { href: "/mensagens", rotulo: "Mensagens", contador: naoLidas, icone: BALAO },
+          { href: `/u/${eu.username}`, rotulo: "Meu diário" },
+        ]
+      : []),
   ];
 
   return (
@@ -38,7 +45,7 @@ export function Navegacao() {
         </Link>
 
         <nav aria-label="Principal" className="flex gap-4 sm:gap-8">
-          {abas.map(({ href, rotulo }) => {
+          {abas.map(({ href, rotulo, contador, icone }) => {
             // O endereço exato ou uma página dentro dele: /u/ada e /u/ada/editar
             // acendem "Meu diário", mas /u/ada2 (outra pessoa) não.
             const ativa =
@@ -49,13 +56,30 @@ export function Navegacao() {
                 href={href}
                 aria-current={ativa ? "page" : undefined}
                 className={
-                  "whitespace-nowrap border-b-[3px] py-4 text-[15px] transition-colors sm:text-[17px] " +
+                  "flex items-center whitespace-nowrap border-b-[3px] py-4 text-[15px] transition-colors sm:text-[17px] " +
                   (ativa
                     ? "border-destaque font-semibold text-destaque"
                     : "border-transparent text-tinta-suave hover:text-tinta")
                 }
               >
-                {rotulo}
+                {icone ? (
+                  <>
+                    <span className="sm:hidden">
+                      <Icone d={icone} />
+                    </span>
+                    {/* No celular a palavra some da tela, mas o leitor de tela continua lendo. */}
+                    <span className="sr-only sm:not-sr-only">{rotulo}</span>
+                  </>
+                ) : (
+                  rotulo
+                )}
+                {/* O leitor de tela lê "Mensagens, 2 não lidas". */}
+                {contador ? (
+                  <span className="ml-1.5 inline-grid min-w-5 place-items-center rounded-full bg-destaque px-1 align-[2px] text-[11px] font-semibold leading-5 text-sobre-destaque">
+                    {contador}
+                    <span className="sr-only">{contador === 1 ? " não lida" : " não lidas"}</span>
+                  </span>
+                ) : null}
               </Link>
             );
           })}
@@ -206,6 +230,9 @@ function Configuracoes({ logado }: { logado: boolean }) {
     </div>
   );
 }
+
+// O balão de conversa da aba Mensagens no celular.
+const BALAO = "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z";
 
 // Ícone de traço simples, sempre do mesmo tamanho e espessura.
 function Icone({ d }: { d: string }) {
