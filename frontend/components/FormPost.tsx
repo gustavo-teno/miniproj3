@@ -126,7 +126,7 @@ export function FormPost({
           placeholder="Tempo de estudo"
           aria-label="Tempo de estudo em minutos (opcional)"
           title="Em minutos (opcional)"
-          className={campo + " w-40 font-numeros placeholder:font-texto"}
+          className={campo + " w-48 font-numeros placeholder:font-texto"}
         />
         <div className="ml-auto flex gap-2">
           <button

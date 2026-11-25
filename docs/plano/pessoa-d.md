@@ -13,7 +13,7 @@ trava outra pessoa vira issue, com o link aqui.
 **Seg 23: follow.** Começa com `make check` verde (guia 00).
 - [x] `POST` e `DELETE /usuarios/{username}/follow`, idempotentes.
 - [x] Componente `<BotaoSeguir username=... />`, usado no perfil e nas turmas.
-- [ ] Tirar o `@skip` de `test_follow_unfollow_com_contadores`.
+- [x] Tirar o `@skip` de `test_follow_unfollow_com_contadores`.
 - **Combinar com B:** os contadores ficam no `GET /usuarios/{username}` dela.
 
 **Ter 24: feed e núcleo verde.**
@@ -50,6 +50,10 @@ estiver mais atrasado.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **ter 24:** revisão do follow (Camila, #33): textos de erro do `<BotaoSeguir>`
+  no padrão do DESIGN.md; clique duplo rápido não dá mais 500 (o
+  `IntegrityError` vira 204, como nas curtidas, com teste); `@skip` do teste de
+  follow do núcleo removido, já que o perfil está na main. Fecha o #15.
 - **seg 23:** follow pronto (#15). Além do `POST`/`DELETE`, criei
   `GET /usuarios/{username}/follow` (`seguindo`, `seguidores`, `eu_mesmo`),
   que o `<BotaoSeguir>` usa para saber o próprio estado. Seguir a si mesmo dá

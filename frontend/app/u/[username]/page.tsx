@@ -138,7 +138,13 @@ export default function PaginaPerfil() {
   // O perfil em dois blocos: o topo e o resto (a estante e os posts). No diário
   // da dona, a coluna da direita (postar, fogo e horas) fica entre os dois no
   // celular; no computador, ela fica ao lado dos dois.
-  const topo = <TopoPerfil perfil={perfil} acao={acao} />;
+  const topo = (
+    <TopoPerfil
+      perfil={perfil}
+      acao={acao}
+      aoMudarSeguidores={(n) => setPerfil((atual) => (atual ? { ...atual, seguidores: n } : atual))}
+    />
+  );
   // A caixa de editar (um <dialog>, escondido até abrir) fica fora do bloco do
   // topo: como último item de um space-y, ela somava 16px embaixo do perfil.
   const editor = eu && (
