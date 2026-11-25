@@ -21,6 +21,25 @@ def test_seguir_e_idempotente(client, logar):
     assert client.get("/usuarios/ana/follow", headers=bia).json()["seguindo"] is False
 
 
+def test_clique_duplo_ao_mesmo_tempo_nao_da_500(client, logar, monkeypatch):
+    """Dois pedidos juntos passam os dois pela conferência "já segue?".
+
+    Para simular isso, a conferência passa a dizer sempre "não segue": o
+    segundo POST tenta gravar o par de novo e bate no UniqueConstraint.
+    """
+    from app.services import follows
+
+    ana = logar("ana")
+    logar("bia")
+    monkeypatch.setattr(follows, "segue", lambda *args: False)
+
+    assert client.post("/usuarios/bia/follow", headers=ana).status_code == 204
+    assert client.post("/usuarios/bia/follow", headers=ana).status_code == 204
+
+    monkeypatch.undo()
+    assert client.get("/usuarios/bia/follow", headers=ana).json()["seguidores"] == 1
+
+
 def test_deixar_de_seguir_e_idempotente(client, logar):
     ana = logar("ana")
     logar("bia")
