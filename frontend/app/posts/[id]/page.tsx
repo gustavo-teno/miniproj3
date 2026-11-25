@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { BotaoCurtir } from "@/components/BotaoCurtir";
+import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
 import { Comentarios } from "@/components/Comentarios";
 import { apiGet, type Post } from "@/lib/api";
@@ -36,7 +37,15 @@ export default function PaginaDoPost() {
   return (
     <div className="mx-auto max-w-2xl space-y-3">
       <div className="overflow-hidden rounded-2xl border border-linha bg-superficie">
-        <CardPost post={post} rodape={<BotaoCurtir post={post} />} />
+        <CardPost
+          post={post}
+          rodape={
+            <>
+              <BotaoCurtir post={post} />
+              <BotaoSalvar post={post} />
+            </>
+          }
+        />
       </div>
       <Comentarios postId={post.id} />
     </div>
