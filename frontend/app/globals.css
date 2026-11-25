@@ -87,6 +87,52 @@
   color: var(--materia-texto-noturno);
 }
 
+/* O nome da matéria no card, com marca-texto na cor dela (como quem grifa o
+   caderno). Usa as mesmas variáveis do .cor-materia, no claro e no noturno. */
+.marca-materia {
+  color: var(--materia-texto);
+  background-image: linear-gradient(
+    transparent 38%,
+    var(--materia-fundo) 38%,
+    var(--materia-fundo) 92%,
+    transparent 92%
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .marca-materia {
+    color: var(--materia-texto-noturno);
+    background-image: linear-gradient(
+      transparent 38%,
+      var(--materia-fundo-noturno) 38%,
+      var(--materia-fundo-noturno) 92%,
+      transparent 92%
+    );
+  }
+}
+
+:root[data-tema="noturno"] .marca-materia {
+  color: var(--materia-texto-noturno);
+  background-image: linear-gradient(
+    transparent 38%,
+    var(--materia-fundo-noturno) 38%,
+    var(--materia-fundo-noturno) 92%,
+    transparent 92%
+  );
+}
+
+/* As linhas de pauta do caderno atrás do texto do post: bem leves, no tom do
+   destaque. Precisa de altura de linha fixa (leading-6 = 24px) para as linhas
+   da pauta caírem embaixo de cada linha do texto. */
+.pauta {
+  background-image: repeating-linear-gradient(
+    transparent 0,
+    transparent 23px,
+    color-mix(in srgb, var(--destaque) 18%, transparent) 23px,
+    color-mix(in srgb, var(--destaque) 18%, transparent) 24px
+  );
+}
+
 /* Partes que o navegador desenha sozinho também seguem a paleta: o texto
    selecionado e o contorno de foco de quem navega pelo teclado (Tab). */
 ::selection {
