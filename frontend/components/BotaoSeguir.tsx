@@ -35,7 +35,7 @@ export function BotaoSeguir({ username, onMudou }: Props) {
     let valendo = true;
     apiGet<EstadoFollow>(`/usuarios/${encodeURIComponent(username)}/follow`)
       .then((e) => valendo && setEstado(e))
-      .catch(() => valendo && setErro("não consegui carregar"));
+      .catch(() => valendo && setErro("Não foi possível carregar."));
     return () => {
       valendo = false;
     };
@@ -54,8 +54,14 @@ export function BotaoSeguir({ username, onMudou }: Props) {
       const novo = await apiGet<EstadoFollow>(caminho);
       setEstado(novo);
       onMudou?.(novo.seguidores);
-    } catch (err) {
-      setErro(err instanceof Error ? err.message : "não deu certo, tente de novo");
+    } catch {
+      // Textos no padrão das "Mensagens do sistema" do DESIGN.md: dizem qual
+      // ação falhou e o que fazer, em vez do código de erro do servidor.
+      setErro(
+        estado.seguindo
+          ? "Não foi possível deixar de seguir. Tente de novo."
+          : "Não foi possível seguir. Tente de novo."
+      );
     } finally {
       setEnviando(false);
     }
