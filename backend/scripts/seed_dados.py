@@ -7,6 +7,8 @@ de verdade, posts do jeito que um vestibulando escreve.
 As chaves de vestibular, curso e matéria são as de app/constantes.py.
 """
 
+from datetime import timedelta
+
 # Rotinas de estudo, para a ofensiva aparecer de todos os jeitos no vídeo:
 # - "firme": estuda quase todo dia, com uma folga aqui e ali (ofensiva em dia).
 # - "quebrou": teve uma ofensiva longa, parou uns dias e recomeçou (recorde
@@ -222,4 +224,38 @@ COMENTARIOS = [
     "Bora, a aprovação tá vindo!",
     "Que rotina inspiradora.",
     "Me identifiquei demais.",
+]
+
+# Conversas da Ada com três mútuos (DMs, decisão 6), para a caixa de mensagens
+# não abrir vazia no vídeo. Cada uma mostra um uso da DM: combinar uma sessão,
+# cobrar um ao outro e desabafar depois do simulado. Cada mensagem é
+# (quem escreveu, há quanto tempo, texto), da mais antiga para a mais nova.
+# "nao_lidas" diz quantas das últimas mensagens a Ada ainda não abriu: são
+# elas que fazem o número aparecer na aba Mensagens.
+CONVERSAS_DEMO = [
+    {"com": "manu", "nao_lidas": 2, "mensagens": [
+        ("manu", timedelta(days=3, hours=2), "Ada, vi teu post de genética. Tu fez aquela lista de heredogramas?"),
+        ("ada", timedelta(days=3, hours=1, minutes=45), "Fiz! Errei 4 de 20, quase tudo em probabilidade. Quer fazer junto?"),
+        ("manu", timedelta(days=3, hours=1, minutes=40), "Quero muito. Sábado de manhã?"),
+        ("ada", timedelta(days=3, hours=1, minutes=35), "Fechado. 9h, chamada de vídeo, cada uma com a câmera no caderno."),
+        ("manu", timedelta(minutes=40), "Ada, bora antecipar pra amanhã à noite? Sábado vou ter simulado."),
+        ("manu", timedelta(minutes=20), "Pode ser às 20h? Levo as questões da UERJ de genética."),
+    ]},
+    {"com": "joaopedro", "nao_lidas": 1, "mensagens": [
+        ("joaopedro", timedelta(days=2, hours=3), "Me cobra amanhã? Prometi fechar a lista de estequiometria e tô enrolando desde segunda."),
+        ("ada", timedelta(days=2, hours=2, minutes=50), "Cobro sim. E você me cobra a redação, combinado? Tô devendo duas."),
+        ("ada", timedelta(days=1, hours=4), "E aí, a estequiometria saiu?"),
+        ("joaopedro", timedelta(days=1, hours=3, minutes=40), "Saiu! 17 de 25. E a redação?"),
+        ("ada", timedelta(days=1, hours=3, minutes=20), "Escrevi uma hoje, tema de mobilidade urbana. Amanhã faço a outra."),
+        ("joaopedro", timedelta(hours=3), "Cadê a segunda redação, hein? Tô cobrando como combinado."),
+    ]},
+    {"com": "larissa", "nao_lidas": 0, "mensagens": [
+        ("larissa", timedelta(days=5, hours=1), "Ada, tirei 640 no simulado. Achei que ia passar dos 700 dessa vez."),
+        ("ada", timedelta(days=5, minutes=50), "Ei, 640 nessa prova é bom. Natureza tava pesada pra todo mundo."),
+        ("larissa", timedelta(days=5, minutes=45), "É que eu estudei tanto. Dá vontade de largar tudo."),
+        ("ada", timedelta(days=5, minutes=35), "Eu senti isso mês passado. Olha teus erros com calma amanhã, não hoje. Hoje é dormir."),
+        ("larissa", timedelta(days=5, minutes=30), "Valeu, de verdade. Amanhã te conto o que errei."),
+        ("larissa", timedelta(days=4, hours=5), "Errei quase tudo em química. Vou focar nela essa semana."),
+        ("ada", timedelta(days=4, hours=4, minutes=45), "Boa! Se quiser, faz comigo as de soluções, também tô nelas."),
+    ]},
 ]
