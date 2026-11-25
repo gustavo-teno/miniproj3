@@ -1,25 +1,22 @@
 """DMs entre mútuos (#18, decisão 6, Pessoa A).
 
-A rota de seguir é da Pessoa D e chega em outro PR, então aqui os follows são
-criados direto no banco, com a função seguir().
+Os follows passam pela rota de seguir da Pessoa D (#33), e não direto pelo
+banco: assim os testes também conferem que as DMs funcionam com o Follow real.
 """
 
-from app.db import SessionLocal
-from app.models.follow import Follow
-from app.services.users import buscar_por_username
+
+def seguir(client, quem: dict, quem_segue: str) -> None:
+    assert client.post(f"/usuarios/{quem_segue}/follow", headers=quem).status_code == 204
 
 
-def seguir(quem: str, quem_segue: str) -> None:
-    with SessionLocal() as db:
-        a = buscar_por_username(db, quem)
-        b = buscar_por_username(db, quem_segue)
-        db.add(Follow(seguidor_id=a.id, seguido_id=b.id))
-        db.commit()
+def deixar_de_seguir(client, quem: dict, quem_segue: str) -> None:
+    assert client.delete(f"/usuarios/{quem_segue}/follow", headers=quem).status_code == 204
 
 
-def mutuos(a: str, b: str) -> None:
-    seguir(a, b)
-    seguir(b, a)
+def mutuos(client, a: dict, b: dict) -> None:
+    nome = lambda quem: client.get("/auth/eu", headers=quem).json()["username"]
+    seguir(client, a, nome(b))
+    seguir(client, b, nome(a))
 
 
 def mandar(client, quem, para, texto="oi"):
@@ -28,7 +25,7 @@ def mandar(client, quem, para, texto="oi"):
 
 def test_mutuos_trocam_mensagem(client, logar):
     ana, bia = logar("ana", "Ana"), logar("bia", "Bia")
-    mutuos("ana", "bia")
+    mutuos(client, ana, bia)
 
     r = mandar(client, ana, "bia", "bora estudar física às 19h?")
     assert r.status_code == 201
@@ -43,13 +40,13 @@ def test_mutuos_trocam_mensagem(client, logar):
 
 
 def test_quem_nao_e_mutuo_recebe_403(client, logar):
-    ana, _ = logar("ana"), logar("bia")
+    ana, bia = logar("ana"), logar("bia")
     assert mandar(client, ana, "bia").status_code == 403  # ninguém segue ninguém
 
-    seguir("ana", "bia")  # só a Ana segue
+    seguir(client, ana, "bia")  # só a Ana segue
     assert mandar(client, ana, "bia").status_code == 403
 
-    seguir("bia", "ana")  # agora as duas
+    seguir(client, bia, "ana")  # agora as duas
     assert mandar(client, ana, "bia").status_code == 201
 
 
@@ -61,14 +58,14 @@ def test_nao_manda_para_si_mesma_nem_para_quem_nao_existe(client, logar):
 
 
 def test_mensagem_vazia_da_422(client, logar):
-    ana, _ = logar("ana"), logar("bia")
-    mutuos("ana", "bia")
+    ana, bia = logar("ana"), logar("bia")
+    mutuos(client, ana, bia)
     assert mandar(client, ana, "bia", "   ").status_code == 422
 
 
 def test_conversa_so_aparece_para_as_duas(client, logar):
     ana, bia, cris = logar("ana"), logar("bia"), logar("cris")
-    mutuos("ana", "bia")
+    mutuos(client, ana, bia)
     mandar(client, ana, "bia", "segredo do simulado")
 
     # A Cris não vê a conversa das duas: nem na lista, nem abrindo.
@@ -79,7 +76,7 @@ def test_conversa_so_aparece_para_as_duas(client, logar):
 
 def test_depois_de_traz_so_as_novas(client, logar):
     ana, bia = logar("ana"), logar("bia")
-    mutuos("ana", "bia")
+    mutuos(client, ana, bia)
     primeira = mandar(client, ana, "bia", "1").json()
     mandar(client, bia, "ana", "2")
     mandar(client, ana, "bia", "3")
@@ -93,8 +90,8 @@ def test_depois_de_traz_so_as_novas(client, logar):
 
 
 def test_abrir_sem_depois_de_traz_as_ultimas_em_ordem(client, logar):
-    ana, _ = logar("ana"), logar("bia")
-    mutuos("ana", "bia")
+    ana, bia = logar("ana"), logar("bia")
+    mutuos(client, ana, bia)
     for i in range(5):
         mandar(client, ana, "bia", str(i))
 
@@ -105,7 +102,7 @@ def test_abrir_sem_depois_de_traz_as_ultimas_em_ordem(client, logar):
 
 def test_abrir_a_conversa_zera_as_nao_lidas(client, logar):
     ana, bia = logar("ana"), logar("bia")
-    mutuos("ana", "bia")
+    mutuos(client, ana, bia)
     mandar(client, ana, "bia", "oi")
     mandar(client, ana, "bia", "tá aí?")
 
@@ -124,7 +121,7 @@ def test_abrir_a_conversa_zera_as_nao_lidas(client, logar):
 
 def test_pagina_antiga_nao_desmarca_as_lidas(client, logar):
     ana, bia = logar("ana"), logar("bia")
-    mutuos("ana", "bia")
+    mutuos(client, ana, bia)
     for texto in ("1", "2", "3"):
         mandar(client, ana, "bia", texto)
 
@@ -137,8 +134,8 @@ def test_pagina_antiga_nao_desmarca_as_lidas(client, logar):
 
 def test_lista_de_conversas_da_mais_recente(client, logar):
     ana, bia, cris = logar("ana"), logar("bia"), logar("cris")
-    mutuos("ana", "bia")
-    mutuos("ana", "cris")
+    mutuos(client, ana, bia)
+    mutuos(client, ana, cris)
     mandar(client, ana, "bia", "primeiro com a bia")
     mandar(client, cris, "ana", "depois a cris")
 
@@ -152,14 +149,10 @@ def test_lista_de_conversas_da_mais_recente(client, logar):
 
 def test_quem_deixou_de_seguir_ve_a_conversa_mas_nao_responde(client, logar):
     ana, bia = logar("ana"), logar("bia")
-    mutuos("ana", "bia")
+    mutuos(client, ana, bia)
     mandar(client, ana, "bia", "oi")
 
-    # A Ana deixa de seguir a Bia.
-    with SessionLocal() as db:
-        ana_id = buscar_por_username(db, "ana").id
-        db.query(Follow).filter(Follow.seguidor_id == ana_id).delete()
-        db.commit()
+    deixar_de_seguir(client, ana, "bia")
 
     conversa = client.get("/dms/ana", headers=bia).json()
     assert [m["texto"] for m in conversa["mensagens"]] == ["oi"]
