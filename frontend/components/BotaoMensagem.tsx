@@ -1,17 +1,21 @@
 "use client";
 
-// Botão Mensagem do perfil (#18, decisão 6, Pessoa A):  <BotaoMensagem username="ana" />
+// Botão Mensagem do perfil (#18, decisão 6, Pessoa A):
+//   <BotaoMensagem username="ana" seguidores={perfil.seguidores} />
 //
 // Só aparece entre mútuos: ele mesmo pergunta ao backend (GET
 // /dms/{username}/pode-mandar) e leva à conversa. Enquanto não sabe, não
-// aparece, para não mostrar um botão que some logo depois.
+// aparece, para não mostrar um botão que some logo depois. Quando o número de
+// seguidores muda (seguir de volta pode tornar vocês mútuos), ele pergunta de
+// novo, mas mantém o que já mostrava até a resposta chegar: assim o botão não
+// pisca ao clicar em Seguir.
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { podeMandarMensagem } from "@/lib/api";
 
-export function BotaoMensagem({ username }: { username: string }) {
+export function BotaoMensagem({ username, seguidores }: { username: string; seguidores: number }) {
   const [pode, setPode] = useState(false);
 
   useEffect(() => {
@@ -24,7 +28,7 @@ export function BotaoMensagem({ username }: { username: string }) {
     return () => {
       valendo = false;
     };
-  }, [username]);
+  }, [username, seguidores]);
 
   if (!pode) return null;
 

@@ -93,13 +93,13 @@ export function TopoPerfil({
           </p>
 
           {/* Quem visita: Seguir (o BotaoSeguir da Pessoa D, que já sabe se você segue
-              a pessoa) e Mensagem, que só aparece entre mútuos (decisão 6). O key
-              faz o BotaoMensagem perguntar de novo quando o número de seguidores
-              muda: seguir de volta pode tornar vocês mútuos. */}
+              a pessoa) e Mensagem, que só aparece entre mútuos (decisão 6). A linha
+              já guarda a altura dos botões enquanto eles carregam, para o topo
+              não dar um pulo quando eles aparecem. */}
           {!perfil.meu_perfil && (
-            <div className="mt-3.5 flex flex-wrap items-start gap-2">
+            <div className="mt-3.5 flex min-h-[34px] flex-wrap items-start gap-2">
               <BotaoSeguir username={perfil.username} onMudou={aoMudarSeguidores} />
-              <BotaoMensagem key={perfil.seguidores} username={perfil.username} />
+              <BotaoMensagem username={perfil.username} seguidores={perfil.seguidores} />
             </div>
           )}
         </div>
