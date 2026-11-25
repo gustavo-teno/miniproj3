@@ -3,8 +3,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base, CriadoEm
 
+
 class Mensagem(Base):
-    """DM entre mútuos (decisão 6, opcional). Se as DMs forem cortadas, sai."""
+    """DM entre mútuos (decisão 6). As regras ficam em services/dms.py."""
 
     __tablename__ = "mensagens"
 

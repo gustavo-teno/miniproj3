@@ -27,6 +27,8 @@ __pycache__/
 node_modules/
 .next/
 out/
+# cache do tsc (npx tsc --noEmit gera)
+*.tsbuildinfo
 
 # editores/os
 .DS_Store

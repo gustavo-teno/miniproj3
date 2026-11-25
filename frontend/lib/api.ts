@@ -231,6 +231,18 @@ export type Opcoes = {
   cursos: Opcao[];
 };
 
+// ---- busca (#38, Pessoa A; espelha backend/app/routers/busca.py) ----
+
+// Sem diferença de acento nem de maiúscula: "calculo" acha "Cálculo".
+// O backend só busca a partir de 2 letras.
+export function buscarPessoas(q: string): Promise<Page<User>> {
+  return apiGet<Page<User>>(`/busca/pessoas?q=${encodeURIComponent(q)}`);
+}
+
+export function buscarPosts(q: string): Promise<Page<Post>> {
+  return apiGet<Page<Post>>(`/busca/posts?q=${encodeURIComponent(q)}`);
+}
+
 // ---- post e perfil (Pessoa B; proposta, fechada nos PRs de posts e perfil) ----
 
 // O autor que aparece no card, sem os dados do perfil inteiro.

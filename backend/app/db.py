@@ -2,9 +2,11 @@ import os
 from datetime import datetime, timezone
 from typing import Annotated
 
-from sqlalchemy import DateTime, create_engine
+from sqlalchemy import DateTime, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, mapped_column, sessionmaker
 from sqlalchemy.types import TypeDecorator
+
+from app.core.texto import sem_acento
 
 # SQLite local, zero setup. O arquivo app.db NUNCA vai para o git (.gitignore).
 # Os testes apontam DATABASE_URL para um banco descartável (ver tests/conftest.py).
@@ -12,6 +14,14 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./app.db")
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+
+
+@event.listens_for(engine, "connect")
+def _funcoes_da_busca(conexao, _registro) -> None:
+    """Ensina o SQLite a comparar sem acento (#38): a busca usa
+    sem_acento(coluna) LIKE ..., e o SQLite sozinho só sabe tirar maiúscula
+    das letras sem acento. Vale para toda conexão que o engine abrir."""
+    conexao.create_function("sem_acento", 1, sem_acento, deterministic=True)
 
 
 class Base(DeclarativeBase):
