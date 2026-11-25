@@ -35,8 +35,8 @@ Depois validem o ambiente:
 
 ```bash
 make check      # tudo precisa ficar verde
-make seed       # cria 3 usuários de exemplo (ada, linus, grace; senha: senha-forte-123)
-make test       # deve mostrar "21 passed, 7 skipped"
+make seed       # cria 25 vestibulandos com posts, follows, curtidas e comentários (entre como ada; senha: senha-forte-123)
+make test       # nenhum "failed"; cada "skipped" é uma tarefa do núcleo que ainda falta
 ```
 
 Para rodar o projeto, abram dois terminais:
