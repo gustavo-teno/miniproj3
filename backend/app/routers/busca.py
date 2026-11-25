@@ -6,7 +6,7 @@ Rotas: GET /busca/pessoas?q= e GET /busca/posts?q=, paginadas. São duas rotas
 UserPage e posts no PostOut, que o card do post já sabe mostrar.
 """
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db import get_db
@@ -19,12 +19,21 @@ from app.services import busca as service
 router = APIRouter(prefix="/busca", tags=["busca"])
 
 # Com uma letra só, quase tudo bate: a busca começa na segunda.
-TERMO = Query(min_length=2, max_length=100, description="o que procurar")
+MINIMO_DE_LETRAS = 2
+
+
+def termo_de_busca(q: str = Query(max_length=100, description="o que procurar")) -> str:
+    """O termo sem os espaços das pontas. O mínimo é conferido depois de tirar
+    os espaços: senão "  " passava e a busca devolvia tudo."""
+    termo = q.strip()
+    if len(termo) < MINIMO_DE_LETRAS:
+        raise HTTPException(status_code=422, detail=f"digite pelo menos {MINIMO_DE_LETRAS} letras")
+    return termo
 
 
 @router.get("/pessoas", response_model=UserPage)
 def buscar_pessoas(
-    q: str = TERMO,
+    q: str = Depends(termo_de_busca),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
     # Só para exigir login, como em GET /posts/{id}.
@@ -37,7 +46,7 @@ def buscar_pessoas(
 
 @router.get("/posts", response_model=ResultadoPosts)
 def buscar_posts(
-    q: str = TERMO,
+    q: str = Depends(termo_de_busca),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
     _user: User = Depends(get_current_user),

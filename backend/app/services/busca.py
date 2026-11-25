@@ -32,7 +32,7 @@ def _paginar(db: Session, consulta, offset: int, limit: int) -> tuple[list, int]
 
 def pessoas(db: Session, q: str, offset: int, limit: int) -> tuple[list[User], int]:
     """Pelo nome ou pelo @, em ordem alfabética do nome."""
-    padrao = _contendo(sem_acento(q.strip()))
+    padrao = _contendo(sem_acento(q))
     consulta = (
         select(User)
         .where(
@@ -48,7 +48,7 @@ def pessoas(db: Session, q: str, offset: int, limit: int) -> tuple[list[User], i
 
 def posts(db: Session, q: str, offset: int, limit: int) -> tuple[list[Post], int]:
     """Pelo texto do post, do mais novo para o mais antigo."""
-    padrao = _contendo(sem_acento(q.strip()))
+    padrao = _contendo(sem_acento(q))
     consulta = (
         select(Post)
         .where(func.sem_acento(Post.texto).like(padrao, escape="\\"))

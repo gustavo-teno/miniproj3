@@ -59,6 +59,20 @@ def test_busca_pessoas_pelo_nome_ou_pelo_arroba(client, logar):
     assert client.get("/busca/pessoas?q=j", headers=ana).status_code == 422
 
 
+def test_espacos_nao_contam_como_letra(client, logar):
+    ana = logar("ana", "Ana")
+    client.post("/posts", json={"texto": "revisão de física"}, headers=ana)
+
+    # só espaços, ou uma letra com espaços em volta: 422, e não a rede inteira
+    for termo in ["%20%20", "%20j%20"]:
+        for rota in ["pessoas", "posts"]:
+            r = client.get(f"/busca/{rota}?q={termo}", headers=ana)
+            assert r.status_code == 422, (rota, termo)
+
+    # os espaços das pontas não atrapalham uma busca de verdade
+    assert client.get("/busca/posts?q=%20fisica%20", headers=ana).json()["total"] == 1
+
+
 def test_busca_pessoas_em_ordem_alfabetica(client, logar):
     ana = logar("ana", "Zuleica Santos")
     logar("bia", "Ágata Santos")
