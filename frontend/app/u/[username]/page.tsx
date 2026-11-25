@@ -153,31 +153,34 @@ export default function PaginaPerfil() {
             <EstanteCadernos cadernos={perfil.cadernos} aberto={aberto} abrir={setAberto} />
           </section>
 
-          <section aria-label="Posts" className="overflow-hidden rounded-2xl border border-linha bg-superficie">
-            <div className="flex items-baseline gap-2 border-b border-linha px-4 py-3">
-              <h3 className="font-semibold">{nomeDoCaderno ? `Caderno de ${nomeDoCaderno}` : "Todas as publicações"}</h3>
+          <section aria-label="Posts" className="space-y-4">
+            {/* O título do caderno fica em cima das folhas, sem caixa em volta. */}
+            <div className="flex items-baseline gap-2">
+              <h3 className="text-lg font-semibold">{nomeDoCaderno ? `Caderno de ${nomeDoCaderno}` : "Todas as publicações"}</h3>
               <span className="font-numeros text-sm text-tinta-suave">{total === 1 ? "1 post" : `${total} posts`}</span>
             </div>
 
             {erroPosts && (
-              <p role="alert" className="m-4 rounded-lg border border-erro bg-erro-fundo p-3 text-sm text-erro">
+              <p role="alert" className="rounded-lg border border-erro bg-erro-fundo p-3 text-sm text-erro">
                 {erroPosts}
               </p>
             )}
             {posts === null ? (
               erroPosts ? null : (
-                <div role="status" aria-label="Carregando os posts" className="m-4 h-24 animate-pulse rounded-xl bg-linha" />
+                <div role="status" aria-label="Carregando os posts" className="h-24 animate-pulse rounded-xl bg-linha" />
               )
             ) : posts.length === 0 ? (
               // O mesmo formato da lista vazia do feed (combinado em 24/11).
-              <p className="p-6 text-sm text-tinta-suave">Nenhum post de {nomeDoCaderno} ainda.</p>
+              <p className="rounded-2xl border border-linha bg-superficie p-6 text-sm text-tinta-suave">
+                Nenhum post de {nomeDoCaderno} ainda.
+              </p>
             ) : (
               <>
                 {posts.map((p) => (
                   <CardPost key={p.id} post={p} />
                 ))}
                 {posts.length < total && (
-                  <div className="border-t border-linha p-3 text-center">
+                  <div className="text-center">
                     <button
                       type="button"
                       onClick={verMais}

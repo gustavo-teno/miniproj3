@@ -18,8 +18,10 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
   const opcoes = useOpcoes();
   const estilo = estiloDaTag(post.tag);
 
+  // Cada post é uma folha de caderno: a dobra e a margem vêm da classe .folha
+  // (globals.css), e a lista põe um espaço entre as folhas.
   return (
-    <article className="flex gap-3 border-b border-linha p-4 last:border-b-0 sm:gap-4">
+    <article className="folha flex gap-3 rounded-xl border border-linha bg-superficie py-4 pl-7 pr-6 sm:gap-4">
       {/* A foto de quem postou em destaque, à esquerda: é uma rede de pessoas.
           Ela também leva ao perfil (o nome já faz isso, então o leitor de
           tela e o Tab pulam este link para não repetir). */}
