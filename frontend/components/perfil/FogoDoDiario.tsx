@@ -31,66 +31,93 @@ export function faixaDoFogo(dias: number): number {
   return faixa;
 }
 
-// O desenho de cada tamanho: a chama, a escala dela e a do miolo mais claro.
-const CHAMAS = {
-  pequena: {
-    d: "M24 17c.8 3 3.6 4.6 4.6 7.4 1.2 3.4-1 6.6-4.6 6.6s-5.8-3.2-4.6-6.4c.5 1.2 1.3 1.8 2.2 2-.6-3.3.6-6.4 2.4-9.6z",
-    escala: 1.75,
-    miolo: 1.84,
-  },
-  media: {
-    d: "M24 12c1 3.6 4.4 5.6 5.6 9 .4-1.4.3-2.8-.2-4.2 2.6 2.4 3.8 6 3 9.2-.9 3.4-4 5.8-8.4 5.8s-7.6-2.6-8.2-6.2c-.5-2.8.6-5.4 2.6-7.4-.1 1.6.4 3 1.4 4-.4-3.8.9-7.2 4.2-10.2z",
-    escala: 1.3,
-    miolo: 1.63,
-  },
-  grande: {
-    d: "M24 5c1.2 4 5 6.4 6.4 10.4.6-1.6.5-3.2 0-4.8 3.2 2.8 5.2 7.2 4.4 11.4-.9 4.8-5 8.4-10.8 8.4s-9.8-3.4-10.6-8c-.6-3.6.8-7 3.4-9.6-.2 1.8.4 3.4 1.6 4.6-.6-4.8 1.6-9.2 5.6-12.4z",
-    escala: 0.96,
-    miolo: 1.49,
-  },
-};
-const MIOLO = "M24 22.5c.5 2 2.3 3 2.9 4.9.7 2.1-.7 3.6-2.9 3.6s-3.6-1.5-2.9-3.5c.3.7.8 1.1 1.4 1.2-.3-2.1.4-4.1 1.5-6.2z";
+// O fogo em recorte de papel (escolhido em 24/11): uma chama assimétrica, com
+// línguas de alturas diferentes, em camadas: a de trás, mais escura e deslocada
+// (a profundidade), a da cor da faixa, a do meio e o miolo claro. Ela cresce com
+// os dias, ganha brasas soltas e, nas faixas mais quentes, um brilho atrás.
+const FORA = "M32 46C22 46 17 39 19 31C20 27 23 25 23 21C26 24 26 27 25.5 30C28 26 27 19 31 12C31 17 34 20 36 24C37 21 37 18 36 15C41 20 45 27 44 34C43 41 39 46 32 46Z";
+const MEIO = "M32 46C25.5 46 22.5 41 24 35C25 31.5 27.5 30 28 26.5C30 29 30.5 31.5 30 34C32 31 32.5 27 34.5 22.5C35.5 27 39.5 30 39.5 36C39.5 42 36.5 46 32 46Z";
+const MIOLO = "M32 46C28.5 46 27 43 28 39.5C28.8 37 30.5 36 31 33C32.5 35.5 33.5 36.5 34.5 35C36 37.5 36.5 40 35.8 42.5C35 45 33.6 46 32 46Z";
 
-// A chama cresce a partir da lombada do caderno (24, 31).
-const escalar = (e: number) => `translate(24 31) scale(${e}) translate(-24 -31)`;
+// Por faixa: o tamanho da chama, se tem brilho atrás e quantas brasas.
+const FAIXA_DO_FOGO: Record<number, { escala: number; brilho: boolean; brasas: number }> = {
+  1: { escala: 0.95, brilho: false, brasas: 0 },
+  2: { escala: 1.02, brilho: false, brasas: 1 },
+  3: { escala: 1.15, brilho: false, brasas: 1 },
+  4: { escala: 1.22, brilho: true, brasas: 2 },
+  5: { escala: 1.32, brilho: true, brasas: 3 },
+  6: { escala: 1.4, brilho: true, brasas: 4 },
+};
+// Onde ficam as brasas (x, y, tamanho), no tamanho cheio da chama.
+const BRASAS = [
+  [24, 30, 1.1],
+  [41, 24, 0.9],
+  [20, 22, 0.8],
+  [44, 16, 0.7],
+];
+
+// A chama cresce a partir da base, no meio do caderno (32, 46).
+const escalar = (e: number) => `translate(32 46) scale(${e}) translate(-32 -46)`;
+
+// O caderno aberto em "V": as duas páginas descem até a dobra do meio; embaixo
+// de cada uma ficam as bordas das folhas (a grossura), por fora a capa, e uma
+// sombra no chão. A chama vem por cima, inteira, com a base sobre as páginas.
+function Caderno() {
+  const traco = { stroke: "var(--caderno-traco)", strokeWidth: 1, strokeLinejoin: "round" as const };
+  return (
+    <>
+      <ellipse cx="32" cy="55.5" rx="25" ry="2.4" fill="var(--caderno-traco)" opacity=".1" />
+      <path d="M8 36.5L5.8 37.6V50.6C14 49 24 49.4 32 54V51.8C24 47.6 15.2 47.2 8 48.8Z" fill="var(--caderno-capa)" {...traco} />
+      <path d="M56 36.5L58.2 37.6V50.6C50 49 40 49.4 32 54V51.8C40 47.6 48.8 47.2 56 48.8Z" fill="var(--caderno-capa)" {...traco} />
+      <path d="M8 46.4C15.2 44.8 24 45.2 32 49.6V51.8C24 47.6 15.2 47.2 8 48.8Z" fill="var(--caderno-folhas)" {...traco} />
+      <path d="M56 46.4C48.8 44.8 40 45.2 32 49.6V51.8C40 47.6 48.8 47.2 56 48.8Z" fill="var(--caderno-folhas)" {...traco} />
+      <path d="M8.6 47.6C15.6 46 24 46.4 32 50.7M55.4 47.6C48.4 46 40 46.4 32 50.7" fill="none" stroke="var(--caderno-pauta)" strokeWidth={0.55} />
+      <path d="M32 40C24 35.6 15 35 8 36.5V46.4C15.2 44.8 24 45.2 32 49.6Z" fill="var(--caderno-pagina)" {...traco} />
+      <path d="M32 40C40 35.6 49 35 56 36.5V46.4C48.8 44.8 40 45.2 32 49.6Z" fill="var(--caderno-pagina)" {...traco} />
+      <path d="M29.6 38.9C30.6 39.3 31.3 39.6 32 40V49.6C31.3 49.2 30.6 48.8 29.6 48.5ZM34.4 38.9C33.4 39.3 32.7 39.6 32 40V49.6C32.7 49.2 33.4 48.8 34.4 48.5Z" fill="var(--caderno-dobra)" />
+      <path
+        d="M11.5 39.4C17 38.4 22.6 39 27.4 41.2M11.5 42.4C17 41.4 22.6 42 27.4 44.2M52.5 39.4C47 38.4 41.4 39 36.6 41.2M52.5 42.4C47 41.4 41.4 42 36.6 44.2"
+        fill="none"
+        stroke="var(--caderno-pauta)"
+        strokeWidth={0.7}
+        strokeLinecap="round"
+      />
+      <path d="M32 40V49.6" fill="none" stroke="var(--caderno-traco)" strokeWidth={1} />
+    </>
+  );
+}
 
 export function IconeFogo({ dias, className }: { dias: number; className?: string }) {
   const faixa = faixaDoFogo(dias);
-  const tamanho = faixa === 0 ? null : faixa <= 2 ? "pequena" : faixa <= 4 ? "media" : "grande";
-  const chama = tamanho ? CHAMAS[tamanho] : null;
+  const fogo = FAIXA_DO_FOGO[faixa];
+  const e = fogo?.escala ?? 0;
 
   return (
-    <svg
-      viewBox="0 0 48 48"
-      aria-hidden
-      className={`fogo-${faixa} ${className ?? ""}`}
-      strokeWidth={1.6}
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    >
-      {tamanho === "grande" && <ellipse cx="24" cy="20" rx="15" ry="14" fill="var(--chama)" opacity=".16" />}
-      {chama && (
+    <svg viewBox="0 -8 64 68" aria-hidden className={`fogo-${faixa} overflow-visible ${className ?? ""}`} strokeLinecap="round" strokeLinejoin="round">
+      <Caderno />
+      {fogo ? (
         <>
-          <path transform={escalar(chama.escala)} d={chama.d} fill="var(--chama)" stroke="var(--chama-contorno)" />
-          <path transform={escalar(chama.miolo)} d={MIOLO} fill="var(--chama-miolo)" />
+          {fogo.brilho && <ellipse cx="32" cy={46 - 26 * e} rx={18 * e} ry={17 * e} fill="var(--chama)" opacity=".18" />}
+          {/* a camada de trás, deslocada: é ela que dá a profundidade */}
+          <path transform={`${escalar(e * 1.04)} translate(-1.6 -.4) rotate(-4 32 46)`} d={FORA} fill="var(--chama-contorno)" opacity=".9" />
+          <path transform={escalar(e)} d={FORA} fill="var(--chama)" stroke="var(--chama-contorno)" strokeWidth={0.7 / e} />
+          <path transform={escalar(e)} d={MEIO} fill="var(--chama-meio)" />
+          <path transform={escalar(e)} d={MIOLO} fill="var(--chama-miolo)" />
+          {BRASAS.slice(0, fogo.brasas).map(([x, y, r]) => (
+            <path
+              key={`${x}-${y}`}
+              transform={escalar(e)}
+              d={`M${x} ${y - r * 1.6}L${x + r} ${y}L${x} ${y + r * 1.6}L${x - r} ${y}Z`}
+              fill="var(--chama-meio)"
+              stroke="var(--chama-contorno)"
+              strokeWidth={0.35}
+            />
+          ))}
         </>
+      ) : (
+        // Sem ofensiva: só um fio de fumaça sobe do caderno.
+        <path d="M32 38c-1.6-1.8 1-3.4 0-5.4M34.6 36.4c-1.1-1.2.7-2.4 0-3.8" fill="none" stroke="var(--caderno-traco)" strokeWidth={0.9} opacity=".45" />
       )}
-      {tamanho === "grande" && (
-        <>
-          <circle cx="36.5" cy="9" r="1.1" fill="var(--chama)" />
-          <circle cx="11.5" cy="13" r=".8" fill="var(--chama)" />
-        </>
-      )}
-      {/* O caderno: a capa (a espessura) por baixo e as duas páginas pautadas. */}
-      <path d="M3 31.5v12.8c7.4-1.8 14.6-1.2 21 2.7 6.4-3.9 13.6-4.5 21-2.7V31.5" fill="var(--caderno-capa)" stroke="var(--caderno-traco)" />
-      <path d="M24 32.6c-6-4-13-4.6-19.2-2.6v12.2c6.2-2 13.2-1.4 19.2 2.6z" fill="var(--caderno-pagina)" stroke="var(--caderno-traco)" />
-      <path d="M24 32.6c6-4 13-4.6 19.2-2.6v12.2c-6.2-2-13.2-1.4-19.2 2.6z" fill="var(--caderno-pagina)" stroke="var(--caderno-traco)" />
-      <path d="M24 32.6v12.2" stroke="var(--caderno-traco)" />
-      <path
-        d="M8.5 34.2c3.6-.8 7.2-.5 10.8.9M8.5 37.6c3.6-.8 7.2-.5 10.8.9M28.7 35.1c3.6-1.4 7.2-1.7 10.8-.9M28.7 38.5c3.6-1.4 7.2-1.7 10.8-.9"
-        stroke="var(--caderno-pauta)"
-        strokeWidth={1.1}
-      />
     </svg>
   );
 }

@@ -10,6 +10,7 @@ import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { CardPost } from "@/components/CardPost";
+import { LinkComentarios } from "@/components/Comentarios";
 import { FormPost } from "@/components/FormPost";
 import { SimboloMateria } from "@/components/SimboloMateria";
 import type { Post } from "@/lib/api";
@@ -51,9 +52,7 @@ type PostFalso = {
   curtidas: number;
 };
 
-type PostDoRascunho = Post & { comentarios?: number };
-
-function paraPost(p: PostFalso): PostDoRascunho {
+function paraPost(p: PostFalso): Post {
   return {
     id: -p.id, // negativo para não bater com o id de um post de verdade
     autor: { id: 0, username: p.autor.split(" ")[0].toLowerCase(), name: p.autor, avatar_url: "" },
@@ -113,7 +112,7 @@ export function FeedRascunho() {
   const [esconderBatePapo, setEsconderBatePapo] = useState(false);
   // Começa com os de mentira; o que você posta pelo formulário vai para o
   // banco de verdade e entra no topo.
-  const [todos, setTodos] = useState<PostDoRascunho[]>(() =>
+  const [todos, setTodos] = useState<Post[]>(() =>
     // Do mais novo para o mais antigo, como no feed de verdade.
     [...POSTS_FALSOS].sort((x, y) => x.minutosAtras - y.minutosAtras).map(paraPost),
   );
@@ -140,7 +139,7 @@ export function FeedRascunho() {
         <div className="min-w-0 space-y-4">
           <FormPost onPostado={(novo) => setTodos((atuais) => [novo, ...atuais])} />
 
-          <section aria-label="Posts" className="overflow-hidden rounded-2xl border border-linha bg-superficie">
+          <section aria-label="Posts" className="space-y-4">
             {posts.length ? (
               posts.map((p) => (
                 <CardPost
@@ -148,15 +147,26 @@ export function FeedRascunho() {
                   post={p}
                   rodape={
                     <>
-                      <span>{p.comentarios ?? 0} comentários</span>
                       {/* Os de mentira têm id negativo e não existem no backend. */}
-                      {p.id > 0 ? <BotaoCurtir post={p} /> : <span>{p.curtidas} curtidas</span>}
+                      {p.id > 0 ? (
+                        <>
+                          <LinkComentarios post={p} />
+                          <BotaoCurtir post={p} />
+                        </>
+                      ) : (
+                        <>
+                          <span>{p.comentarios} comentários</span>
+                          <span>{p.curtidas} curtidas</span>
+                        </>
+                      )}
                     </>
                   }
                 />
               ))
             ) : (
-              <p className="p-6 text-sm text-tinta-suave">Nenhum post com esses filtros por enquanto.</p>
+              <p className="rounded-2xl border border-linha bg-superficie p-6 text-sm text-tinta-suave">
+                Nenhum post com esses filtros por enquanto.
+              </p>
             )}
           </section>
         </div>

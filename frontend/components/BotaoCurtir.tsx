@@ -13,6 +13,20 @@ export function BotaoCurtir({ post }: { post: Pick<Post, "id" | "curtidas" | "cu
   const [curtidas, setCurtidas] = useState(post.curtidas);
   const [enviando, setEnviando] = useState(false);
 
+  // Quando a lista recarrega (ex.: o feed busca de novo), o post chega com
+  // números novos e o botão passa a mostrar esses, não os do primeiro desenho.
+  // É o jeito do React de "ajustar o estado quando a prop muda", sem useEffect.
+  const [doServidor, setDoServidor] = useState(post);
+  if (
+    post.id !== doServidor.id ||
+    post.curtidas !== doServidor.curtidas ||
+    post.curtido_por_mim !== doServidor.curtido_por_mim
+  ) {
+    setDoServidor(post);
+    setCurtido(post.curtido_por_mim);
+    setCurtidas(post.curtidas);
+  }
+
   async function alternar() {
     if (enviando) return; // dois cliques rápidos não mandam duas chamadas
     const antes = { curtido, curtidas };

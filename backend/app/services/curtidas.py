@@ -1,6 +1,7 @@
 """Regras das curtidas (#11, Pessoa C). O router só recebe a chamada e chama daqui."""
 
 from sqlalchemy import delete, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.like import Like
@@ -17,9 +18,16 @@ def _ja_curtiu(db: Session, user: User, post_id: int) -> bool:
 def curtir(db: Session, user: User, post_id: int) -> None:
     """Idempotente: curtir de novo não cria uma segunda curtida."""
     buscar(db, post_id)  # 404 se o post não existe
-    if not _ja_curtiu(db, user, post_id):
-        db.add(Like(user_id=user.id, post_id=post_id))
+    if _ja_curtiu(db, user, post_id):
+        return
+    db.add(Like(user_id=user.id, post_id=post_id))
+    try:
         db.commit()
+    except IntegrityError:
+        # Dois pedidos ao mesmo tempo (ex.: duas abas): os dois passam pela
+        # conferência acima e o segundo bate no par único do model Like. A
+        # curtida já existe, que é o resultado pedido, então não é erro.
+        db.rollback()
 
 
 def descurtir(db: Session, user: User, post_id: int) -> None:

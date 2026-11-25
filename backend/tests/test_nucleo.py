@@ -176,7 +176,6 @@ def test_curtidas_idempotentes(client, logar):
 # ---------- COMENTÁRIOS ----------
 
 
-@pytest.mark.skip(reason="Remova ao implementar comentários planos em ordem cronológica (núcleo)")
 def test_comentarios_planos_cronologicos(client, logar):
     ana = logar("ana")
     bia = logar("bia")
@@ -194,7 +193,6 @@ def test_comentarios_planos_cronologicos(client, logar):
 # ---------- SEED FAKE ----------
 
 
-@pytest.mark.skip(reason="Remova ao implementar seed_fake(db) com faker em scripts/seed.py (núcleo)")
 def test_seed_fake_popula_a_rede(client):
     # contrato: função seed_fake(db) em scripts/seed.py — a demo nunca começa vazia
     import sys
