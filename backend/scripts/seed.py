@@ -2,7 +2,8 @@
 
 Cria 25 vestibulandos com metas variadas (todas as turmas têm gente), três
 semanas de sessões de estudo, conversas de bate-papo, follows entre quem tem
-a mesma meta, curtidas e comentários. O conteúdo fica em seed_dados.py.
+a mesma meta, curtidas, comentários e as DMs do usuário de demonstração. O
+conteúdo fica em seed_dados.py.
 
 Todos entram com a senha SENHA_SEED. O usuário de demonstração, para o vídeo
 e para a banca, é o "ada".
@@ -26,13 +27,16 @@ from app.core.ofensiva import BRASILIA, hoje_em_brasilia
 from app.db import Base, SessionLocal, engine
 from app.models.comment import Comment
 from app.models.follow import Follow
+from app.models.leitura import Leitura
 from app.models.like import Like
+from app.models.mensagem import Mensagem
 from app.models.post import Post
 from app.models.user import User
 from scripts.seed_dados import (
     ASSUNTOS,
     BATE_PAPO,
     COMENTARIOS,
+    CONVERSAS_DEMO,
     FIRME,
     QUEBROU,
     REFLEXOES,
@@ -143,6 +147,11 @@ def _criar_follows(db: Session, usuarios: list[User], rng: random.Random) -> dic
     demo = next(u for u in usuarios if u.username == USUARIO_DEMO)
     for fa in rng.sample([u for u in usuarios if u.id != demo.id], 8):
         pares.add((fa.id, demo.id))
+    # E é mútuo de quem conversa com ele: a DM só existe entre mútuos.
+    por_username = {u.username: u for u in usuarios}
+    for conversa in CONVERSAS_DEMO:
+        colega = por_username[conversa["com"]]
+        pares.update({(demo.id, colega.id), (colega.id, demo.id)})
 
     db.add_all(Follow(seguidor_id=a, seguido_id=b) for a, b in pares)
     por_id = {u.id: u for u in usuarios}
@@ -194,6 +203,38 @@ def _criar_interacoes(db: Session, posts: list[Post], seguidores: dict[int, list
                                texto=rng.choice(COMENTARIOS), created_at=momento))
 
 
+def _criar_conversas(db: Session, usuarios: list[User], agora: datetime) -> None:
+    """As conversas do usuário de demonstração, com as últimas mensagens ainda
+    não lidas por ele. As outras pessoas já leram tudo."""
+    por_username = {u.username: u for u in usuarios}
+    demo = por_username[USUARIO_DEMO]
+    # As não lidas e a ordem da lista de conversas vêm do id das mensagens, então
+    # elas entram no banco na ordem em que foram escritas, de todas as conversas.
+    escritas = sorted(
+        (agora - ha, autor, conversa["com"], texto)
+        for conversa in CONVERSAS_DEMO
+        for autor, ha, texto in conversa["mensagens"]
+    )
+    mensagens: dict[str, list[Mensagem]] = {c["com"]: [] for c in CONVERSAS_DEMO}
+    for momento, autor, com, texto in escritas:
+        colega = por_username[com]
+        remetente, destinatario = (demo, colega) if autor == USUARIO_DEMO else (colega, demo)
+        mensagem = Mensagem(remetente_id=remetente.id, destinatario_id=destinatario.id,
+                            texto=texto, created_at=momento)
+        db.add(mensagem)
+        mensagens[com].append(mensagem)
+    db.flush()  # dá os ids, que marcam até onde cada um leu
+
+    for conversa in CONVERSAS_DEMO:
+        colega = por_username[conversa["com"]]
+        da_conversa = mensagens[conversa["com"]]
+        lida_pelo_demo = da_conversa[-conversa["nao_lidas"] - 1]
+        db.add_all([
+            Leitura(leitor_id=demo.id, outro_id=colega.id, ultima_lida_id=lida_pelo_demo.id),
+            Leitura(leitor_id=colega.id, outro_id=demo.id, ultima_lida_id=da_conversa[-1].id),
+        ])
+
+
 def seed_fake(db: Session, agora: datetime | None = None) -> None:
     """Popula a rede: a demo nunca começa vazia (contrato do teste do núcleo)."""
     agora = agora or datetime.now(timezone.utc)
@@ -202,6 +243,7 @@ def seed_fake(db: Session, agora: datetime | None = None) -> None:
     seguidores = _criar_follows(db, usuarios, rng)
     posts = _criar_posts(db, usuarios, agora, rng)
     _criar_interacoes(db, posts, seguidores, agora, rng)
+    _criar_conversas(db, usuarios, agora)
     db.commit()
 
 
@@ -214,7 +256,8 @@ def main() -> None:
         seed_fake(db)
         contagens = {nome: db.scalar(select(func.count()).select_from(model))
                      for nome, model in [("usuários", User), ("posts", Post), ("follows", Follow),
-                                         ("curtidas", Like), ("comentários", Comment)]}
+                                         ("curtidas", Like), ("comentários", Comment),
+                                         ("mensagens", Mensagem)]}
         print("seed ok: " + ", ".join(f"{n} {nome}" for nome, n in contagens.items()))
         print(f"entre como '{USUARIO_DEMO}' com a senha '{SENHA_SEED}'")
 

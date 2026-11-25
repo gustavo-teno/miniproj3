@@ -17,7 +17,7 @@ from app.models.post import Post
 from app.models.user import User
 
 from scripts import seed
-from scripts.seed_dados import FIRME, QUEBROU, VESTIBULANDOS
+from scripts.seed_dados import CONVERSAS_DEMO, FIRME, QUEBROU, VESTIBULANDOS
 
 AGORA = datetime(2026, 11, 25, 15, 0, tzinfo=timezone.utc)
 
@@ -75,6 +75,25 @@ def test_ofensiva_aparece_de_todos_os_jeitos(db):
             # recomeçou há pouco: o perfil mostra o recorde ao lado
             assert 1 <= ofensiva.atual <= 3, user.username
             assert ofensiva.recorde > ofensiva.atual, user.username
+
+
+def test_demo_tem_conversas_com_mutuos_e_nao_lidas(db, client):
+    token = client.post(
+        "/auth/login", json={"username": "ada", "password": seed.SENHA_SEED}
+    ).json()["token"]
+    ada = {"Authorization": f"Bearer {token}"}
+
+    conversas = client.get("/dms", headers=ada).json()
+    esperadas = {c["com"]: c["nao_lidas"] for c in CONVERSAS_DEMO}
+    assert {c["pessoa"]["username"]: c["nao_lidas"] for c in conversas} == esperadas
+    # a conversa com a mensagem mais recente vem primeiro, e nada está no futuro
+    assert conversas[0]["pessoa"]["username"] == "manu"
+    assert all(datetime.fromisoformat(c["ultima"]["created_at"]) <= AGORA for c in conversas)
+    assert client.get("/dms/nao-lidas", headers=ada).json() == {"total": sum(esperadas.values())}
+
+    # são mútuos, então a Ada pode responder
+    for com in esperadas:
+        assert client.get(f"/dms/{com}", headers=ada).json()["pode_responder"]
 
 
 def test_seed_on_boot_popula_a_rede_ao_ligar(monkeypatch):
