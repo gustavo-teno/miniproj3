@@ -12,8 +12,8 @@
   --linha: #e2e8e5; /* bordas e divisões */
   --tinta: #1e2a2c; /* texto principal */
   --tinta-suave: #5a6b6e; /* texto secundário */
-  --destaque: #6352a7; /* lavanda: só o que é seu e o item ativo */
-  --destaque-fundo: #eee9fa; /* fundo suave do item ativo */
+  --destaque: #7263b0; /* lavanda: só o que é seu e o item ativo */
+  --destaque-fundo: #f3f0fc; /* fundo suave do item ativo */
   --sobre-destaque: #ffffff; /* texto em cima do destaque (botões) */
   --erro: #a3302a; /* texto e borda de avisos de erro */
   --erro-fundo: #fbeeed; /* fundo do aviso de erro */
