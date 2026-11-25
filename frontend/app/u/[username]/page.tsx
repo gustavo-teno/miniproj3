@@ -137,7 +137,11 @@ export default function PaginaPerfil() {
 
   const principal = (
     <div className="min-w-0 space-y-4">
-      <TopoPerfil perfil={perfil} acao={acao} />
+      <TopoPerfil
+        perfil={perfil}
+        acao={acao}
+        aoMudarSeguidores={(n) => setPerfil((atual) => (atual ? { ...atual, seguidores: n } : atual))}
+      />
       {eu && (
         <EditarPerfil perfil={perfil} aberto={editando} fechar={() => setEditando(false)} aoSalvar={setPerfil} />
       )}
