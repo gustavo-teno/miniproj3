@@ -135,13 +135,20 @@ export default function PaginaPerfil() {
   // Para quem visita: o BotaoSeguir (Pessoa D, PR #33) entra no lugar de "acao"
   // quando chegar à main. Mensagem só aparece se as DMs existirem (decisão 6).
 
-  const principal = (
-    <div className="min-w-0 space-y-4">
+  // O perfil em dois blocos: o topo e o resto (a estante e os posts). No diário
+  // da dona, a coluna da direita (postar, fogo e horas) fica entre os dois no
+  // celular; no computador, ela fica ao lado dos dois.
+  const topo = (
+    <>
       <TopoPerfil perfil={perfil} acao={acao} />
       {eu && (
         <EditarPerfil perfil={perfil} aberto={editando} fechar={() => setEditando(false)} aoSalvar={setPerfil} />
       )}
+    </>
+  );
 
+  const conteudo = (
+    <>
       {semNenhumPost ? (
         <ConviteVazio eu={eu} nome={perfil.name} />
       ) : (
@@ -196,21 +203,33 @@ export default function PaginaPerfil() {
           </section>
         </>
       )}
-    </div>
+    </>
   );
 
-  if (!eu) return principal;
+  if (!eu) {
+    return (
+      <div className="min-w-0 space-y-4">
+        {topo}
+        {conteudo}
+      </div>
+    );
+  }
 
-  // No celular, a coluna da direita vem antes dos posts (order) e rola junto.
+  // No celular: o topo do perfil, depois a coluna da direita e depois os posts.
+  // No computador, a coluna fica à direita (248px) e acompanha a rolagem.
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_248px] lg:items-start">
-      {principal}
-      <aside aria-label="Seu diário" className="-order-1 space-y-4 lg:sticky lg:top-4 lg:order-none">
+      <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-1">{topo}</div>
+      <aside
+        aria-label="Seu diário"
+        className="space-y-4 lg:sticky lg:top-4 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+      >
         {/* A matéria do caderno aberto já vem marcada; em "Todas", fica a última escolhida. */}
         <PostarNoDiario tagInicial={aberto ?? ""} onPostado={aoPostar} />
         <CaixaFogo dados={ofensiva.dados} erro={ofensiva.erro} />
         <HorasEstudadas ofensiva={ofensiva.dados} />
       </aside>
+      <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">{conteudo}</div>
     </div>
   );
 }

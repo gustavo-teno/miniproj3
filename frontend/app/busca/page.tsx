@@ -81,7 +81,7 @@ export default function BuscaPage() {
         autoFocus
         maxLength={100}
         aria-label="O que você procura"
-        placeholder="Um colega ou um assunto, como logaritmo"
+        placeholder="Buscar pessoas ou posts"
         className="mt-4 w-full rounded-xl border border-linha bg-superficie px-4 py-3 text-tinta"
       />
 
