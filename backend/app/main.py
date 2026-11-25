@@ -9,6 +9,7 @@ from app.db import Base, SessionLocal, engine
 from app.models import User
 from app.routers import (
     auth,
+    busca,
     comentarios,
     curtidas,
     dms,
@@ -47,6 +48,7 @@ app.add_middleware(
 # 1 linha por feature — registre o seu router aqui.
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(busca.router)
 app.include_router(posts.router)
 app.include_router(follows.router)
 app.include_router(curtidas.router)

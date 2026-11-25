@@ -12,8 +12,8 @@
   --linha: #e2e8e5; /* bordas e divisões */
   --tinta: #1e2a2c; /* texto principal */
   --tinta-suave: #5a6b6e; /* texto secundário */
-  --destaque: #665f82; /* lavanda: só o que é seu e o item ativo */
-  --destaque-fundo: #efedf5; /* fundo suave do item ativo */
+  --destaque: #7263b0; /* lavanda: só o que é seu e o item ativo */
+  --destaque-fundo: #f3f0fc; /* fundo suave do item ativo */
   --sobre-destaque: #ffffff; /* texto em cima do destaque (botões) */
   --erro: #a3302a; /* texto e borda de avisos de erro */
   --erro-fundo: #fbeeed; /* fundo do aviso de erro */
@@ -30,8 +30,8 @@
     --linha: #2a313b;
     --tinta: #e6eaf0;
     --tinta-suave: #9aa4b2;
-    --destaque: #bdb5d8;
-    --destaque-fundo: #2b2938;
+    --destaque: #c2b4ee;
+    --destaque-fundo: #302a4c;
     --sobre-destaque: #13171d;
     --erro: #f2a7a0;
     --erro-fundo: #3a2224;
@@ -45,8 +45,8 @@
   --linha: #2a313b;
   --tinta: #e6eaf0;
   --tinta-suave: #9aa4b2;
-  --destaque: #bdb5d8;
-  --destaque-fundo: #2b2938;
+  --destaque: #c2b4ee;
+  --destaque-fundo: #302a4c;
   --sobre-destaque: #13171d;
   --erro: #f2a7a0;
   --erro-fundo: #3a2224;
@@ -87,6 +87,83 @@
   color: var(--materia-texto-noturno);
 }
 
+/* O nome da matéria no card, com marca-texto na cor dela (como quem grifa o
+   caderno). Usa as mesmas variáveis do .cor-materia, no claro e no noturno. */
+.marca-materia {
+  color: var(--materia-texto);
+  background-image: linear-gradient(
+    transparent 38%,
+    var(--materia-fundo) 38%,
+    var(--materia-fundo) 92%,
+    transparent 92%
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .marca-materia {
+    color: var(--materia-texto-noturno);
+    background-image: linear-gradient(
+      transparent 38%,
+      var(--materia-fundo-noturno) 38%,
+      var(--materia-fundo-noturno) 92%,
+      transparent 92%
+    );
+  }
+}
+
+:root[data-tema="noturno"] .marca-materia {
+  color: var(--materia-texto-noturno);
+  background-image: linear-gradient(
+    transparent 38%,
+    var(--materia-fundo-noturno) 38%,
+    var(--materia-fundo-noturno) 92%,
+    transparent 92%
+  );
+}
+
+/* As linhas de pauta do caderno atrás do texto do post: bem leves, no tom do
+   destaque. Precisa de altura de linha fixa (leading-6 = 24px) para as linhas
+   da pauta caírem embaixo de cada linha do texto. */
+.pauta {
+  background-image: repeating-linear-gradient(
+    transparent 0,
+    transparent 23px,
+    color-mix(in srgb, var(--destaque) 18%, transparent) 23px,
+    color-mix(in srgb, var(--destaque) 18%, transparent) 24px
+  );
+}
+
+/* A cor de cada pessoa (avatar sem foto): 6 tons pastéis e calmos, da mesma
+   vibe do lavanda, com as iniciais num tom mais escuro da mesma família. Sem
+   azul, verde, vermelho, amarelo e laranja vivos, que são as cores das
+   matérias. No noturno, fundo escuro suave e iniciais pastéis. */
+.avatar-0 { --av-fundo: #e3dff1; --av-texto: #4f4875; }
+.avatar-1 { --av-fundo: #f1dfe8; --av-texto: #7a4560; }
+.avatar-2 { --av-fundo: #d9ece8; --av-texto: #3f6b64; }
+.avatar-3 { --av-fundo: #dbe4f3; --av-texto: #44587f; }
+.avatar-4 { --av-fundo: #efe4d4; --av-texto: #7a6143; }
+.avatar-5 { --av-fundo: #e1e6ea; --av-texto: #4b5b68; }
+.avatar {
+  background-color: var(--av-fundo);
+  color: var(--av-texto);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .avatar-0 { --av-fundo: #302a4c; --av-texto: #c9c2e6; }
+  :root:not([data-tema="claro"]) .avatar-1 { --av-fundo: #402a36; --av-texto: #e3bccf; }
+  :root:not([data-tema="claro"]) .avatar-2 { --av-fundo: #223b37; --av-texto: #aedacf; }
+  :root:not([data-tema="claro"]) .avatar-3 { --av-fundo: #25324a; --av-texto: #b5c7e6; }
+  :root:not([data-tema="claro"]) .avatar-4 { --av-fundo: #3a3126; --av-texto: #dcc6a3; }
+  :root:not([data-tema="claro"]) .avatar-5 { --av-fundo: #2b333b; --av-texto: #b9c6d1; }
+}
+
+:root[data-tema="noturno"] .avatar-0 { --av-fundo: #302a4c; --av-texto: #c9c2e6; }
+:root[data-tema="noturno"] .avatar-1 { --av-fundo: #402a36; --av-texto: #e3bccf; }
+:root[data-tema="noturno"] .avatar-2 { --av-fundo: #223b37; --av-texto: #aedacf; }
+:root[data-tema="noturno"] .avatar-3 { --av-fundo: #25324a; --av-texto: #b5c7e6; }
+:root[data-tema="noturno"] .avatar-4 { --av-fundo: #3a3126; --av-texto: #dcc6a3; }
+:root[data-tema="noturno"] .avatar-5 { --av-fundo: #2b333b; --av-texto: #b9c6d1; }
+
 /* Partes que o navegador desenha sozinho também seguem a paleta: o texto
    selecionado e o contorno de foco de quem navega pelo teclado (Tab). */
 ::selection {
@@ -116,26 +193,29 @@
   /* Lexend em tudo (300 no texto corrido, 400 na interface, 600 em nomes e
      títulos) e uma mono pequena para números e @usuário. */
   --font-texto: var(--fonte-texto), system-ui, sans-serif;
-  --font-numeros: var(--fonte-numeros), ui-monospace, monospace;
+  --font-numeros: var(--fonte-texto), system-ui, sans-serif;
 }
 
 /* O fogo do diário (#10, Pessoa B): o caderno com a chama, que cresce e muda
-   de cor com os dias seguidos (0 = apagado; 1 a 6 = as faixas do Ofensiva.tsx,
+   de cor com os dias seguidos (0 = apagado; 1 a 6 = as faixas da decisão 4,
    do vermelho ao azul, o mais intenso). Cada faixa é uma classe que define as
    cores da chama, do número e do painel de quem visita, no claro e no noturno,
    no mesmo esquema da paleta acima. Quem usa: components/perfil/FogoDoDiario.tsx.
    Combinado em 24/11: no noturno, só a caixa (o painel) muda; o caderno, a
    chama e os números ficam com as mesmas cores do claro. */
 :root {
-  --caderno-capa: #dfe5e3;
+  --caderno-capa: #9fb1ae;
+  --caderno-folhas: #eef2f1;
   --caderno-pagina: #ffffff;
-  --caderno-traco: #5a6b6e;
-  --caderno-pauta: #cdd5d3;
+  --caderno-traco: #4d5e60;
+  --caderno-pauta: #c4cfcc;
+  --caderno-dobra: #e3e9e7;
 }
 
 .fogo-0 {
   --chama: transparent;
   --chama-contorno: #9aa4a6;
+  --chama-meio: transparent;
   --chama-miolo: transparent;
   --fogo-texto: #5a6b6e;
   --fogo-painel: #eef0f0;
@@ -143,42 +223,48 @@
 .fogo-1 {
   --chama: #e0483a;
   --chama-contorno: #a8281d;
-  --chama-miolo: #ffc2b8;
+  --chama-meio: #f37a6e;
+  --chama-miolo: #ffd9d3;
   --fogo-texto: #a8281d;
   --fogo-painel: #fdecea;
 }
 .fogo-2 {
   --chama: #f08a24;
   --chama-contorno: #b55d0b;
-  --chama-miolo: #ffe0a3;
+  --chama-meio: #f8ad5d;
+  --chama-miolo: #fff0d6;
   --fogo-texto: #b55d0b;
   --fogo-painel: #fdf1e4;
 }
 .fogo-3 {
   --chama: #f2c230;
   --chama-contorno: #a37c08;
-  --chama-miolo: #fff6c9;
+  --chama-meio: #f8dc72;
+  --chama-miolo: #fffbe6;
   --fogo-texto: #a37c08;
   --fogo-painel: #fdf7e0;
 }
 .fogo-4 {
   --chama: #ffffff;
   --chama-contorno: #8f979c;
-  --chama-miolo: #dfe9f5;
+  --chama-meio: #f4f6f8;
+  --chama-miolo: #ffffff;
   --fogo-texto: #5a6b6e;
   --fogo-painel: #f0f3f6;
 }
 .fogo-5 {
   --chama: #7cc8f0;
   --chama-contorno: #2f86b8;
-  --chama-miolo: #e6f6fe;
+  --chama-meio: #aadcf6;
+  --chama-miolo: #f0faff;
   --fogo-texto: #2f86b8;
   --fogo-painel: #e8f5fc;
 }
 .fogo-6 {
   --chama: #2f6fe0;
   --chama-contorno: #1d4ea8;
-  --chama-miolo: #b9d0fb;
+  --chama-meio: #6f9cf2;
+  --chama-miolo: #dce7fd;
   --fogo-texto: #1d4ea8;
   --fogo-painel: #e6eefc;
 }
@@ -233,4 +319,39 @@
    em lavanda, sem efeito. */
 .saudacao {
   color: var(--destaque);
+}
+
+/* A folha de caderno do post (combinado em 24/11, ideia do Gustavo): cada post
+   é uma folha separada, com o canto de cima à direita dobrado e uma margem
+   lavanda fininha à esquerda (o tom do destaque da rede, que já muda no noturno). O canto cortado mostra o fundo da página, e a
+   aba dobrada usa a cor das bordas. */
+.folha {
+  --margem-caderno: color-mix(in srgb, var(--destaque) 62%, var(--superficie));
+  position: relative;
+  border-top-right-radius: 0;
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent 15px,
+    var(--margem-caderno) 15px,
+    var(--margem-caderno) 17px,
+    transparent 17px
+  );
+}
+.folha::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(225deg, var(--fundo) 50%, var(--linha) 50%);
+  border-bottom-left-radius: 4px;
+  box-shadow: -1px 1px 2px rgb(0 0 0 / 0.08);
+}
+
+/* Os números e o @usuário: a mesma Lexend do texto, com algarismos de largura
+   igual para os tempos (1h30, 45min) ficarem alinhados. */
+.font-numeros {
+  font-variant-numeric: tabular-nums;
 }

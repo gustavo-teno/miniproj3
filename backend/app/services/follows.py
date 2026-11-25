@@ -7,6 +7,7 @@ o botão não precisa saber o estado exato do banco para funcionar.
 
 from fastapi import HTTPException
 from sqlalchemy import delete, func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.follow import Follow
@@ -18,7 +19,7 @@ def buscar_alvo(db: Session, username: str) -> User:
     """Busca quem vai ser seguido (ou deixado de seguir); 404 se não existe."""
     alvo = buscar_por_username(db, username)
     if alvo is None:
-        raise HTTPException(status_code=404, detail="usuário não encontrado")
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
     return alvo
 
 
@@ -37,12 +38,19 @@ def segue(db: Session, seguidor_id: int, seguido_id: int) -> bool:
 def seguir(db: Session, eu: User, username: str) -> None:
     alvo = buscar_alvo(db, username)
     if alvo.id == eu.id:
-        raise HTTPException(status_code=400, detail="não dá para seguir a si mesmo")
-    # Já segue? Não faz nada. O UniqueConstraint do model também barra o par
-    # repetido, mas conferir antes evita transformar um clique duplo em erro 500.
-    if not segue(db, eu.id, alvo.id):
-        db.add(Follow(seguidor_id=eu.id, seguido_id=alvo.id))
+        raise HTTPException(status_code=400, detail="Não é possível seguir a si mesmo.")
+    # Já segue? Não faz nada.
+    if segue(db, eu.id, alvo.id):
+        return
+    db.add(Follow(seguidor_id=eu.id, seguido_id=alvo.id))
+    try:
         db.commit()
+    except IntegrityError:
+        # Dois pedidos ao mesmo tempo (clique duplo rápido, duas abas): os dois
+        # passam pela conferência acima e o segundo bate no par único do model
+        # Follow. O follow já existe, que é o resultado pedido, então não é
+        # erro (mesmo padrão das curtidas, em services/curtidas.py).
+        db.rollback()
 
 
 def deixar_de_seguir(db: Session, eu: User, username: str) -> None:

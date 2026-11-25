@@ -8,6 +8,7 @@
 
 import type { ReactNode } from "react";
 
+import { Avatar } from "@/components/Avatar";
 import { BotaoSeguir } from "@/components/BotaoSeguir";
 import { PainelFogo } from "@/components/perfil/FogoDoDiario";
 import type { Perfil } from "@/lib/api";
@@ -46,7 +47,7 @@ export function TopoPerfil({
       className="flex flex-col gap-5 rounded-2xl border border-linha bg-superficie p-5 sm:flex-row sm:p-6"
     >
       <div className="flex min-w-0 flex-1 gap-4 sm:gap-5">
-        <FotoDoPerfil perfil={perfil} />
+        <Avatar autor={perfil} enorme />
 
         {/* Para quem visita, as informações vão até 560px (como no esboço) e o
             painel do fogo fica encostado à direita. */}
@@ -114,31 +115,5 @@ export function TopoPerfil({
       {/* Para quem visita, o fogo faz parte das informações da pessoa. */}
       {!perfil.meu_perfil && <PainelFogo username={perfil.username} />}
     </section>
-  );
-}
-
-// A foto grande do topo (96px no computador). Fica aqui, e não no <Avatar>,
-// enquanto o PR #41 (que mexe no Avatar) não entra na main. Depois dá para
-// virar um tamanho do próprio <Avatar>.
-function FotoDoPerfil({ perfil }: { perfil: Pick<Perfil, "name" | "avatar_url"> }) {
-  const tamanho = "size-16 flex-none rounded-full sm:size-24";
-  if (perfil.avatar_url) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={perfil.avatar_url} alt="" className={`${tamanho} object-cover`} />;
-  }
-  const iniciais = perfil.name
-    .split(" ")
-    .filter(Boolean)
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-  return (
-    <span
-      aria-hidden
-      className={`${tamanho} grid place-items-center bg-destaque-fundo text-xl font-semibold text-destaque sm:text-3xl`}
-    >
-      {iniciais}
-    </span>
   );
 }

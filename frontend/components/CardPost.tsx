@@ -18,8 +18,10 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
   const opcoes = useOpcoes();
   const estilo = estiloDaTag(post.tag);
 
+  // Cada post é uma folha de caderno: a dobra e a margem vêm da classe .folha
+  // (globals.css), e a lista põe um espaço entre as folhas.
   return (
-    <article className="flex gap-3 border-b border-linha p-4 last:border-b-0 sm:gap-4">
+    <article className="folha flex gap-3 rounded-xl border border-linha bg-superficie py-4 pl-7 pr-6 sm:gap-4">
       {/* A foto de quem postou em destaque, à esquerda: é uma rede de pessoas.
           Ela também leva ao perfil (o nome já faz isso, então o leitor de
           tela e o Tab pulam este link para não repetir). */}
@@ -28,8 +30,8 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
       </Link>
 
       <div className="min-w-0 flex-1">
-        {/* Quem postou vem primeiro. A matéria fica na linha de baixo, com o
-            símbolo pequeno e a cor dela. */}
+        {/* Quem postou vem primeiro. A matéria fica na linha de baixo, com
+            marca-texto na cor dela. */}
         <p className="flex min-w-0 items-center gap-2">
           <Link href={`/u/${post.autor.username}`} className="truncate font-semibold hover:underline">
             {post.autor.name}
@@ -47,11 +49,8 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
         </p>
 
         <div className="mt-0.5 flex items-center gap-2 text-sm">
-          <span className="cor-materia-texto flex items-center gap-1.5 font-medium" style={estilo}>
-            {/* O quadradinho com o fundo da cor da matéria, em miniatura. */}
-            <span className="cor-materia grid size-6 flex-none place-items-center rounded-md" style={estilo}>
-              <SimboloMateria tag={post.tag} className="size-3.5" />
-            </span>
+          <span className="marca-materia flex items-center gap-1.5 px-1 font-semibold" style={estilo}>
+            <SimboloMateria tag={post.tag} className="size-4 flex-none" />
             {/* Sem a lista de /opcoes ainda, o nome some em vez de aparecer como a
                 chave ("biologia"); o espaço fica reservado para o texto não pular. */}
             <span className={opcoes ? "" : "invisible"}>{nomeDaOpcao(opcoes?.tags, post.tag)}</span>
@@ -62,7 +61,7 @@ export function CardPost({ post, rodape }: { post: Post; rodape?: ReactNode }) {
         </div>
 
         {/* whitespace-pre-line: as quebras de linha que a pessoa digitou aparecem. */}
-        <p className="mt-1.5 whitespace-pre-line break-words font-light leading-relaxed">{post.texto}</p>
+        <p className="pauta mt-1 whitespace-pre-line break-words font-light leading-6">{post.texto}</p>
 
         {rodape && <div className="mt-2 flex gap-6 text-sm text-tinta-suave">{rodape}</div>}
       </div>
