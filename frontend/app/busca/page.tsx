@@ -115,25 +115,35 @@ export default function BuscaPage() {
             {total === 1 ? "1 resultado" : `${total} resultados`}
             {(atual.pessoas ?? atual.posts)!.items.length < total! && ", mostrando os primeiros"}
           </p>
-          <div className="mt-2 overflow-hidden rounded-xl border border-linha bg-superficie">
-            {atual.pessoas?.items.map((u) => (
-              <Link
-                key={u.id}
-                href={`/u/${u.username}`}
-                className="flex items-center gap-3 border-b border-linha p-4 last:border-b-0 hover:bg-destaque-fundo"
-              >
-                <Avatar autor={u} />
-                <span className="min-w-0">
-                  <span className="block truncate font-semibold">{u.name}</span>
-                  <span className="block truncate text-sm text-tinta-suave">
-                    @{u.username}
-                    {u.bio && ` · ${u.bio}`}
+          {atual.pessoas && (
+            <div className="mt-2 overflow-hidden rounded-xl border border-linha bg-superficie">
+              {atual.pessoas.items.map((u) => (
+                <Link
+                  key={u.id}
+                  href={`/u/${u.username}`}
+                  className="flex items-center gap-3 border-b border-linha p-4 last:border-b-0 hover:bg-destaque-fundo"
+                >
+                  <Avatar autor={u} />
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold">{u.name}</span>
+                    <span className="block truncate text-sm text-tinta-suave">
+                      @{u.username}
+                      {u.bio && ` · ${u.bio}`}
+                    </span>
                   </span>
-                </span>
-              </Link>
-            ))}
-            {atual.posts?.items.map((p) => <CardPost key={p.id} post={p} />)}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          {/* Os posts ficam soltos, como no feed: cada um já é uma folha com
+              a própria borda (#52). */}
+          {atual.posts && (
+            <div className="mt-2 space-y-4">
+              {atual.posts.items.map((p) => (
+                <CardPost key={p.id} post={p} />
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>
