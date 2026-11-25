@@ -4,9 +4,10 @@
 // Ao clicar, abre para escrever, com a matéria (obrigatória, decisão 2) e a
 // duração da sessão (opcional). Salva de verdade com POST /posts.
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
 import { Avatar } from "@/components/Avatar";
+import { BotaoEmoji, inserirNoCursor } from "@/components/BotaoEmoji";
 import { apiPost, type Autor, type Post } from "@/lib/api";
 import { useOpcoes } from "@/lib/opcoes";
 
@@ -29,6 +30,7 @@ export function FormPost({
   const [minutos, setMinutos] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const caixaTexto = useRef<HTMLTextAreaElement>(null);
 
   const campo = "rounded-lg border border-linha bg-superficie px-2 py-1.5 text-sm text-tinta";
 
@@ -88,6 +90,7 @@ export function FormPost({
       <div className="flex gap-3">
         {autor && <Avatar autor={autor} />}
         <textarea
+          ref={caixaTexto}
           autoFocus
           required
           rows={2}
@@ -101,6 +104,11 @@ export function FormPost({
       </div>
 
       <div className={`flex flex-wrap items-center gap-2 ${autor ? "pl-11" : ""}`}>
+        {/* O emoji (Pessoa A) na linha de baixo do campo, antes da matéria. */}
+        <BotaoEmoji
+          abrirPara="baixo"
+          aoEscolher={(emoji) => setTexto(inserirNoCursor(caixaTexto.current, texto, emoji, MAX_TEXTO))}
+        />
         <select
           required
           value={tag}

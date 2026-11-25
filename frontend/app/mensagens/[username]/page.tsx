@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 
 import { Avatar } from "@/components/Avatar";
+import { BotaoEmoji, inserirNoCursor } from "@/components/BotaoEmoji";
 import { AvisoErro } from "@/components/FormAuth";
 import { buscarConversa, enviarMensagem, type Autor, type Mensagem } from "@/lib/api";
 import { avisarQueLeu } from "@/lib/naoLidas";
@@ -43,6 +44,7 @@ export default function ConversaPage() {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const fim = useRef<HTMLDivElement>(null);
+  const caixaTexto = useRef<HTMLTextAreaElement>(null);
 
   // O id da última mensagem que a tela tem, para pedir só as novas.
   const ultimoId = mensagens.at(-1)?.id;
@@ -170,7 +172,12 @@ export default function ConversaPage() {
       {pessoa &&
         (podeResponder ? (
           <form onSubmit={enviar} className="mt-3 flex items-end gap-2">
+            {/* O emoji à esquerda da caixa, como nos apps de mensagem. */}
+            <div className="pb-1">
+              <BotaoEmoji aoEscolher={(emoji) => setTexto(inserirNoCursor(caixaTexto.current, texto, emoji, MAX_TEXTO))} />
+            </div>
             <textarea
+              ref={caixaTexto}
               value={texto}
               onChange={(e) => setTexto(e.target.value)}
               onKeyDown={aoTeclar}
@@ -178,7 +185,7 @@ export default function ConversaPage() {
               rows={2}
               aria-label={`Mensagem para ${pessoa.name}`}
               placeholder="Escreva uma mensagem"
-              className="flex-1 resize-none rounded-xl border border-linha bg-superficie px-3 py-2 text-tinta"
+              className="min-w-0 flex-1 resize-none rounded-xl border border-linha bg-superficie px-3 py-2 text-tinta"
             />
             <button
               type="submit"

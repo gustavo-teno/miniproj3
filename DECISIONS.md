@@ -171,6 +171,7 @@ entram na tabela "Quem faz o quê" de lá.
 | Turmas | Pessoa D | Quem acabou de chegar encontra quem tem a mesma meta e sai do feed vazio (decisão 5). |
 | DMs entre mútuos | Pessoa A (Gustavo) | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
 | Busca de pessoas e posts | Pessoa A (Gustavo) | Achar um colega pelo nome ou um post sobre um assunto, sem depender da meta. |
+| Emoji ao escrever | Pessoa A (Gustavo) | Quem escreve pelo computador também comemora uma lista feita com 🔥 ou 💪, como faria no celular. |
 
 **Login sem prazo de validade (escolha consciente).** O token do login vale
 até a pessoa clicar em sair, que apaga a sessão no banco. Uma validade (por
