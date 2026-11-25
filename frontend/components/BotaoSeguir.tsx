@@ -54,13 +54,13 @@ export function BotaoSeguir({ username, onMudou }: Props) {
       const novo = await apiGet<EstadoFollow>(caminho);
       setEstado(novo);
       onMudou?.(novo.seguidores);
-    } catch {
-      // Textos no padrão das "Mensagens do sistema" do DESIGN.md: dizem qual
-      // ação falhou e o que fazer, em vez do código de erro do servidor.
+    } catch (err) {
       setErro(
-        estado.seguindo
-          ? "Não foi possível deixar de seguir. Tente de novo."
-          : "Não foi possível seguir. Tente de novo."
+        err instanceof Error
+          ? err.message
+          : estado.seguindo
+            ? "Não foi possível deixar de seguir. Tente de novo."
+            : "Não foi possível seguir. Tente de novo.",
       );
     } finally {
       setEnviando(false);
@@ -76,7 +76,6 @@ export function BotaoSeguir({ username, onMudou }: Props) {
         type="button"
         onClick={alternar}
         disabled={enviando}
-        aria-pressed={estado.seguindo}
         className={
           "whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold disabled:opacity-50 " +
           (estado.seguindo
@@ -84,6 +83,8 @@ export function BotaoSeguir({ username, onMudou }: Props) {
             : "bg-destaque text-sobre-destaque")
         }
       >
+        {/* O estado vai no texto (Seguir / Seguindo): com o aria-pressed junto, o leitor
+            de tela lia "Seguindo, pressionado". */}
         {estado.seguindo ? "Seguindo" : "Seguir"}
       </button>
       {erro && <span className="text-xs text-tinta-suave">{erro}</span>}
