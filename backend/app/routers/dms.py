@@ -6,6 +6,8 @@ Rotas:
 - GET /dms/nao-lidas: o total, para o número na aba Mensagens.
 - GET /dms/{username}: a conversa (?depois_de=<id> traz só as novas).
 - POST /dms/{username}: manda uma mensagem (403 se não forem mútuos).
+- GET /dms/{username}/pode-mandar: se são mútuos, para o botão do perfil.
+  Separada da conversa porque abrir a conversa marca as mensagens como lidas.
 
 /dms/nao-lidas nunca vira conversa com alguém: nome de usuário não tem hífen.
 """
@@ -22,6 +24,7 @@ from app.schemas.dm import (
     MensagemCriar,
     MensagemOut,
     NaoLidasOut,
+    PodeMandarOut,
 )
 from app.services import dms as service
 
@@ -54,6 +57,15 @@ def abrir_conversa(
     db: Session = Depends(get_db),
 ):
     return service.abrir_conversa(db, user, username, depois_de, limite)
+
+
+@router.get("/{username}/pode-mandar", response_model=PodeMandarOut)
+def pode_mandar(
+    username: str,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return PodeMandarOut(pode_mandar=service.pode_mandar(db, user, username))
 
 
 @router.post("/{username}", response_model=MensagemOut, status_code=201)

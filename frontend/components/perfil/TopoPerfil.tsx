@@ -9,6 +9,7 @@
 import type { ReactNode } from "react";
 
 import { Avatar } from "@/components/Avatar";
+import { BotaoMensagem } from "@/components/BotaoMensagem";
 import { BotaoSeguir } from "@/components/BotaoSeguir";
 import { PainelFogo } from "@/components/perfil/FogoDoDiario";
 import type { Perfil } from "@/lib/api";
@@ -92,21 +93,13 @@ export function TopoPerfil({
           </p>
 
           {/* Quem visita: Seguir (o BotaoSeguir da Pessoa D, que já sabe se você segue
-              a pessoa) e Mensagem, que fica desativado até as DMs (decisão 6) existirem. */}
+              a pessoa) e Mensagem, que só aparece entre mútuos (decisão 6). O key
+              faz o BotaoMensagem perguntar de novo quando o número de seguidores
+              muda: seguir de volta pode tornar vocês mútuos. */}
           {!perfil.meu_perfil && (
-            <div className="mt-3.5 flex gap-2">
+            <div className="mt-3.5 flex flex-wrap items-start gap-2">
               <BotaoSeguir username={perfil.username} onMudou={aoMudarSeguidores} />
-              <button
-                type="button"
-                disabled
-                title="Em breve"
-                className="inline-flex items-center gap-1.5 rounded-lg border border-destaque px-4 py-2 text-sm font-semibold text-destaque disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z" />
-                </svg>
-                Mensagem
-              </button>
+              <BotaoMensagem key={perfil.seguidores} username={perfil.username} />
             </div>
           )}
         </div>
