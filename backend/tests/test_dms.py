@@ -164,3 +164,21 @@ def test_dms_exigem_login(client):
     assert client.get("/dms").status_code == 401
     assert client.get("/dms/nao-lidas").status_code == 401
     assert client.post("/dms/ana", json={"texto": "oi"}).status_code == 401
+
+
+def test_pode_mandar_so_entre_mutuos(client, logar):
+    # O botão Mensagem do perfil pergunta aqui, sem abrir a conversa (abrir
+    # marcaria as mensagens como lidas).
+    ana, bia = logar("ana"), logar("bia")
+    pode = lambda quem, para: client.get(f"/dms/{para}/pode-mandar", headers=quem).json()["pode_mandar"]
+
+    assert pode(ana, "bia") is False
+    seguir(client, ana, "bia")
+    assert pode(ana, "bia") is False  # só a Ana segue
+    seguir(client, bia, "ana")
+    assert pode(ana, "bia") is True and pode(bia, "ana") is True
+
+    deixar_de_seguir(client, bia, "ana")
+    assert pode(ana, "bia") is False
+    assert pode(ana, "ana") is False
+    assert client.get("/dms/ninguem/pode-mandar", headers=ana).status_code == 404

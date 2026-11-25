@@ -363,6 +363,13 @@ export function buscarConversa(username: string, depoisDe?: number): Promise<Con
   return apiGet<ConversaAberta>(`/dms/${encodeURIComponent(username)}${busca}`);
 }
 
+// Para o botão Mensagem do perfil: só entre mútuos. Não abre a conversa, então
+// não marca nada como lido.
+export async function podeMandarMensagem(username: string): Promise<boolean> {
+  return (await apiGet<{ pode_mandar: boolean }>(`/dms/${encodeURIComponent(username)}/pode-mandar`))
+    .pode_mandar;
+}
+
 export function enviarMensagem(username: string, texto: string): Promise<Mensagem> {
   return apiPost<Mensagem>(`/dms/${encodeURIComponent(username)}`, { texto });
 }
