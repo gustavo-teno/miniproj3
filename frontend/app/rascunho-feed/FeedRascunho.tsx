@@ -155,8 +155,8 @@ export function FeedRascunho() {
                         </>
                       ) : (
                         <>
-                          <span>{p.comentarios} comentários</span>
-                          <span>{p.curtidas} curtidas</span>
+                          <span>{p.comentarios === 1 ? "1 comentário" : `${p.comentarios} comentários`}</span>
+                          <span>{p.curtidas === 1 ? "1 curtida" : `${p.curtidas} curtidas`}</span>
                         </>
                       )}
                     </>

@@ -35,7 +35,7 @@ export function BotaoSeguir({ username, onMudou }: Props) {
     let valendo = true;
     apiGet<EstadoFollow>(`/usuarios/${encodeURIComponent(username)}/follow`)
       .then((e) => valendo && setEstado(e))
-      .catch(() => valendo && setErro("não consegui carregar"));
+      .catch(() => valendo && setErro("Não foi possível carregar."));
     return () => {
       valendo = false;
     };
@@ -55,7 +55,13 @@ export function BotaoSeguir({ username, onMudou }: Props) {
       setEstado(novo);
       onMudou?.(novo.seguidores);
     } catch (err) {
-      setErro(err instanceof Error ? err.message : "não deu certo, tente de novo");
+      setErro(
+        err instanceof Error
+          ? err.message
+          : estado.seguindo
+            ? "Não foi possível deixar de seguir. Tente de novo."
+            : "Não foi possível seguir. Tente de novo.",
+      );
     } finally {
       setEnviando(false);
     }
@@ -70,7 +76,6 @@ export function BotaoSeguir({ username, onMudou }: Props) {
         type="button"
         onClick={alternar}
         disabled={enviando}
-        aria-pressed={estado.seguindo}
         className={
           "whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold disabled:opacity-50 " +
           (estado.seguindo
@@ -78,6 +83,8 @@ export function BotaoSeguir({ username, onMudou }: Props) {
             : "bg-destaque text-sobre-destaque")
         }
       >
+        {/* O estado vai no texto (Seguir / Seguindo): com o aria-pressed junto, o leitor
+            de tela lia "Seguindo, pressionado". */}
         {estado.seguindo ? "Seguindo" : "Seguir"}
       </button>
       {erro && <span className="text-xs text-tinta-suave">{erro}</span>}

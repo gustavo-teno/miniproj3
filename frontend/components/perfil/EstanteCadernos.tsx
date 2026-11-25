@@ -71,7 +71,7 @@ export function EstanteCadernos({ cadernos, aberto, abrir }: Props) {
           <span className="font-numeros text-xl font-semibold">{total}</span>
           <span>
             <span className="block text-[15px] font-semibold">Todas</span>
-            <span className="block font-numeros text-xs opacity-85">{total === 1 ? "1 post" : `${total} posts`}</span>
+            <span className="block font-numeros text-xs opacity-85">{total === 1 ? "post" : "posts"}</span>
           </span>
         </button>
 
