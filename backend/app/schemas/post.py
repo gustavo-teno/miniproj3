@@ -60,3 +60,8 @@ class PostOut(BaseModel):
     minutos: int | None
     created_at: datetime
     autor: AutorOut
+    curtidas: int
+    comentarios: int
+    # Depende de quem está vendo: quem preenche é services/curtidas.py
+    # (marcar_curtidos). Sem ele, sai False.
+    curtido_por_mim: bool = False
