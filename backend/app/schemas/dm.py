@@ -38,6 +38,13 @@ class ConversaAberta(BaseModel):
     mensagens: list[MensagemOut]
 
 
+class PodeMandarOut(BaseModel):
+    """GET /dms/{username}/pode-mandar: o botão Mensagem do perfil só aparece
+    entre mútuos (decisão 6)."""
+
+    pode_mandar: bool
+
+
 class NaoLidasOut(BaseModel):
     """GET /dms/nao-lidas: o número na aba Mensagens."""
 

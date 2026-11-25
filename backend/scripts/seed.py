@@ -32,7 +32,7 @@ from app.models.like import Like
 from app.models.mensagem import Mensagem
 from app.models.post import Post
 from app.models.user import User
-from seed_dados import (
+from scripts.seed_dados import (
     ASSUNTOS,
     BATE_PAPO,
     COMENTARIOS,

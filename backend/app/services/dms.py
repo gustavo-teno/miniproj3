@@ -48,6 +48,11 @@ def sao_mutuos(db: Session, a: User, b: User) -> bool:
     return follows == 2
 
 
+def pode_mandar(db: Session, eu: User, username: str) -> bool:
+    """Se eu posso mandar mensagem para essa pessoa (404 se ela não existe)."""
+    return sao_mutuos(db, eu, _pessoa_ou_404(db, username))
+
+
 def _para_out(mensagem: Mensagem, eu: User) -> MensagemOut:
     return MensagemOut(
         id=mensagem.id,

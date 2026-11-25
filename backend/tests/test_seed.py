@@ -4,9 +4,7 @@ Conferem o que a banca vai ver: as turmas com gente, o usuário de
 demonstração entrando e a ofensiva aparecendo de todos os jeitos.
 """
 
-import sys
 from datetime import datetime, timezone
-from pathlib import Path
 
 import pytest
 from sqlalchemy import select
@@ -18,9 +16,8 @@ from app.models.comment import Comment
 from app.models.post import Post
 from app.models.user import User
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-import seed  # noqa: E402
-from seed_dados import CONVERSAS_DEMO, FIRME, QUEBROU, VESTIBULANDOS  # noqa: E402
+from scripts import seed
+from scripts.seed_dados import CONVERSAS_DEMO, FIRME, QUEBROU, VESTIBULANDOS
 
 AGORA = datetime(2026, 11, 25, 15, 0, tzinfo=timezone.utc)
 
@@ -97,3 +94,18 @@ def test_demo_tem_conversas_com_mutuos_e_nao_lidas(db, client):
     # são mútuos, então a Ada pode responder
     for com in esperadas:
         assert client.get(f"/dms/{com}", headers=ada).json()["pode_responder"]
+
+
+def test_seed_on_boot_popula_a_rede_ao_ligar(monkeypatch):
+    # No Render o disco zera a cada restart (guia 08): com SEED_ON_BOOT=true o
+    # servidor já liga com a rede populada e a demo entra.
+    from fastapi.testclient import TestClient
+
+    from app.db import Base, engine
+    from app.main import app
+
+    monkeypatch.setenv("SEED_ON_BOOT", "true")
+    Base.metadata.drop_all(engine)
+    with TestClient(app) as client:
+        r = client.post("/auth/login", json={"username": "ada", "password": seed.SENHA_SEED})
+        assert r.status_code == 200

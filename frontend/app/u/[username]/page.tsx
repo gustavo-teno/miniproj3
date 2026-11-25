@@ -132,8 +132,7 @@ export default function PaginaPerfil() {
       Editar perfil
     </button>
   ) : null;
-  // Para quem visita: o BotaoSeguir (Pessoa D, PR #33) entra no lugar de "acao"
-  // quando chegar à main. Mensagem só aparece se as DMs existirem (decisão 6).
+  // Para quem visita, os botões Seguir e Mensagem ficam dentro do TopoPerfil.
 
   const principal = (
     <div className="min-w-0 space-y-4">
