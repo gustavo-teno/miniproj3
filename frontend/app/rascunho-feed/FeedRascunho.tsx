@@ -139,7 +139,7 @@ export function FeedRascunho() {
         <div className="min-w-0 space-y-4">
           <FormPost onPostado={(novo) => setTodos((atuais) => [novo, ...atuais])} />
 
-          <section aria-label="Posts" className="overflow-hidden rounded-2xl border border-linha bg-superficie">
+          <section aria-label="Posts" className="space-y-4">
             {posts.length ? (
               posts.map((p) => (
                 <CardPost
@@ -164,7 +164,9 @@ export function FeedRascunho() {
                 />
               ))
             ) : (
-              <p className="p-6 text-sm text-tinta-suave">Nenhum post com esses filtros por enquanto.</p>
+              <p className="rounded-2xl border border-linha bg-superficie p-6 text-sm text-tinta-suave">
+                Nenhum post com esses filtros por enquanto.
+              </p>
             )}
           </section>
         </div>
