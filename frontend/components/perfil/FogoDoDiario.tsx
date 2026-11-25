@@ -152,6 +152,7 @@ export function LegendaFogo({
   comAviso: boolean;
   noPainel?: boolean; // no painel colorido de quem visita, a linha usa o tom do próprio painel
 }) {
+  const emRecorde = dados.atual > 0 && dados.atual >= dados.recorde;
   const folgas = dados.folgas_por_semana - dados.folgas_usadas_na_semana;
   const aviso = !comAviso
     ? null
@@ -176,10 +177,19 @@ export function LegendaFogo({
           className={`fogo-${faixaDoFogo(dados.atual)} mt-1.5 flex items-baseline justify-center gap-1.5 border-t pt-1.5 font-semibold leading-snug ${noPainel ? "text-sm" : "border-linha"}`}
           style={noPainel ? { borderColor: "color-mix(in srgb, var(--fogo-texto) 25%, transparent)" } : undefined}
         >
-          Recorde:{" "}
-          <b className={`fogo-${faixaDoFogo(dados.recorde)} font-bold`} style={{ color: "var(--fogo-texto)" }}>
-            {dados.recorde}
-          </b>
+          {/* Ofensiva atual igual ao recorde: em vez de repetir o número, comemora. */}
+          {emRecorde ? (
+            <b className="font-bold" style={{ color: "var(--fogo-texto)" }}>
+              {comAviso ? "É o seu recorde!" : "Em recorde!"}
+            </b>
+          ) : (
+            <>
+              Recorde:{" "}
+              <b className={`fogo-${faixaDoFogo(dados.recorde)} font-bold`} style={{ color: "var(--fogo-texto)" }}>
+                {dados.recorde}
+              </b>
+            </>
+          )}
         </p>
       </div>
       {aviso && (
