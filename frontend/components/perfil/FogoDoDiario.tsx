@@ -2,10 +2,10 @@
 
 // O fogo da ofensiva no diário (#10, Pessoa B), no desenho aprovado em 24/11:
 // um caderno aberto com a chama saindo da lombada. Os dados vêm da rota do
-// Gustavo (GET /usuarios/{username}/ofensiva); o componente <Ofensiva /> dele
-// continua existindo, este é o jeito do perfil de mostrar os mesmos números.
+// Gustavo (GET /usuarios/{username}/ofensiva). É o único lugar que desenha o
+// fogo: o antigo componente <Ofensiva /> saiu no PR 44.
 //
-// A intensidade aparece pela cor (as 6 faixas do Ofensiva.tsx, do vermelho ao
+// A intensidade aparece pela cor (as 6 faixas da decisão 4, do vermelho ao
 // azul, o mais intenso) e pelo desenho: 1 ponta, 2 pontas, 3 pontas com brilho
 // e faíscas. As três chamas têm quase a mesma altura. As cores ficam no
 // globals.css (.fogo-0 a .fogo-6 e --caderno-*): o caderno, a chama e os
@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 
 import { buscarOfensiva, type Ofensiva } from "@/lib/api";
 
-// As mesmas faixas do Ofensiva.tsx (Pessoa A). 0 = apagado.
+// As faixas da decisão 4 (DECISIONS.md). 0 = apagado.
 const FAIXAS = [
   { faixa: 1, de: 1 },
   { faixa: 2, de: 7 },

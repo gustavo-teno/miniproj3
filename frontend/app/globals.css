@@ -120,7 +120,7 @@
 }
 
 /* O fogo do diário (#10, Pessoa B): o caderno com a chama, que cresce e muda
-   de cor com os dias seguidos (0 = apagado; 1 a 6 = as faixas do Ofensiva.tsx,
+   de cor com os dias seguidos (0 = apagado; 1 a 6 = as faixas da decisão 4,
    do vermelho ao azul, o mais intenso). Cada faixa é uma classe que define as
    cores da chama, do número e do painel de quem visita, no claro e no noturno,
    no mesmo esquema da paleta acima. Quem usa: components/perfil/FogoDoDiario.tsx.
