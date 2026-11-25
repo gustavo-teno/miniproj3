@@ -9,6 +9,7 @@ from app.db import Base, SessionLocal, engine
 from app.models import User
 from app.routers import (
     auth,
+    busca,
     comentarios,
     curtidas,
     dms,
@@ -37,7 +38,8 @@ app = FastAPI(title="Rede Social da Trilha", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # A 3001 é para quando a 3000 já está ocupada e o Next sobe na seguinte.
+    allow_origins=["http://localhost:3000", "http://localhost:3001"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,6 +48,7 @@ app.add_middleware(
 # 1 linha por feature — registre o seu router aqui.
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(busca.router)
 app.include_router(posts.router)
 app.include_router(follows.router)
 app.include_router(curtidas.router)

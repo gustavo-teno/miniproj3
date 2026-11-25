@@ -11,25 +11,38 @@ import type { CSSProperties } from "react";
 type Par = { fundo: string; texto: string };
 export type CorTag = { claro: Par; noturno: Par };
 
+// Paleta por área de conhecimento (24/11, ideia da Camila): uma cor por área,
+// igual para todas as matérias dela (o símbolo e o nome diferenciam uma da
+// outra). O lavanda e o roxo ficam só para a rede (botões, "Todas"). Todas as
+// cores passam no contraste de leitura (4,5) nos dois modos.
+const EXATAS: CorTag = { claro: { fundo: "#8fc1ff", texto: "#0048a1" }, noturno: { fundo: "#17304f", texto: "#4a99fa" } };
+const NATUREZA: CorTag = { claro: { fundo: "#bdffcd", texto: "#007d1f" }, noturno: { fundo: "#194324", texto: "#47f572" } };
+const LINGUAGENS: CorTag = { claro: { fundo: "#ffbdbf", texto: "#b20006" }, noturno: { fundo: "#43191b", texto: "#f6555b" } };
+const HUMANAS: CorTag = { claro: { fundo: "#fff4bd", texto: "#826c00" }, noturno: { fundo: "#433c19", texto: "#f5d847" } };
+const IDIOMAS: CorTag = { claro: { fundo: "#ffd9bd", texto: "#a34700" }, noturno: { fundo: "#432b19", texto: "#f59247" } };
+const BATE_PAPO: CorTag = { claro: { fundo: "#eef0f0", texto: "#4f5a5c" }, noturno: { fundo: "#262c35", texto: "#c3cad4" } };
+
+// Cada matéria aponta para a cor da sua área: mudar a cor de uma área é
+// mudar uma linha só.
 const CORES: Record<string, CorTag> = {
-  matematica: { claro: { fundo: "#e7eefc", texto: "#2f5bb7" }, noturno: { fundo: "#243049", texto: "#a8c0f5" } },
-  fisica: { claro: { fundo: "#ece9fb", texto: "#5b45b8" }, noturno: { fundo: "#2e2a48", texto: "#c2b6f5" } },
-  quimica: { claro: { fundo: "#e2f4f1", texto: "#157a70" }, noturno: { fundo: "#1c3633", texto: "#8fd9cd" } },
-  biologia: { claro: { fundo: "#e6f4e8", texto: "#2e7d3e" }, noturno: { fundo: "#213626", texto: "#9ad9a7" } },
-  portugues: { claro: { fundo: "#fce9e7", texto: "#b23a2e" }, noturno: { fundo: "#3d2522", texto: "#f2a99f" } },
-  literatura: { claro: { fundo: "#fbe8f0", texto: "#a3305f" }, noturno: { fundo: "#3d2230", texto: "#f0a6c4" } },
-  redacao: { claro: { fundo: "#fdeedf", texto: "#b05a12" }, noturno: { fundo: "#3d2b1a", texto: "#f3bc85" } },
-  historia: { claro: { fundo: "#f8f0dc", texto: "#8a6411" }, noturno: { fundo: "#383019", texto: "#e6cb82" } },
-  geografia: { claro: { fundo: "#eef4de", texto: "#5e7a16" }, noturno: { fundo: "#2e361a", texto: "#c6dd8a" } },
-  filosofia: { claro: { fundo: "#f1eaf8", texto: "#7a3fa0" }, noturno: { fundo: "#322745", texto: "#d2b3ee" } },
-  sociologia: { claro: { fundo: "#faeaf6", texto: "#973a84" }, noturno: { fundo: "#3d253a", texto: "#e9a9da" } },
-  ingles: { claro: { fundo: "#e4f1fa", texto: "#1e6c9e" }, noturno: { fundo: "#1c3442", texto: "#93cbee" } },
-  espanhol: { claro: { fundo: "#fdf5d8", texto: "#8c6a00" }, noturno: { fundo: "#393318", texto: "#edd67a" } },
-  "bate-papo": { claro: { fundo: "#eef0f0", texto: "#4f5a5c" }, noturno: { fundo: "#262c35", texto: "#c3cad4" } },
+  matematica: EXATAS,
+  fisica: NATUREZA,
+  quimica: NATUREZA,
+  biologia: NATUREZA,
+  portugues: LINGUAGENS,
+  literatura: LINGUAGENS,
+  redacao: LINGUAGENS,
+  historia: HUMANAS,
+  geografia: HUMANAS,
+  filosofia: HUMANAS,
+  sociologia: HUMANAS,
+  ingles: IDIOMAS,
+  espanhol: IDIOMAS,
+  "bate-papo": BATE_PAPO,
 };
 
 // Tag nova no backend sem cor aqui ainda: aparece cinza em vez de quebrar.
-const COR_PADRAO = CORES["bate-papo"];
+const COR_PADRAO = BATE_PAPO;
 
 export function corDaTag(tag: string): CorTag {
   return CORES[tag] ?? COR_PADRAO;
