@@ -3,7 +3,6 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.contadores import contador_iniciais
-from app.models.follow import Follow
 from app.models.post import Post
 from app.models.user import User
 from app.schemas.user import CadernoOut, PerfilEditar, PerfilOut, UserCreate, UserOut
@@ -51,10 +50,6 @@ def buscar_ou_404(db: Session, username: str) -> User:
     return user
 
 
-def _contar(db: Session, coluna) -> int:
-    return db.scalar(select(func.count()).select_from(Follow).where(coluna)) or 0
-
-
 def cadernos(db: Session, user_id: int) -> list[CadernoOut]:
     """A estante do perfil: posts e último post por tag, numa consulta só.
     Do caderno mais usado para o menos usado (empate: o mais recente antes)."""
@@ -69,6 +64,11 @@ def cadernos(db: Session, user_id: int) -> list[CadernoOut]:
 
 
 def perfil(db: Session, username: str, quem_ve: User) -> PerfilOut:
+    # A contagem de seguidores mora no service do follow (Pessoa D), para a regra
+    # de "quem segue quem" ficar num lugar só. O import é aqui dentro porque
+    # services/follows.py já importa este arquivo (import circular, se fosse no topo).
+    from app.services import follows
+
     user = buscar_ou_404(db, username)
     return PerfilOut.model_validate(
         {
@@ -78,8 +78,8 @@ def perfil(db: Session, username: str, quem_ve: User) -> PerfilOut:
             "vestibular_outro": user.vestibular_outro,
             "curso_outro": user.curso_outro,
             "universidade": user.universidade,
-            "seguidores": _contar(db, Follow.seguido_id == user.id),
-            "seguindo": _contar(db, Follow.seguidor_id == user.id),
+            "seguidores": follows.contar_seguidores(db, user.id),
+            "seguindo": follows.contar_seguindo(db, user.id),
             "meu_perfil": quem_ve.id == user.id,
             "cadernos": cadernos(db, user.id),
         }

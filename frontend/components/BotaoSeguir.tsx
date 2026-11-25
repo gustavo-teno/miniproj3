@@ -54,13 +54,13 @@ export function BotaoSeguir({ username, onMudou }: Props) {
       const novo = await apiGet<EstadoFollow>(caminho);
       setEstado(novo);
       onMudou?.(novo.seguidores);
-    } catch (err) {
+    } catch {
+      // Sempre o texto da ação: a mensagem do servidor vinha na frente e podia
+      // ser "erro 500", que não diz à pessoa o que fazer.
       setErro(
-        err instanceof Error
-          ? err.message
-          : estado.seguindo
-            ? "Não foi possível deixar de seguir. Tente de novo."
-            : "Não foi possível seguir. Tente de novo.",
+        estado.seguindo
+          ? "Não foi possível deixar de seguir este usuário. Tente de novo."
+          : "Não foi possível seguir este usuário. Tente de novo.",
       );
     } finally {
       setEnviando(false);
