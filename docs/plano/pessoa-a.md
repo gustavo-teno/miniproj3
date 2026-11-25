@@ -95,12 +95,12 @@ Antes de cada dia, olhar o grupo: se alguém travou no núcleo, ajudar vem antes
     pessoas, o "depois de" traz só as novas, e abrir a conversa zera as não lidas.
 
 **Qua 25: DMs na tela.** PR com `Closes #18`.
-- [ ] `/mensagens`: a lista de conversas; `/mensagens/[username]`: a conversa,
+- [x] `/mensagens`: a lista de conversas; `/mensagens/[username]`: a conversa,
     que pergunta as novas a cada poucos segundos e para quando a aba fica
     escondida.
-- [ ] Ligar a aba "Mensagens" (`MOSTRAR_MENSAGENS` em `Navegacao.tsx`) com o
+- [x] Ligar a aba "Mensagens" (`MOSTRAR_MENSAGENS` em `Navegacao.tsx`) com o
     número de não lidas.
-- [ ] `<BotaoMensagem username=... />` no perfil, que só aparece entre mútuos.
+- [x] `<BotaoMensagem username=... />` no perfil, que só aparece entre mútuos.
 - **Combinar com B:** a navegação e o perfil são da área dela, mas na quarta
     e na quinta ela está nos ajustes visuais e no vídeo. Então a aba, o botão
     no perfil e o link "Buscar" vão prontos no meu PR, avisando no texto do PR
@@ -125,6 +125,7 @@ seguir). Dependem das curtidas, dos comentários e do follow já estarem na
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **qua 25:** DMs completas (#18). O #61 (telas) entrou depois da revisão da Camila: no celular a aba Mensagens virou um balão com o número (com a palavra, a barra passava de 375px) e a hora no balão de quem escreve perdeu a transparência (a `opacity-75` dava contraste 3,65 e a `opacity-90` ainda 4,47; o mínimo é 4,5). Com o #50 na `main`, o `<BotaoMensagem />` entrou no `TopoPerfil`: só aparece entre mútuos e pergunta à rota nova `GET /dms/{username}/pode-mandar`, separada da conversa porque abrir a conversa marca as mensagens como lidas. O `key` com o número de seguidores faz o botão perguntar de novo quando a pessoa segue de volta. No celular, só o balão. **Para a Clarisse:** o seed não cria mensagens, então a aba fica vazia na demo.
 - **ter 24:** tela das DMs adiantada de quarta (branch `feat/dms-tela`). `/mensagens` lista as conversas e se atualiza a cada 15 s; `/mensagens/[username]` pergunta as novas a cada 4 s com `?depois_de=` e para com a aba escondida (`lib/useRepetir.ts`). A aba "Mensagens" aparece para quem entrou, com o número de não lidas (`lib/naoLidas.ts`, a cada 30 s e na hora em que uma conversa é lida). Sem mútuos, a conversa explica a regra no lugar da caixa de escrever. **Para a Camila:** a aba mexe na `Navegacao.tsx` (área dela). Falta o `<BotaoMensagem />` no perfil, que espera o PR 42 (perfil) e o 33 (follow).
 - **ter 24:** DMs no backend (#18). Rotas: `GET /dms` (conversas, da mais recente, com a última mensagem e as não lidas), `GET /dms/nao-lidas` (o total, para a aba), `GET /dms/{username}` (a conversa, com `?depois_de=<id>` para trazer só as novas) e `POST /dms/{username}` (403 se não forem mútuos). Quem deixou de seguir ainda vê a conversa, mas `pode_responder` vem falso. As não lidas ficam na tabela nova `leituras` (até qual mensagem cada pessoa leu em cada conversa), que o `create_all` cria sozinho: ninguém precisa apagar o banco. A lista de conversas usa três consultas, qualquer que seja o número de conversas. Nos testes, os follows passam pela rota de seguir do Pedro (#33), sugestão da Camila na revisão.
 - **ter 24:** Busca (#38) adiantada de quinta, numa branch separada das DMs. Viraram duas rotas, `GET /busca/pessoas?q=` (nome ou @, em ordem alfabética) e `GET /busca/posts?q=` (texto, do mais novo), em vez de uma com `?tipo=`, porque cada uma devolve um formato. Sem diferença de acento nem de maiúscula: `sem_acento()` em `core/texto.py`, registrada como função do SQLite em `app/db.py`, compara o que a pessoa digitou com o texto guardado. Sem coluna nova, então ninguém recria o banco. Custo O(N) por busca (LIKE com % no começo não usa índice); numa rede grande, seria a hora de um índice de texto (FTS). `%` e `_` digitados viram texto comum. Na tela, `/busca` com as abas Pessoas e Posts, que espera 300 ms depois da última tecla, e uma lupa no topo ao lado da engrenagem. **Para a Camila:** a lupa mexe na `Navegacao.tsx` (área dela).
