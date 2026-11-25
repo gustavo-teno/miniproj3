@@ -155,7 +155,9 @@ export default function ConversaPage() {
               <time
                 dateTime={m.created_at}
                 title={dataCompleta(m.created_at)}
-                className="mt-0.5 block text-right font-numeros text-[11px] opacity-75"
+                // No balão lavanda de quem escreveu, a hora vai sem transparência:
+                // com opacity-75 o branco dava contraste 3,65 (o mínimo é 4,5).
+                className={"mt-0.5 block text-right font-numeros text-[11px] " + (m.minha ? "" : "opacity-75")}
               >
                 {hora(m.created_at)}
               </time>

@@ -28,7 +28,9 @@ export function Navegacao() {
     { href: "/turmas", rotulo: "Turmas" },
     ...(eu
       ? [
-          { href: "/mensagens", rotulo: "Mensagens", contador: naoLidas },
+          // No celular, só o balão: com a palavra e o número, as abas passavam
+          // de 375px e empurravam a lupa e a engrenagem para fora da tela.
+          { href: "/mensagens", rotulo: "Mensagens", contador: naoLidas, icone: BALAO },
           { href: `/u/${eu.username}`, rotulo: "Meu diário" },
         ]
       : []),
@@ -43,7 +45,7 @@ export function Navegacao() {
         </Link>
 
         <nav aria-label="Principal" className="flex gap-4 sm:gap-8">
-          {abas.map(({ href, rotulo, contador }) => {
+          {abas.map(({ href, rotulo, contador, icone }) => {
             // O endereço exato ou uma página dentro dele: /u/ada e /u/ada/editar
             // acendem "Meu diário", mas /u/ada2 (outra pessoa) não.
             const ativa =
@@ -54,13 +56,23 @@ export function Navegacao() {
                 href={href}
                 aria-current={ativa ? "page" : undefined}
                 className={
-                  "whitespace-nowrap border-b-[3px] py-4 text-[15px] transition-colors sm:text-[17px] " +
+                  "flex items-center whitespace-nowrap border-b-[3px] py-4 text-[15px] transition-colors sm:text-[17px] " +
                   (ativa
                     ? "border-destaque font-semibold text-destaque"
                     : "border-transparent text-tinta-suave hover:text-tinta")
                 }
               >
-                {rotulo}
+                {icone ? (
+                  <>
+                    <span className="sm:hidden">
+                      <Icone d={icone} />
+                    </span>
+                    {/* No celular a palavra some da tela, mas o leitor de tela continua lendo. */}
+                    <span className="sr-only sm:not-sr-only">{rotulo}</span>
+                  </>
+                ) : (
+                  rotulo
+                )}
                 {/* O leitor de tela lê "Mensagens, 2 não lidas". */}
                 {contador ? (
                   <span className="ml-1.5 inline-grid min-w-5 place-items-center rounded-full bg-destaque px-1 align-[2px] text-[11px] font-semibold leading-5 text-sobre-destaque">
@@ -218,6 +230,9 @@ function Configuracoes({ logado }: { logado: boolean }) {
     </div>
   );
 }
+
+// O balão de conversa da aba Mensagens no celular.
+const BALAO = "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z";
 
 // Ícone de traço simples, sempre do mesmo tamanho e espessura.
 function Icone({ d }: { d: string }) {
