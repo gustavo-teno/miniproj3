@@ -15,6 +15,8 @@ from app.models.user import User
 from app.schemas.busca import ResultadoPosts
 from app.schemas.user import UserPage
 from app.services import busca as service
+from app.services.curtidas import marcar_curtidos
+from app.services.salvos import marcar_salvos
 
 router = APIRouter(prefix="/busca", tags=["busca"])
 
@@ -49,8 +51,12 @@ def buscar_posts(
     q: str = Depends(termo_de_busca),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
-    _user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     itens, total = service.posts(db, q, offset, limit)
+    # O card da busca tem os botões de curtir e salvar: eles precisam saber o
+    # que você já curtiu e salvou (uma consulta para a lista toda, cada).
+    marcar_curtidos(db, user, itens)
+    marcar_salvos(db, user, itens)
     return ResultadoPosts(items=itens, total=total, offset=offset, limit=limit)

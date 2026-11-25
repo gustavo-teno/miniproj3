@@ -11,7 +11,7 @@ from app.db import get_db
 from app.deps import get_current_user
 from app.models.user import User
 from app.schemas.post import PostCriar, PostEditar, PostOut
-from app.services import curtidas
+from app.services import curtidas, salvos
 from app.services import posts as service
 
 router = APIRouter(prefix="/posts", tags=["posts"])
@@ -34,6 +34,7 @@ def ver_post(
 ):
     post = service.buscar(db, post_id)
     curtidas.marcar_curtidos(db, user, [post])
+    salvos.marcar_salvos(db, user, [post])
     return post
 
 
@@ -46,6 +47,7 @@ def editar_post(
 ):
     post = service.editar(db, user, post_id, dados)
     curtidas.marcar_curtidos(db, user, [post])
+    salvos.marcar_salvos(db, user, [post])
     return post
 
 

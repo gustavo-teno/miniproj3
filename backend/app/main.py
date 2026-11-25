@@ -19,6 +19,7 @@ from app.routers import (
     ofensiva,
     opcoes,
     posts,
+    salvos,
     turmas,
     users,
 )
@@ -74,4 +75,5 @@ app.include_router(feed.router)
 app.include_router(ofensiva.router)
 app.include_router(turmas.router)
 app.include_router(dms.router)
+app.include_router(salvos.router)
 app.include_router(opcoes.router)
