@@ -45,15 +45,17 @@ modo é trocar as variáveis, e nenhuma tela precisa saber disso.
 | `linha` | bordas e divisões | `#e2e8e5` | `#2a313b` |
 | `tinta` | texto principal | `#1e2a2c` | `#e6eaf0` |
 | `tinta-suave` | texto secundário (hora, contagem, ajuda) | `#5a6b6e` | `#9aa4b2` |
-| `destaque` | lavanda: botão principal, item ativo, o que é seu | `#6352a7` | `#c2b4ee` |
-| `destaque-fundo` | fundo suave do item ativo e do hover | `#eee9fa` | `#302a4c` |
+| `destaque` | lavanda: botão principal, item ativo, o que é seu | `#7263b0` | `#c2b4ee` |
+| `destaque-fundo` | fundo suave do item ativo e do hover | `#f3f0fc` | `#302a4c` |
 | `sobre-destaque` | texto em cima do `destaque` | `#ffffff` | `#13171d` |
 | `erro` | texto e borda de aviso de erro | `#a3302a` | `#f2a7a0` |
 | `erro-fundo` | fundo do aviso de erro | `#fbeeed` | `#3a2224` |
 
 O `destaque` é pouco, de propósito: só o que é da pessoa, o botão principal e o
-item ativo. Se tudo for lavanda, nada se destaca. O tom é calmo, mas não
-apagado: nada de roxo forte nem de cinza-lavanda. A listra de margem e a pauta
+item ativo. Se tudo for lavanda, nada se destaca. O tom é pastel e calmo,
+sem roxo forte; o claro é o passo mais claro que ainda passa no contraste de
+leitura (4,5) com letra branca nos botões e com texto lavanda em cima do
+`destaque-fundo`. Se for clarear mais, revise esses dois usos. A listra de margem e a pauta
 dos posts também usam o `destaque`, por isso mudam sozinhas no modo noturno.
 
 ### As cores das matérias
