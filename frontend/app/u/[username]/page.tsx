@@ -138,13 +138,11 @@ export default function PaginaPerfil() {
   // O perfil em dois blocos: o topo e o resto (a estante e os posts). No diário
   // da dona, a coluna da direita (postar, fogo e horas) fica entre os dois no
   // celular; no computador, ela fica ao lado dos dois.
-  const topo = (
-    <>
-      <TopoPerfil perfil={perfil} acao={acao} />
-      {eu && (
-        <EditarPerfil perfil={perfil} aberto={editando} fechar={() => setEditando(false)} aoSalvar={setPerfil} />
-      )}
-    </>
+  const topo = <TopoPerfil perfil={perfil} acao={acao} />;
+  // A caixa de editar (um <dialog>, escondido até abrir) fica fora do bloco do
+  // topo: como último item de um space-y, ela somava 16px embaixo do perfil.
+  const editor = eu && (
+    <EditarPerfil perfil={perfil} aberto={editando} fechar={() => setEditando(false)} aoSalvar={setPerfil} />
   );
 
   const conteudo = (
@@ -216,10 +214,13 @@ export default function PaginaPerfil() {
   }
 
   // No celular: o topo do perfil, depois a coluna da direita e depois os posts.
-  // No computador, a coluna fica à direita (248px) e acompanha a rolagem.
+  // No computador, a coluna fica à direita (248px) e acompanha a rolagem. O
+  // grid-rows-[auto_1fr] deixa a sobra de altura da coluna na linha de baixo,
+  // e não entre o topo do perfil e o resto (buraco no diário vazio).
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_248px] lg:items-start">
-      <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-1">{topo}</div>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_248px] lg:grid-rows-[auto_1fr] lg:items-start">
+      <div className="min-w-0 lg:col-start-1 lg:row-start-1">{topo}</div>
+      {editor}
       <aside
         aria-label="Seu diário"
         className="space-y-4 lg:sticky lg:top-4 lg:col-start-2 lg:row-span-2 lg:row-start-1"
