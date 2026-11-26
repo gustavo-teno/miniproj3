@@ -420,3 +420,63 @@ export function buscarFeed(filtros: FiltrosFeed, offset = 0, limit = 20): Promis
   if (filtros.esconderBatePapo) params.set("esconder_bate_papo", "true");
   return apiGet<Page<Post>>(`/feed?${params}`);
 }
+
+// ---- turmas (#17, Pessoa D; espelha backend/app/schemas/turmas.py) ----
+
+export type TipoTurma = "vestibular" | "curso";
+
+export type Turma = {
+  tipo: TipoTurma;
+  chave: string; // chave de /opcoes, ex.: "enem"; "outro" é "Outros vestibulares"
+  nome: string;
+  pessoas: number;
+  estudaram_hoje: number; // postaram de matéria hoje (dia de Brasília)
+};
+
+export type Turmas = {
+  minhas: Turma[]; // a do vestibular e a do curso de quem está vendo
+  vestibulares: Turma[];
+  cursos: Turma[];
+};
+
+// Uma pessoa na aba Chamada. A meta inteira vem junto, para o card mostrar a
+// outra turma dela.
+export type Membro = Autor & {
+  vestibular: string;
+  curso: string;
+  vestibular_outro: string;
+  curso_outro: string;
+  universidade: string;
+  estudou_hoje: boolean;
+  segue_voce: boolean;
+};
+
+export function buscarTurmas(): Promise<Turmas> {
+  return apiGet<Turmas>("/turmas");
+}
+
+// A página da turma no site tem o mesmo endereço da rota na API.
+export function enderecoDaTurma(tipo: TipoTurma, chave: string): string {
+  return `/turmas/${tipo}/${encodeURIComponent(chave)}`;
+}
+
+export function buscarTurma(tipo: TipoTurma, chave: string): Promise<Turma> {
+  return apiGet<Turma>(enderecoDaTurma(tipo, chave));
+}
+
+export function buscarMembros(tipo: TipoTurma, chave: string, offset = 0, limit = 50): Promise<Page<Membro>> {
+  return apiGet<Page<Membro>>(`${enderecoDaTurma(tipo, chave)}/membros?offset=${offset}&limit=${limit}`);
+}
+
+// Sem tag, os posts de todas as matérias (e o bate-papo).
+export function buscarPostsDaTurma(
+  tipo: TipoTurma,
+  chave: string,
+  tag: string,
+  offset = 0,
+  limit = 20,
+): Promise<Page<Post>> {
+  const params = new URLSearchParams({ offset: String(offset), limit: String(limit) });
+  if (tag) params.set("tag", tag);
+  return apiGet<Page<Post>>(`${enderecoDaTurma(tipo, chave)}/posts?${params}`);
+}
