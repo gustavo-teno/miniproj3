@@ -226,6 +226,17 @@ COMENTARIOS = [
     "Me identifiquei demais.",
 ]
 
+# Uma conversa num post da Ada, cada fala respondendo a anterior: com mais de
+# 3 respostas, ela aparece recolhida em "Ver conversa" no vídeo e para a banca.
+# "fa" é alguém que segue a Ada; "demo" é a própria Ada.
+CONVERSA_DEMO = [
+    ("fa", "Como você organiza as revisões? Eu sempre esqueço o que já estudei."),
+    ("demo", "Revejo no dia seguinte, depois de uma semana e depois de um mês. Anoto tudo num caderninho."),
+    ("fa", "Caderninho de papel ou no celular?"),
+    ("demo", "Papel! Riscar o que já revisei dá uma satisfação enorme."),
+    ("fa", "Vou testar essa semana. Valeu pela dica!"),
+]
+
 # Respostas de quem postou a quem comentou (comentários em árvore): a conversa
 # continua embaixo do comentário, em vez de virar outro comentário solto. O
 # seed sorteia qual resposta vai em qual comentário, então todas servem para
