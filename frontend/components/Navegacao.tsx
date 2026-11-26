@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { buscarEu, sair, type Eu } from "@/lib/api";
 import { useNaoLidas } from "@/lib/naoLidas";
+import { LogoPostIt } from "@/components/LogoPostIt";
 import { NOME_REDE } from "@/lib/rede";
 
 // O topo da rede: nome à esquerda, abas no centro e configurações à direita.
@@ -40,7 +41,8 @@ export function Navegacao() {
     <header className="border-b border-linha bg-superficie">
       <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-2 px-4 sm:grid sm:gap-3 sm:grid-cols-[1fr_auto_1fr] sm:px-6">
         {/* No celular o nome some para as abas caberem: o Feed já leva ao início. */}
-        <Link href="/" className="hidden justify-self-start text-lg font-semibold text-tinta sm:block">
+        <Link href="/" className="hidden items-center gap-2 justify-self-start text-lg font-semibold text-tinta sm:flex">
+          <LogoPostIt className="size-7" />
           {NOME_REDE}
         </Link>
 
