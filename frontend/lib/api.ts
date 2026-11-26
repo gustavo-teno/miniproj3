@@ -262,13 +262,22 @@ export type Post = {
   salvo_por_mim: boolean; // idem, para o botão Salvar (#64)
 };
 
-// Um comentário de GET /posts/{id}/comentarios (#12, Pessoa C).
+// Um comentário de GET /posts/{id}/comentarios (#12, Pessoa C), com as
+// respostas dentro (comentários em árvore) e as curtidas dele.
 export type Comentario = {
   id: number;
   autor: Autor;
   texto: string;
   created_at: string;
+  parent_id: number | null; // o comentário que este responde; null se é direto no post
+  curtidas: number;
+  curtido_por_mim: boolean;
+  respostas: Comentario[];
 };
+
+// A página de comentários conta só os diretos no post; o total com as
+// respostas é o "N comentários" do topo.
+export type ComentarioPage = Page<Comentario> & { total_com_respostas: number };
 
 // GET /usuarios/{username}: a meta (decisão 2) e os contadores do follow (D).
 export type Perfil = User & {
@@ -394,4 +403,20 @@ export function descurtirMensagem(id: number): Promise<void> {
 // Os posts que você salvou, do salvo mais recente para o mais antigo.
 export function buscarSalvos(offset = 0, limit = 20): Promise<Page<Post>> {
   return apiGet<Page<Post>>(`/salvos?offset=${offset}&limit=${limit}`);
+}
+
+// ---- feed (#16, Pessoa D; espelha backend/app/routers/feed.py) ----
+
+export type FiltrosFeed = {
+  materias: string[]; // vazio = todas as matérias
+  esconderBatePapo: boolean;
+};
+
+// Cronológico, só de quem você segue (decisão 3). O bate-papo não é matéria:
+// só o esconderBatePapo decide se ele aparece.
+export function buscarFeed(filtros: FiltrosFeed, offset = 0, limit = 20): Promise<Page<Post>> {
+  const params = new URLSearchParams({ offset: String(offset), limit: String(limit) });
+  for (const m of filtros.materias) params.append("tag", m);
+  if (filtros.esconderBatePapo) params.set("esconder_bate_papo", "true");
+  return apiGet<Page<Post>>(`/feed?${params}`);
 }

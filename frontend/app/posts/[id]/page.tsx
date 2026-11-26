@@ -1,7 +1,8 @@
 "use client";
 
-// A página de um post (#12, Pessoa C): o card e a conversa embaixo. É para
-// onde o "N comentários" do card leva, no feed, no perfil e nas turmas.
+// A página de um post (#12, Pessoa C): o card e a conversa na mesma folha. É
+// para onde o "N comentários" do card leva, e também o clique no próprio post,
+// no feed, no perfil e nas turmas.
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,19 +36,19 @@ export default function PaginaDoPost() {
   if (!post) return <p className="text-tinta-suave">Carregando...</p>;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3">
-      <div className="overflow-hidden rounded-2xl border border-linha bg-superficie">
-        <CardPost
-          post={post}
-          rodape={
-            <>
-              <BotaoCurtir post={post} />
-              <BotaoSalvar post={post} />
-            </>
-          }
-        />
-      </div>
-      <Comentarios postId={post.id} />
+    <div className="mx-auto max-w-2xl">
+      {/* O post e a conversa ficam na mesma folha: nada de caixa separada. */}
+      <CardPost
+        post={post}
+        abrirAoClicar={false}
+        rodape={
+          <>
+            <BotaoCurtir post={post} />
+            <BotaoSalvar post={post} />
+          </>
+        }
+        embaixo={<Comentarios postId={post.id} />}
+      />
     </div>
   );
 }

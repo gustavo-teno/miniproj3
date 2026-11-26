@@ -21,9 +21,12 @@ type EstadoFollow = {
 type Props = {
   username: string;
   onMudou?: (seguidores: number) => void;
+  // No celular, o botão ocupa a largura que o pai der (ex.: a linha de botões
+  // do topo do perfil). Sem isso, ele tem o tamanho do texto, como sempre.
+  cheioNoCelular?: boolean;
 };
 
-export function BotaoSeguir({ username, onMudou }: Props) {
+export function BotaoSeguir({ username, onMudou, cheioNoCelular = false }: Props) {
   // null = ainda carregando: o botão não aparece até saber o estado certo,
   // para não mostrar "Seguir" para quem você já segue.
   const [estado, setEstado] = useState<EstadoFollow | null>(null);
@@ -71,13 +74,14 @@ export function BotaoSeguir({ username, onMudou }: Props) {
   if (!estado || estado.eu_mesmo) return null;
 
   return (
-    <span className="inline-flex flex-col items-start gap-1">
+    <span className={"inline-flex flex-col items-start gap-1 " + (cheioNoCelular ? "max-sm:flex-1 max-sm:items-stretch" : "")}>
       <button
         type="button"
         onClick={alternar}
         disabled={enviando}
         className={
           "whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold disabled:opacity-50 " +
+          (cheioNoCelular ? "max-sm:min-h-[34px] " : "") +
           (estado.seguindo
             ? "border border-linha bg-superficie text-tinta hover:bg-fundo"
             : "bg-destaque text-sobre-destaque")

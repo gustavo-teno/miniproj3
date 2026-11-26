@@ -2,8 +2,8 @@
 
 Cria 25 vestibulandos com metas variadas (todas as turmas têm gente), três
 semanas de sessões de estudo, conversas de bate-papo, follows entre quem tem
-a mesma meta, curtidas, comentários e as DMs do usuário de demonstração. O
-conteúdo fica em seed_dados.py.
+a mesma meta, curtidas, comentários (com respostas e curtidas) e as DMs do
+usuário de demonstração. O conteúdo fica em seed_dados.py.
 
 Todos entram com a senha SENHA_SEED. O usuário de demonstração, para o vídeo
 e para a banca, é o "ada".
@@ -26,6 +26,7 @@ from sqlalchemy.orm import Session
 from app.core.ofensiva import BRASILIA, hoje_em_brasilia
 from app.db import Base, SessionLocal, engine
 from app.models.comment import Comment
+from app.models.curtida_comentario import CurtidaComentario
 from app.models.follow import Follow
 from app.models.leitura import Leitura
 from app.models.like import Like
@@ -40,6 +41,7 @@ from scripts.seed_dados import (
     FIRME,
     QUEBROU,
     REFLEXOES,
+    RESPOSTAS,
     SESSOES,
     USUARIO_DEMO,
     VESTIBULANDOS,
@@ -235,6 +237,27 @@ def _criar_conversas(db: Session, usuarios: list[User], agora: datetime) -> None
         ])
 
 
+def _criar_respostas(db: Session, posts: list[Post], seguidores: dict[int, list[User]],
+                     agora: datetime, rng: random.Random) -> None:
+    """Quem postou responde a parte dos comentários e curte outros; quem segue
+    o autor também curte alguns comentários (comentários em árvore)."""
+    por_post = {post.id: post for post in posts}
+    for comentario in list(db.scalars(select(Comment).order_by(Comment.id))):
+        post = por_post[comentario.post_id]
+        curtiram = set()
+        if comentario.autor_id != post.autor_id and rng.random() < 0.5:
+            curtiram.add(post.autor_id)
+        for fa in rng.sample(seguidores[post.autor_id], rng.randint(0, 2)):
+            if fa.id != comentario.autor_id:
+                curtiram.add(fa.id)
+        db.add_all(CurtidaComentario(user_id=quem, comentario_id=comentario.id) for quem in curtiram)
+        if comentario.autor_id != post.autor_id and rng.random() < 0.3:
+            # A resposta vem depois do comentário e nunca no futuro.
+            momento = min(comentario.created_at + timedelta(minutes=rng.randint(10, 300)), agora)
+            db.add(Comment(autor_id=post.autor_id, post_id=post.id, parent_id=comentario.id,
+                           texto=rng.choice(RESPOSTAS), created_at=momento))
+
+
 def seed_fake(db: Session, agora: datetime | None = None) -> None:
     """Popula a rede: a demo nunca começa vazia (contrato do teste do núcleo)."""
     agora = agora or datetime.now(timezone.utc)
@@ -244,6 +267,9 @@ def seed_fake(db: Session, agora: datetime | None = None) -> None:
     posts = _criar_posts(db, usuarios, agora, rng)
     _criar_interacoes(db, posts, seguidores, agora, rng)
     _criar_conversas(db, usuarios, agora)
+    db.flush()  # dá os ids dos comentários, para as respostas e as curtidas
+    # Outra semente: assim o resto da rede continua igual ao de antes das respostas.
+    _criar_respostas(db, posts, seguidores, agora, random.Random(SEMENTE + 1))
     db.commit()
 
 
@@ -257,6 +283,7 @@ def main() -> None:
         contagens = {nome: db.scalar(select(func.count()).select_from(model))
                      for nome, model in [("usuários", User), ("posts", Post), ("follows", Follow),
                                          ("curtidas", Like), ("comentários", Comment),
+                                         ("curtidas em comentários", CurtidaComentario),
                                          ("mensagens", Mensagem)]}
         print("seed ok: " + ", ".join(f"{n} {nome}" for nome, n in contagens.items()))
         print(f"entre como '{USUARIO_DEMO}' com a senha '{SENHA_SEED}'")

@@ -38,13 +38,15 @@ export function Navegacao() {
 
   return (
     <header className="border-b border-linha bg-superficie">
-      <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-3 px-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:px-6">
+      <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-2 px-4 sm:grid sm:gap-3 sm:grid-cols-[1fr_auto_1fr] sm:px-6">
         {/* No celular o nome some para as abas caberem: o Feed já leva ao início. */}
         <Link href="/" className="hidden justify-self-start text-lg font-semibold text-tinta sm:block">
           {NOME_REDE}
         </Link>
 
-        <nav aria-label="Principal" className="flex gap-4 sm:gap-8">
+        {/* Espaços menores no celular: com gap-4, o topo passava de 360px de
+            largura e a página inteira rolava para o lado. */}
+        <nav aria-label="Principal" className="flex gap-3 sm:gap-8">
           {abas.map(({ href, rotulo, contador, icone }) => {
             // O endereço exato ou uma página dentro dele: /u/ada e /u/ada/editar
             // acendem "Meu diário", mas /u/ada2 (outra pessoa) não.
@@ -85,7 +87,7 @@ export function Navegacao() {
           })}
         </nav>
 
-        <div className="flex items-center gap-3 justify-self-end">
+        <div className="flex items-center gap-2 justify-self-end sm:gap-3">
           {/* A busca (#38): uma lupa, e não mais uma aba, para as abas
               continuarem cabendo no celular. */}
           {eu && (

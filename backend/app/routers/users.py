@@ -27,6 +27,7 @@ from app.schemas.user import (
     UserOut,
     UserPage,
 )
+from app.services import curtidas, salvos
 from app.services import users as service
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
@@ -88,10 +89,14 @@ def posts_do_perfil(
     tag: str | None = None,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
-    _user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     if tag is not None and tag not in TAGS:
         raise HTTPException(status_code=422, detail=f"tag desconhecida: {tag}")
     posts, total = service.posts_do_perfil(db, username, tag, offset, limit)
+    # Sem isto, o coração e o Salvar dos posts do diário apareciam sempre
+    # vazios, mesmo para quem já tinha curtido ou salvado.
+    curtidas.marcar_curtidos(db, user, posts)
+    salvos.marcar_salvos(db, user, posts)
     return PostPage(items=posts, total=total, offset=offset, limit=limit)

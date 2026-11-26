@@ -3,12 +3,20 @@
 // O botão de curtir (#11, Pessoa C). Vai no `rodape` do <CardPost>, em todo
 // lugar que mostra post (feed, perfil e turmas): <BotaoCurtir post={post} />.
 // Muda na hora do clique e desfaz se o backend recusar, para não parecer lento.
+// Também curte um comentário: <BotaoCurtir post={comentario} caminho=".../curtir" />.
 
 import { useState } from "react";
 
 import { apiDelete, apiPost, type Post } from "@/lib/api";
 
-export function BotaoCurtir({ post }: { post: Pick<Post, "id" | "curtidas" | "curtido_por_mim"> }) {
+export function BotaoCurtir({
+  post,
+  caminho = `/posts/${post.id}/curtir`,
+}: {
+  post: Pick<Post, "id" | "curtidas" | "curtido_por_mim">;
+  // A rota de curtir; por padrão, a do post.
+  caminho?: string;
+}) {
   const [curtido, setCurtido] = useState(post.curtido_por_mim);
   const [curtidas, setCurtidas] = useState(post.curtidas);
   const [enviando, setEnviando] = useState(false);
@@ -34,8 +42,8 @@ export function BotaoCurtir({ post }: { post: Pick<Post, "id" | "curtidas" | "cu
     setCurtidas(curtidas + (curtido ? -1 : 1));
     setEnviando(true);
     try {
-      if (curtido) await apiDelete(`/posts/${post.id}/curtir`);
-      else await apiPost(`/posts/${post.id}/curtir`);
+      if (curtido) await apiDelete(caminho);
+      else await apiPost(caminho);
     } catch {
       setCurtido(antes.curtido);
       setCurtidas(antes.curtidas);

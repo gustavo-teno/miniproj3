@@ -174,6 +174,17 @@ entram na tabela "Quem faz o quê" de lá.
 | Curtir mensagem nas DMs | Pessoa A (Gustavo) | Dois toques num balão dizem "valeu" ou "tamo junto" sem precisar escrever, como nos apps de mensagem. |
 | Emoji ao escrever | Pessoa A (Gustavo) | Quem escreve pelo computador também comemora uma lista feita com 🔥 ou 💪, como faria no celular. |
 | Salvar posts | Pessoa A (Gustavo) | Guardar uma explicação boa ou uma lista de questões para rever depois, só para você. |
+| Comentários em árvore e curtir comentário | Pessoa C (Clarisse) | A dúvida de um comentário vira conversa embaixo dele, e uma dica boa ganha um "valeu" sem precisar escrever. |
+
+**Comentários em árvore: a árvore é montada a cada pedido.** O
+`core/arvore.py` recebe os comentários diretos no post (a página pedida) e
+todas as respostas do post, numa consulta só, e pendura cada resposta no pai:
+um dict de filhos por pai numa passada e uma recursão que visita cada
+comentário uma vez, O(n) no número de respostas do post. Não guardamos a
+árvore em memória: a conversa de um post tem dezenas de comentários, então
+montar de novo é barato e ela nunca fica desatualizada quando alguém responde
+ou um post é apagado. A página continua contando só os comentários diretos, e
+a ordem é cronológica em todo nível, como pede o contrato.
 
 **Login sem prazo de validade (escolha consciente).** O token do login vale
 até a pessoa clicar em sair, que apaga a sessão no banco. Uma validade (por
@@ -224,3 +235,26 @@ ela é chamada.
 
 Claude: rascunho deste arquivo e revisão do texto. O conteúdo e as decisões
 foram discutidos e aprovados pelo time.
+
+**Clarisse (Pessoa C: curtidas, comentários, seed e deploy).** Usei o Claude
+Code (Claude Opus) no projeto, com o `CLAUDE.md` do time para ele seguir o
+nosso fluxo: uma branch por feature, commits pequenos em português, PR para o
+fork do time e merge só depois da aprovação de outra pessoa.
+
+- **Para quê:** escrever o código e os testes das minhas features a partir do
+  que eu pedia (curtidas, comentários, o seed com os 25 vestibulandos, as
+  respostas e curtidas em comentários), abrir as issues e os PRs, revisar os
+  PRs da Camila e me guiar no deploy do Render, que eu configurei.
+- **O que foi meu:** escolher o papel e o escopo, decidir o que entrava e o que
+  ficava de fora, testar no navegador e repassar as correções que o Gustavo e a
+  Camila pediam nas revisões, e ainda tomar algumas decisões contrariando a
+  sugestão da IA.
+- **Onde a IA ajudou além do código:** apontou que a ordem cronológica dos
+  comentários é exigida pelo `CATALOGO.md` e pelo teste do núcleo, e achou no
+  `CONTRATO.md` o formato de "Comentários em árvore", que segui nas respostas.
+- **Onde precisei corrigir:** um arquivo de erro do terminal
+  (`bash.exe.stackdump`) entrou num PR sem querer e foi tirado antes da
+  revisão (e passou para o `.gitignore`). Depois disso, os commits passaram a
+  ser feitos arquivo por arquivo. Os textos de erro também saíram fora do
+  padrão do time ("Não deu para...") e foram trocados por "Não foi possível..."
+  depois da revisão do Gustavo.

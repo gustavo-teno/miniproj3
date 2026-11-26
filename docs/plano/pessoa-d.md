@@ -17,11 +17,11 @@ trava outra pessoa vira issue, com o link aqui.
 - **Combinar com B:** os contadores ficam no `GET /usuarios/{username}` dela.
 
 **Ter 24: feed e núcleo verde.**
-- [ ] `GET /feed`, cronológico e paginado, só de quem você segue, com opção de
+- [x] `GET /feed`, cronológico e paginado, só de quem você segue, com opção de
     esconder o bate-papo.
-- [ ] Tela inicial: feed com "carregar mais", o filtro de bate-papo, e o feed vazio
+- [x] Tela inicial: feed com "carregar mais", o filtro de bate-papo, e o feed vazio
     com um convite para conhecer a turma (decisão 3).
-- [ ] Tirar o `@skip` de `test_feed_cronologico_dos_seguidos` e conferir se todos
+- [x] Tirar o `@skip` de `test_feed_cronologico_dos_seguidos` e conferir se todos
     os testes do núcleo passam. É a meta da terça à noite.
 
 **Qua 25: Turmas** (decisão 5).
@@ -56,6 +56,13 @@ estiver mais atrasado.
   (meta, texto do "Outro", `estudou_hoje`, `segue_voce`) e `/posts?tag=`
   (PostOut). "Estudou hoje" usa o dia de Brasília e ignora bate-papo, como a
   ofensiva. Quem não escolheu a meta não entra em turma. Telas ainda faltam.
+- **qui 26:** feed pronto (#16): `GET /feed` cronológico, só de quem você
+  segue, com os filtros do rascunho da Camila (várias matérias em `?tag=` e
+  `esconder_bate_papo`; marcar matéria não esconde o bate-papo). A tela
+  inicial segue o rascunho, com "Carregar mais" e o feed vazio levando para a
+  turma. O próprio post não entra no feed (decisão 3): depois de postar, um
+  aviso leva para o diário. Último `@skip` do núcleo removido. A pasta
+  `/rascunho-feed` ficou para a Camila tirar, já que é dela.
 - **ter 24:** revisão do follow (Camila, #33): textos de erro do `<BotaoSeguir>`
   no padrão do DESIGN.md; clique duplo rápido não dá mais 500 (o
   `IntegrityError` vira 204, como nas curtidas, com teste); `@skip` do teste de

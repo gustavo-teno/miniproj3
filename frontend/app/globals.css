@@ -17,6 +17,10 @@
   --sobre-destaque: #ffffff; /* texto em cima do destaque (botões) */
   --erro: #a3302a; /* texto e borda de avisos de erro */
   --erro-fundo: #fbeeed; /* fundo do aviso de erro */
+  /* A altura dos três blocos da coluna do diário (postar, fogo e horas) no
+     computador: uma só, para os três ficarem iguais e darem para ajustar num
+     lugar só. No celular, cada bloco tem a altura que o conteúdo pedir. */
+  --altura-bloco-diario: 264px;
 }
 
 /* Modo noturno. Na primeira visita, segue o sistema da pessoa; depois que ela
@@ -122,15 +126,24 @@
 }
 
 /* As linhas de pauta do caderno atrás do texto do post: bem leves, no tom do
-   destaque. Precisa de altura de linha fixa (leading-6 = 24px) para as linhas
-   da pauta caírem embaixo de cada linha do texto. */
+   destaque. Precisa de altura de linha fixa para as linhas da pauta caírem
+   embaixo de cada linha do texto: por padrão 24px (leading-6); um campo com
+   outra altura diz qual é com [--altura-linha:20px]. */
 .pauta {
   background-image: repeating-linear-gradient(
     transparent 0,
-    transparent 23px,
-    color-mix(in srgb, var(--destaque) 18%, transparent) 23px,
-    color-mix(in srgb, var(--destaque) 18%, transparent) 24px
+    transparent calc(var(--altura-linha, 24px) - 1px),
+    color-mix(in srgb, var(--destaque) 18%, transparent) calc(var(--altura-linha, 24px) - 1px),
+    color-mix(in srgb, var(--destaque) 18%, transparent) var(--altura-linha, 24px)
   );
+}
+
+/* A pauta num campo de escrever (<textarea>): as linhas começam no texto, e não
+   na borda do campo, e rolam junto quando o texto é maior que o campo. */
+.pauta-campo {
+  background-origin: content-box;
+  background-clip: content-box;
+  background-attachment: local;
 }
 
 /* A cor de cada pessoa (avatar sem foto): 6 tons pastéis e calmos, da mesma
