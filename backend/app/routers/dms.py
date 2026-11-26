@@ -8,11 +8,13 @@ Rotas:
 - POST /dms/{username}: manda uma mensagem (403 se não forem mútuos).
 - GET /dms/{username}/pode-mandar: se são mútuos, para o botão do perfil.
   Separada da conversa porque abrir a conversa marca as mensagens como lidas.
+- POST/DELETE /dms/mensagens/{id}/curtir: o coração dos dois toques (#68).
+  Idempotentes, respondem 204. As curtidas vêm na própria conversa.
 
 /dms/nao-lidas nunca vira conversa com alguém: nome de usuário não tem hífen.
 """
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.orm import Session
 
 from app.db import get_db
@@ -76,3 +78,23 @@ def enviar_mensagem(
     db: Session = Depends(get_db),
 ):
     return service.enviar(db, user, username, dados)
+
+
+@router.post("/mensagens/{mensagem_id}/curtir", status_code=204)
+def curtir_mensagem(
+    mensagem_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    service.curtir(db, user, mensagem_id)
+    return Response(status_code=204)
+
+
+@router.delete("/mensagens/{mensagem_id}/curtir", status_code=204)
+def descurtir_mensagem(
+    mensagem_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    service.descurtir(db, user, mensagem_id)
+    return Response(status_code=204)
