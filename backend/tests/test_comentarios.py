@@ -147,3 +147,53 @@ def test_apagar_post_apaga_respostas_e_curtidas_dos_comentarios(client, logar):
     with SessionLocal() as db:
         assert db.scalar(select(func.count()).select_from(Comment)) == 0
         assert db.scalar(select(func.count()).select_from(CurtidaComentario)) == 0
+
+
+# ---------- VER CONVERSA ----------
+
+
+def test_ver_conversa_traz_o_comentario_com_toda_a_arvore(client, logar):
+    ana, bia, post_id, pai_id = _post_com_comentario(client, logar)
+    url = f"/posts/{post_id}/comentarios"
+    filho = client.post(url, json={"texto": "a", "parent_id": pai_id}, headers=ana).json()["id"]
+    neto = client.post(url, json={"texto": "b", "parent_id": filho}, headers=bia).json()["id"]
+    client.post(url, json={"texto": "c", "parent_id": neto}, headers=ana)
+    client.post(f"{url}/{neto}/curtir", headers=bia)
+    # Outro comentário do post não entra na conversa.
+    client.post(url, json={"texto": "solto"}, headers=ana)
+
+    r = client.get(f"{url}/{pai_id}", headers=bia)
+    assert r.status_code == 200
+    c = r.json()
+    assert c["texto"] == "qual parte?"
+    assert c["respostas"][0]["texto"] == "a"
+    neto_json = c["respostas"][0]["respostas"][0]
+    assert (neto_json["texto"], neto_json["curtido_por_mim"]) == ("b", True)
+    assert neto_json["respostas"][0]["texto"] == "c"
+
+    # Abrir a conversa a partir de uma resposta também funciona.
+    assert client.get(f"{url}/{neto}", headers=ana).json()["respostas"][0]["texto"] == "c"
+
+
+def test_ver_conversa_de_outro_post_ou_inexistente_da_404(client, logar):
+    ana, _bia, post_id, pai_id = _post_com_comentario(client, logar)
+    outro = client.post("/posts", json={"texto": "outro post"}, headers=ana).json()["id"]
+    assert client.get(f"/posts/{outro}/comentarios/{pai_id}", headers=ana).status_code == 404
+    assert client.get(f"/posts/{post_id}/comentarios/999", headers=ana).status_code == 404
+    assert client.get(f"/posts/{post_id}/comentarios/{pai_id}").status_code == 401
+
+
+def test_respostas_param_no_limite_de_profundidade(client, logar):
+    from app.services.comentarios import PROFUNDIDADE_MAXIMA
+
+    ana, _bia, post_id, pai_id = _post_com_comentario(client, logar)
+    url = f"/posts/{post_id}/comentarios"
+    # O comentário direto é o nível 1; as respostas vão até o último nível permitido.
+    for _ in range(PROFUNDIDADE_MAXIMA - 1):
+        r = client.post(url, json={"texto": "mais uma", "parent_id": pai_id}, headers=ana)
+        assert r.status_code == 201
+        pai_id = r.json()["id"]
+
+    r = client.post(url, json={"texto": "funda demais", "parent_id": pai_id}, headers=ana)
+    assert r.status_code == 422
+    assert "limite" in r.json()["detail"]
