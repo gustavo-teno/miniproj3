@@ -17,6 +17,7 @@
   --sobre-destaque: #ffffff; /* texto em cima do destaque (botões) */
   --erro: #a3302a; /* texto e borda de avisos de erro */
   --erro-fundo: #fbeeed; /* fundo do aviso de erro */
+  --presenca: #1f7a46; /* verde de "estudou hoje" nas Turmas (contraste AA no branco) */
   /* A altura dos três blocos da coluna do diário (postar, fogo e horas) no
      computador: uma só, para os três ficarem iguais e darem para ajustar num
      lugar só. No celular, cada bloco tem a altura que o conteúdo pedir. */
@@ -39,6 +40,7 @@
     --sobre-destaque: #13171d;
     --erro: #f2a7a0;
     --erro-fundo: #3a2224;
+    --presenca: #7fd6a2;
   }
 }
 
@@ -54,6 +56,7 @@
   --sobre-destaque: #13171d;
   --erro: #f2a7a0;
   --erro-fundo: #3a2224;
+  --presenca: #7fd6a2;
 }
 
 /* A cor de uma matéria (etiqueta, quadrado do símbolo). O elemento recebe as
@@ -202,6 +205,7 @@
   --color-sobre-destaque: var(--sobre-destaque);
   --color-erro: var(--erro);
   --color-erro-fundo: var(--erro-fundo);
+  --color-presenca: var(--presenca);
 
   /* Lexend em tudo (300 no texto corrido, 400 na interface, 600 em nomes e
      títulos) e uma mono pequena para números e @usuário. */
