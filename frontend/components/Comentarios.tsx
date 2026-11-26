@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
 import { Avatar } from "@/components/Avatar";
+import { AvisoErro } from "@/components/FormAuth";
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { apiGet, apiPost, type Comentario, type ComentarioPage, type Post } from "@/lib/api";
 import { dataCompleta, tempoDesde } from "@/lib/tempo";
@@ -174,7 +175,11 @@ export function Comentarios({ postId }: { postId: number }) {
       {!carregando && !erro && total === 0 && (
         <p className="mt-4 text-sm text-tinta-suave">Ninguém comentou ainda. Que tal uma dica ou um incentivo?</p>
       )}
-      {erro && <p className="mt-4 text-sm text-erro">{erro}</p>}
+      {erro && (
+        <div className="mt-4">
+          <AvisoErro texto={erro} />
+        </div>
+      )}
 
       {comentarios.length < total && (
         <button
@@ -215,7 +220,11 @@ export function ConversaDoComentario({ postId, comentarioId }: { postId: number;
       <Link href={`/posts/${postId}`} className="text-sm font-semibold text-destaque hover:underline">
         ← Todos os comentários
       </Link>
-      {erro && <p className="mt-4 text-sm text-erro">{erro}</p>}
+      {erro && (
+        <div className="mt-4">
+          <AvisoErro texto={erro} />
+        </div>
+      )}
       {!raiz && !erro && <p className="mt-4 text-sm text-tinta-suave">Carregando...</p>}
       {raiz && (
         <>
@@ -291,7 +300,7 @@ function ItemComentario({
           {respondeA && <p className="text-xs text-tinta-suave">em resposta a {respondeA}</p>}
           <p className="mt-0.5 whitespace-pre-line break-words font-light">{c.texto}</p>
 
-          <div className="mt-1.5 flex items-center gap-5 text-xs text-tinta-suave">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-tinta-suave">
             <BotaoCurtir post={c} caminho={`/posts/${postId}/comentarios/${c.id}/curtir`} />
             <button
               type="button"
@@ -301,8 +310,13 @@ function ItemComentario({
             >
               Responder
             </button>
+            {/* No celular o link ganha uma linha só dele: ao lado do "Responder",
+                ele quebrava em três linhas. */}
             {recolhido && (
-              <Link href={linkDaConversa} className="font-semibold text-destaque hover:underline">
+              <Link
+                href={linkDaConversa}
+                className="basis-full whitespace-nowrap font-semibold text-destaque hover:underline sm:basis-auto"
+              >
                 Ver conversa ({quantas} respostas)
               </Link>
             )}

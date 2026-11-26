@@ -9,6 +9,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
+import { AvisoErro } from "@/components/FormAuth";
 import { apiGet, type Post } from "@/lib/api";
 import { useExigeLogin } from "@/lib/useExigeLogin";
 
@@ -29,7 +30,13 @@ export function FolhaDoPost({ id, embaixo }: { id: string; embaixo: (post: Post)
   }, [liberado, id]);
 
   if (!liberado) return null;
-  if (erro) return <p className="text-tinta-suave">{erro}</p>;
+  if (erro) {
+    return (
+      <div className="mx-auto max-w-2xl">
+        <AvisoErro texto={erro} />
+      </div>
+    );
+  }
   if (!post) return <p className="text-tinta-suave">Carregando...</p>;
 
   return (
