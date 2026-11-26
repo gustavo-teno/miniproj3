@@ -11,15 +11,27 @@ import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
 import { AvisoErro } from "@/components/FormAuth";
 import { apiGet, type Post } from "@/lib/api";
+import { precarregar } from "@/lib/precarregar";
 import { useExigeLogin } from "@/lib/useExigeLogin";
 
-export function FolhaDoPost({ id, embaixo }: { id: string; embaixo: (post: Post) => ReactNode }) {
+export function FolhaDoPost({
+  id,
+  embaixo,
+  precarregar: caminhoDeBaixo,
+}: {
+  id: string;
+  embaixo: (post: Post) => ReactNode;
+  // O pedido do que vai embaixo (a conversa), feito junto com o do post para
+  // as duas esperas não se somarem.
+  precarregar?: string;
+}) {
   const liberado = useExigeLogin();
   const [post, setPost] = useState<Post | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
     if (!liberado) return;
+    if (caminhoDeBaixo) precarregar(caminhoDeBaixo);
     apiGet<Post>(`/posts/${id}`)
       .then(setPost)
       // A mensagem vem do backend: "post não encontrado" no 404, ou o aviso
@@ -27,7 +39,7 @@ export function FolhaDoPost({ id, embaixo }: { id: string; embaixo: (post: Post)
       .catch((falha) =>
         setErro(falha instanceof Error ? falha.message : "Não foi possível carregar o post."),
       );
-  }, [liberado, id]);
+  }, [liberado, id, caminhoDeBaixo]);
 
   if (!liberado) return null;
   if (erro) {
@@ -37,7 +49,30 @@ export function FolhaDoPost({ id, embaixo }: { id: string; embaixo: (post: Post)
       </div>
     );
   }
-  if (!post) return <p className="text-tinta-suave">Carregando...</p>;
+  if (!post) {
+    // O desenho da folha enquanto o post chega, como nas outras telas (o
+    // retângulo pulsando), em vez de um "Carregando..." solto no canto.
+    return (
+      <div className="mx-auto max-w-2xl">
+        <div
+          role="status"
+          aria-label="Carregando o post"
+          className="folha rounded-xl border border-linha bg-superficie py-4 pl-7 pr-6"
+        >
+          <div className="flex gap-3 sm:gap-4">
+            <div className="size-11 flex-none animate-pulse rounded-full bg-linha" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 w-1/3 animate-pulse rounded bg-linha" />
+              <div className="h-3 w-1/5 animate-pulse rounded bg-linha" />
+              <div className="h-4 w-full animate-pulse rounded bg-linha" />
+              <div className="h-4 w-2/3 animate-pulse rounded bg-linha" />
+            </div>
+          </div>
+          <div className="mt-6 h-20 animate-pulse rounded-xl bg-linha" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-2xl">
