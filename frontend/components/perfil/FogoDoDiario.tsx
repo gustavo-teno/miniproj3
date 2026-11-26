@@ -167,9 +167,9 @@ export function LegendaFogo({
   return (
     <>
       {/* No painel de quem visita, tudo menor, para caber na altura do bloco do perfil. */}
-      <IconeFogo dias={dados.atual} className={noPainel ? "-mb-0.5 -mt-2 size-24" : "-mb-1 -mt-3.5 size-[140px]"} />
+      <IconeFogo dias={dados.atual} className={noPainel ? "-mb-0.5 -mt-2 size-24" : "-mb-1 -mt-3.5 size-[140px] lg:-mt-2 lg:size-[100px]"} />
       <div className="w-full text-center">
-        <p className={`fogo-${faixaDoFogo(dados.atual)} ${noPainel ? "text-[32px]" : "text-[42px]"} font-bold leading-none tracking-tight`}>
+        <p className={`fogo-${faixaDoFogo(dados.atual)} ${noPainel ? "text-[32px]" : "text-[42px] lg:text-[36px]"} font-bold leading-none tracking-tight`}>
           <span style={{ color: "var(--fogo-texto)" }}>{dados.atual}</span>
         </p>
         <p className={`${noPainel ? "text-[15px]" : "text-lg"} font-semibold leading-snug`}>{dados.atual === 1 ? "dia seguido" : "dias seguidos"}</p>
@@ -207,7 +207,7 @@ export function CaixaFogo({ dados, erro }: { dados: Ofensiva | null; erro: boole
   return (
     <section
       aria-label="Ofensiva"
-      className="flex h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-linha bg-superficie px-4 py-2"
+      className="flex h-[280px] flex-col lg:h-[var(--altura-bloco-diario)] items-center justify-center overflow-hidden rounded-2xl border border-linha bg-superficie px-4 py-2"
     >
       {erro ? (
         <p className="text-sm text-tinta-suave">Não foi possível carregar a ofensiva.</p>
