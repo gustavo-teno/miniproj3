@@ -24,6 +24,10 @@ class NotificacaoOut(BaseModel):
     # "seguiu", os dois ficam vazios e a linha leva ao perfil de quem seguiu.
     post_id: int | None = None
     comentario_id: int | None = None
+    # O comentário cuja conversa a linha abre ("Ver conversa"), em vez da
+    # página do post: na resposta, o seu comentário que foi respondido; na
+    # curtida de comentário, o próprio comentário. Vazio nos outros tipos.
+    conversa_id: int | None = None
     # O começo do texto: do comentário (comentou, respondeu, curtiu seu
     # comentário) ou do post (curtiu seu post).
     trecho: str = ""

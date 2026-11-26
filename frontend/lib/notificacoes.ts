@@ -21,6 +21,8 @@ export type Notificacao = {
   nova: boolean;
   post_id: number | null;
   comentario_id: number | null;
+  // A conversa que a linha abre (resposta e curtida de comentário).
+  conversa_id: number | null;
   trecho: string;
 };
 

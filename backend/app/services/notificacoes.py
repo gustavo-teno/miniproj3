@@ -115,6 +115,8 @@ def _montar(db: Session, eu: User) -> list[NotificacaoOut]:
                 nova=nova(c.created_at),
                 post_id=c.post_id,
                 comentario_id=c.id,
+                # A resposta abre a conversa do seu comentário, com ela embaixo.
+                conversa_id=c.parent_id if c.parent_id in ids_dos_meus_comentarios else None,
                 trecho=_trecho(c.texto),
             )
         )
@@ -146,6 +148,7 @@ def _montar(db: Session, eu: User) -> list[NotificacaoOut]:
                 nova=nova(quando),
                 post_id=post_id,
                 comentario_id=comentario_id,
+                conversa_id=comentario_id,
                 trecho=_trecho(texto),
             )
         )

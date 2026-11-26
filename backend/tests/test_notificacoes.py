@@ -64,8 +64,18 @@ def test_resposta_ao_meu_comentario(client, logar):
     comentar(client, bia, post_id, "por substituição", parent_id=meu)
     client.post(f"/posts/{post_id}/comentarios/{meu}/curtir", headers=bia)
 
-    tipos = [n["tipo"] for n in notificacoes(client, ana)]
-    assert tipos == ["curtida_comentario", "resposta"]
+    lista = notificacoes(client, ana)
+    assert [n["tipo"] for n in lista] == ["curtida_comentario", "resposta"]
+    # As duas abrem a conversa do comentário da ana ("Ver conversa").
+    assert [n["conversa_id"] for n in lista] == [meu, meu]
+
+
+def test_comentario_no_post_abre_o_post(client, logar):
+    ana, bia = logar("ana"), logar("bia")
+    post_id = postar(client, ana)
+    comentar(client, bia, post_id)
+
+    assert notificacoes(client, ana)[0]["conversa_id"] is None
 
 
 def test_resposta_no_meu_post_nao_vira_dois_avisos(client, logar):

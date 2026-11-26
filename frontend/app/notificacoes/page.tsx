@@ -110,7 +110,10 @@ function frase(n: Notificacao): string {
   }
 }
 
+// Resposta e curtida de comentário abrem a conversa do comentário ("Ver
+// conversa"), e não o post inteiro, onde ele poderia estar lá embaixo.
 function destino(n: Notificacao): string {
   if (n.tipo === "seguiu" || n.post_id === null) return `/u/${n.pessoa.username}`;
+  if (n.conversa_id !== null) return `/posts/${n.post_id}/comentarios/${n.conversa_id}`;
   return `/posts/${n.post_id}`;
 }
