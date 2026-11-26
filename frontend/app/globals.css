@@ -20,7 +20,8 @@
   --presenca: #1f7a46; /* verde de "estudou hoje" nas Turmas (contraste AA no branco) */
   /* A altura dos três blocos da coluna do diário (postar, fogo e horas) no
      computador: uma só, para os três ficarem iguais e darem para ajustar num
-     lugar só. No celular, cada bloco tem a altura que o conteúdo pedir. */
+     lugar só. Abaixo de lg (celular e tablet), os três têm 280px fixos
+     (h-[280px] em cada componente), também iguais entre si. */
   --altura-bloco-diario: 264px;
 }
 
