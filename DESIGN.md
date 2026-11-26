@@ -8,8 +8,8 @@ rejeita) está no [`PRODUCT.md`](PRODUCT.md).
 A área é da Pessoa B (Camila). Se algo aqui não servir, avise antes de criar
 um padrão novo: se for bom, ele entra neste arquivo.
 
-Atualizado em 25/11, depois do feedback do Gustavo (#52) e das dicas da
-Clarisse (#54).
+Atualizado em 26/11, depois do feedback do Gustavo (#52), das dicas da
+Clarisse (#54), do topo do perfil no celular (#71) e da página do post (#73).
 
 ## A ideia em uma frase
 
@@ -166,7 +166,19 @@ títulos de página. Texto longo leva `leading-relaxed`; o texto do post leva
 Espaçamentos mais usados: `gap-2` e `gap-3` entre itens, `p-3` e `p-4` dentro
 de caixas, `p-6` em caixas de formulário. A página tem largura máxima de
 `1320px` com `px-6`, já no `layout.tsx`. No perfil, a coluna da direita (postar,
-fogo e horas) tem 248px, com `gap-4` entre as colunas.
+fogo e horas) tem 248px, com `gap-4` entre as colunas. No computador, os três
+blocos dessa coluna têm a **mesma altura**, definida num lugar só: a variável
+`--altura-bloco-diario` (264px, no `globals.css`). Abaixo de `lg`, os três têm
+`280px` fixos (`h-[280px]`), também iguais entre si. Aqui, "computador" quer
+dizer a partir de `lg` (1024px), não de `sm`.
+
+**O topo do perfil no celular.** O avatar divide a linha só com o nome e o @; a
+meta, a bio, os contadores e os botões usam a largura toda embaixo. Os botões
+**Seguindo** e **Mensagem** dividem a linha (o **Seguir** sozinho ocupa a linha
+toda), e o **Editar perfil** desce para uma linha própria. No computador, o
+avatar fica numa coluna à esquerda, como sempre. Para os botões ocuparem a
+largura no celular, `<BotaoSeguir>` e `<BotaoMensagem>` aceitam o prop
+`cheioNoCelular`; sem ele, ficam com o tamanho do texto.
 
 O layout é desenhado primeiro para **computador** (tela larga). Celular é um
 extra, mas não deixe nada quebrar abaixo de `sm`.
@@ -179,13 +191,36 @@ uma **folha solta** (`<CardPost>`, classe `.folha` do `globals.css`):
 - o canto de cima à direita é **dobrado** (a dobra usa a cor das bordas);
 - uma **listra lavanda** fininha faz de margem de caderno, à esquerda;
 - o texto do post tem **linhas de pauta** bem leves atrás (classe `.pauta`, que
-  precisa de `leading-6`);
+  precisa de uma altura de linha fixa: `leading-6` por padrão, ou outra altura
+  dita pela variável `--altura-linha`). As caixas de **escrever** um post
+  ("Postar no diário" e o `<FormPost>`) também têm a pauta (`.pauta-campo`,
+  que faz as linhas começarem no texto e rolarem com ele). As **mensagens** e os
+  **comentários** não têm;
 - o nome da matéria vem com **marca-texto** na cor dela (`.marca-materia`).
 
 As folhas ficam soltas, com `space-y-4` entre elas, e a lista leva o nome do
 caderno em cima ("Todas as publicações", "Caderno de Física"). **Não ponha uma
 caixa com borda em volta de um `<CardPost>`**: a folha já tem a própria borda e
 ficaria borda dupla.
+
+**Clicar no post abre a página dele** (`/posts/{id}`), como no Twitter. Os
+botões e links de dentro (curtir, salvar, o nome da pessoa) continuam fazendo o
+que fazem, e selecionar texto para copiar não abre o post. Na própria página do
+post, o card não é clicável (`abrirAoClicar={false}`).
+
+### A página do post
+
+O post e os comentários ficam na **mesma folha**, sem caixas separadas: o
+`<CardPost>` recebe a conversa em `embaixo`. Logo embaixo do post vem o título
+("N comentários") e a caixa de **comentar**, com contorno contínuo, que cresce
+com o texto. Cada **comentário** é uma caixinha de fundo branco, com uma
+**fitinha** lavanda no topo, como um papel colado na folha. As respostas dentro
+de um comentário e a curtida em cada comentário já existem (#83): embaixo do
+texto ficam o coração com o número e o "Responder", que abre um campo na hora, e
+as respostas ficam recuadas dentro da mesma caixinha. Do terceiro nível em
+diante as respostas não recuam mais (no celular o texto ficaria espremido):
+elas vêm numa lista só, cada uma dizendo "em resposta a" e o nome de quem
+respondem.
 
 ## Padrões prontos
 
@@ -226,9 +261,12 @@ Use o que já existe antes de criar um novo.
 
 | Componente | Para quê |
 |---|---|
-| `<CardPost post rodape>` | o post, igual no feed, no perfil e nas turmas. Botões (curtir, comentar) entram no `rodape`, sem mexer no card |
+| `<CardPost post rodape embaixo abrirAoClicar>` | o post, igual no feed, no perfil e nas turmas. Botões (curtir, comentar, salvar) entram no `rodape`; a conversa da página do post entra em `embaixo`. Clicar nele abre a página do post |
 | `<FormPost autor onPostado>` | o atalho de postar: uma linha fechada, que abre com matéria e tempo de estudo |
-| `<BotaoCurtir post>` e `<LinkComentarios post>` | curtir e comentar, no `rodape` do `<CardPost>` |
+| `<BotaoCurtir post>`, `<LinkComentarios post>` e `<BotaoSalvar post>` | curtir, comentar e salvar, no `rodape` do `<CardPost>`. Os salvos ficam na página `/salvos`, que abre pelo menu da engrenagem. O `<BotaoCurtir>` também curte um comentário: `<BotaoCurtir post={comentario} caminho=".../curtir" />`, com o `caminho` da rota de curtir do comentário |
+| `<Comentarios postId>` | a conversa da página do post: a caixa de comentar e as caixinhas dos comentários |
+| `<BotaoEmoji aoEscolher>` | o botão de emoji (carinha) nas caixas de escrever: uma barra com os mais usados e um "+" com todos |
+| `<BotaoMensagem username seguidores>` | o botão do perfil que leva à conversa; só aparece entre mútuos |
 | `<BotaoSeguir username onMudou>` | seguir e deixar de seguir; o texto "Seguir"/"Seguindo" já diz o estado |
 | `<TagMateria tag>` | etiqueta com símbolo e nome da matéria |
 | `<SimboloMateria tag>` | só o símbolo (usa a cor do texto em volta) |
@@ -238,6 +276,15 @@ Use o que já existe antes de criar um novo.
 | `<FogoDoDiario>` / `<PainelFogo>` | o fogo da ofensiva com a legenda, no diário e no perfil de quem visita |
 | `<HorasEstudadas>` | as horas da semana, só para a dona do perfil |
 | `<BoasVindasDeVolta>` | a saudação do feed, só na primeira visita depois do login |
+
+### Mensagens (DMs)
+
+A conversa tem o **topo** (seta de voltar, foto e nome) e a **caixa de escrever**
+grudados na tela, como nos apps de mensagem. Os balões de quem escreve são
+lavanda cheio, e os do outro, lavanda suave. **Dois cliques (ou dois toques)** num
+balão põem um ❤️ no canto; repetir tira. A aba "Mensagens" do topo mostra o
+número de não lidas, e no celular vira só um balão com o número, para a barra
+caber.
 
 ### Avatares
 
