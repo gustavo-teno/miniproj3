@@ -77,6 +77,26 @@ def test_posts_do_perfil_filtram_por_tag_e_paginam(client, logar):
     assert [p["texto"] for p in resto["items"]] == ["bio 0"]
 
 
+def test_posts_do_perfil_dizem_o_que_eu_curti_e_salvei(client, logar):
+    ana = logar("ana")
+    bia = logar("bia")
+    curtido = postar(client, ana, "biologia", texto="curtido e salvo")
+    postar(client, ana, "fisica", texto="nada")
+    assert client.post(f"/posts/{curtido['id']}/curtir", headers=bia).status_code == 204
+    assert client.post(f"/posts/{curtido['id']}/salvar", headers=bia).status_code == 204
+
+    # Quem curtiu e salvou vê o coração e o Salvar marcados no diário.
+    da_bia = {p["texto"]: p for p in client.get("/usuarios/ana/posts", headers=bia).json()["items"]}
+    assert da_bia["curtido e salvo"]["curtido_por_mim"] is True
+    assert da_bia["curtido e salvo"]["salvo_por_mim"] is True
+    assert da_bia["nada"]["curtido_por_mim"] is False
+    assert da_bia["nada"]["salvo_por_mim"] is False
+
+    # A dona do diário não curtiu nem salvou: para ela, tudo vazio.
+    da_ana = client.get("/usuarios/ana/posts", headers=ana).json()["items"]
+    assert not any(p["curtido_por_mim"] or p["salvo_por_mim"] for p in da_ana)
+
+
 def test_posts_com_tag_desconhecida_da_422(client, logar):
     ana = logar("ana")
     assert client.get("/usuarios/ana/posts?tag=astrologia", headers=ana).status_code == 422
