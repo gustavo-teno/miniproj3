@@ -7,9 +7,14 @@
 //   do post (CardPost `embaixo`): o campo para comentar vem logo embaixo do post,
 //   e os comentários, do mais antigo para o mais novo, em caixinhas, com
 //   "carregar mais". Cada comentário tem curtida e "Responder", e as respostas
-//   ficam recuadas dentro da caixinha (comentários em árvore).
+//   ficam recuadas dentro da caixinha (comentários em árvore). Um comentário
+//   com RECOLHER_A_PARTIR respostas ou mais mostra só "Ver conversa".
+// - <ConversaDoComentario postId=... comentarioId=... /> é a tela "Ver
+//   conversa" (/posts/{id}/comentarios/{comentarioId}): o comentário em
+//   destaque, com todas as respostas dele.
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
 import { Avatar } from "@/components/Avatar";
@@ -20,6 +25,9 @@ import { dataCompleta, tempoDesde } from "@/lib/tempo";
 // O mesmo limite do backend (schemas/comentario.py), para avisar antes de enviar.
 const MAX_TEXTO = 500;
 const POR_PAGINA = 20;
+// A partir de quantas respostas a conversa sai da página do post e vai para a
+// tela dela, como no Twitter: a página do post continua curta.
+const RECOLHER_A_PARTIR = 3;
 
 export function LinkComentarios({ post }: { post: Pick<Post, "id" | "comentarios"> }) {
   return (
@@ -55,6 +63,19 @@ function achatar(c: Comentario): { comentario: Comentario; respondeA: string }[]
   return c.respostas.flatMap((r) => [{ comentario: r, respondeA: c.autor.name }, ...achatar(r)]);
 }
 
+// Se o comentário de id `id` é este ou uma resposta dele, em qualquer nível.
+function contem(c: Comentario, id: number): boolean {
+  return c.id === id || c.respostas.some((r) => contem(r, id));
+}
+
+// Quantas respostas o comentário tem, em todos os níveis.
+function contarRespostas(c: Comentario): number {
+  return c.respostas.reduce((soma, r) => soma + 1 + contarRespostas(r), 0);
+}
+
+const CAIXINHA =
+  "relative rounded-xl border bg-superficie px-3 py-2.5 before:absolute before:-top-1.5 before:left-3.5 before:h-3 before:w-11 before:rounded-[3px] before:bg-[color-mix(in_srgb,var(--destaque)_16%,var(--superficie))]";
+
 export function Comentarios({ postId }: { postId: number }) {
   const [comentarios, setComentarios] = useState<Comentario[]>([]);
   // `total` conta só os comentários diretos no post (é o que a página pagina);
@@ -67,6 +88,7 @@ export function Comentarios({ postId }: { postId: number }) {
   const [enviadoNoFim, setEnviadoNoFim] = useState(false);
   // O comentário cuja caixa de resposta está aberta (uma por vez).
   const [respondendo, setRespondendo] = useState<number | null>(null);
+  const router = useRouter();
 
   const carregar = useCallback(
     async (offset: number) => {
@@ -100,6 +122,12 @@ export function Comentarios({ postId }: { postId: number }) {
     if (novo.parent_id !== null) {
       setComentarios((atuais) => pendurar(atuais, novo));
       setRespondendo(null);
+      // Se com ela a conversa passa a ser recolhida, a resposta sumiria da tela:
+      // quem respondeu vai direto para a conversa, onde ela aparece.
+      const raiz = comentarios.find((c) => contem(c, novo.parent_id!));
+      if (raiz && contarRespostas(raiz) + 1 >= RECOLHER_A_PARTIR) {
+        router.push(`/posts/${postId}/comentarios/${raiz.id}`);
+      }
       return;
     }
     setTotal((t) => t + 1);
@@ -114,7 +142,7 @@ export function Comentarios({ postId }: { postId: number }) {
     setComentarios((atuais) => [...atuais, novo]);
   }
 
-  const conversa = { postId, respondendo, setRespondendo, onComentou: adicionar };
+  const conversa = { postId, respondendo, setRespondendo, onComentou: adicionar, recolher: true };
 
   return (
     <section aria-label="Comentários">
@@ -136,10 +164,7 @@ export function Comentarios({ postId }: { postId: number }) {
           {comentarios.map((c) => (
             // Cada comentário é uma caixinha com uma fitinha no topo, como um papel
             // colado na folha do post. As respostas ficam dentro dela.
-            <li
-              key={c.id}
-              className="relative rounded-xl border border-linha bg-superficie px-3 py-2.5 before:absolute before:-top-1.5 before:left-3.5 before:h-3 before:w-11 before:rounded-[3px] before:bg-[color-mix(in_srgb,var(--destaque)_16%,var(--superficie))]"
-            >
+            <li key={c.id} className={`${CAIXINHA} border-linha`}>
               <ItemComentario comentario={c} nivel={0} {...conversa} />
             </li>
           ))}
@@ -165,11 +190,63 @@ export function Comentarios({ postId }: { postId: number }) {
   );
 }
 
+// A tela "Ver conversa": o comentário em destaque, com todas as respostas dele
+// (nada recolhido), e o caminho de volta para a conversa do post.
+export function ConversaDoComentario({ postId, comentarioId }: { postId: number; comentarioId: string }) {
+  const [raiz, setRaiz] = useState<Comentario | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
+  const [respondendo, setRespondendo] = useState<number | null>(null);
+
+  useEffect(() => {
+    apiGet<Comentario>(`/posts/${postId}/comentarios/${comentarioId}`)
+      .then(setRaiz)
+      .catch((falha) =>
+        setErro(falha instanceof Error ? falha.message : "Não foi possível carregar a conversa."),
+      );
+  }, [postId, comentarioId]);
+
+  function adicionar(nova: Comentario) {
+    setRaiz((atual) => (atual ? pendurar([atual], nova)[0] : atual));
+    setRespondendo(null);
+  }
+
+  return (
+    <section aria-label="Conversa">
+      <Link href={`/posts/${postId}`} className="text-sm font-semibold text-destaque hover:underline">
+        ← Todos os comentários
+      </Link>
+      {erro && <p className="mt-4 text-sm text-erro">{erro}</p>}
+      {!raiz && !erro && <p className="mt-4 text-sm text-tinta-suave">Carregando...</p>}
+      {raiz && (
+        <>
+          <h2 className="mt-3 text-sm font-semibold text-tinta-suave">
+            {contarRespostas(raiz) === 1 ? "1 resposta" : `${contarRespostas(raiz)} respostas`}
+          </h2>
+          {/* O comentário da conversa fica em destaque, com a borda na cor do site. */}
+          <div className={`${CAIXINHA} mt-4 border-destaque/50`}>
+            <ItemComentario
+              comentario={raiz}
+              nivel={0}
+              postId={postId}
+              respondendo={respondendo}
+              setRespondendo={setRespondendo}
+              onComentou={adicionar}
+              recolher={false}
+            />
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
 type Conversa = {
   postId: number;
   respondendo: number | null;
   setRespondendo: (id: number | null) => void;
   onComentou: (c: Comentario) => void;
+  // Na página do post, uma conversa grande vira o link "Ver conversa".
+  recolher: boolean;
 };
 
 // Um comentário com a curtida, o "Responder" e as respostas dele. O nível 0 é o
@@ -181,9 +258,13 @@ function ItemComentario({
   respondeA,
   ...conversa
 }: Conversa & { comentario: Comentario; nivel: number; respondeA?: string }) {
-  const { postId, respondendo, setRespondendo, onComentou } = conversa;
-  const respostas =
-    nivel === 0
+  const { postId, respondendo, setRespondendo, onComentou, recolher } = conversa;
+  const linkDaConversa = `/posts/${postId}/comentarios/${c.id}`;
+  const quantas = contarRespostas(c);
+  const recolhido = recolher && nivel === 0 && quantas >= RECOLHER_A_PARTIR;
+  const respostas = recolhido
+    ? []
+    : nivel === 0
       ? c.respostas.map((r) => ({ comentario: r, respondeA: undefined }))
       : nivel === 1
         ? achatar(c)
@@ -220,6 +301,11 @@ function ItemComentario({
             >
               Responder
             </button>
+            {recolhido && (
+              <Link href={linkDaConversa} className="font-semibold text-destaque hover:underline">
+                Ver conversa ({quantas} respostas)
+              </Link>
+            )}
           </div>
 
           {respondendo === c.id && (
