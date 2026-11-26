@@ -262,13 +262,22 @@ export type Post = {
   salvo_por_mim: boolean; // idem, para o botão Salvar (#64)
 };
 
-// Um comentário de GET /posts/{id}/comentarios (#12, Pessoa C).
+// Um comentário de GET /posts/{id}/comentarios (#12, Pessoa C), com as
+// respostas dentro (comentários em árvore) e as curtidas dele.
 export type Comentario = {
   id: number;
   autor: Autor;
   texto: string;
   created_at: string;
+  parent_id: number | null; // o comentário que este responde; null se é direto no post
+  curtidas: number;
+  curtido_por_mim: boolean;
+  respostas: Comentario[];
 };
+
+// A página de comentários conta só os diretos no post; o total com as
+// respostas é o "N comentários" do topo.
+export type ComentarioPage = Page<Comentario> & { total_com_respostas: number };
 
 // GET /usuarios/{username}: a meta (decisão 2) e os contadores do follow (D).
 export type Perfil = User & {

@@ -99,7 +99,7 @@ export function FormPost({
           onChange={(e) => setTexto(e.target.value)}
           placeholder="O que você estudou agora?"
           aria-label="O que você estudou agora?"
-          className="min-w-0 flex-1 resize-none bg-transparent py-1 font-light text-tinta outline-none placeholder:text-tinta-suave"
+          className="pauta pauta-campo min-w-0 flex-1 resize-none bg-transparent py-1 font-light leading-6 text-tinta outline-none placeholder:text-tinta-suave"
         />
       </div>
 

@@ -22,7 +22,7 @@ export function HorasEstudadas({ ofensiva }: { ofensiva: Ofensiva | null }) {
   const maior = Math.max(1, ...(porDia ?? [0]));
 
   return (
-    <section aria-labelledby="titulo-horas" className="flex h-[280px] flex-col rounded-2xl border border-linha bg-superficie px-4 py-3.5">
+    <section aria-labelledby="titulo-horas" className="flex h-[280px] flex-col lg:h-[var(--altura-bloco-diario)] rounded-2xl border border-linha bg-superficie px-4 py-3.5">
       <div className="flex items-baseline justify-between">
         <h2 id="titulo-horas" className="text-[15px] font-semibold">
           Horas estudadas

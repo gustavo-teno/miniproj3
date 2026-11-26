@@ -226,6 +226,21 @@ COMENTARIOS = [
     "Me identifiquei demais.",
 ]
 
+# Respostas de quem postou a quem comentou (comentários em árvore): a conversa
+# continua embaixo do comentário, em vez de virar outro comentário solto. O
+# seed sorteia qual resposta vai em qual comentário, então todas servem para
+# qualquer um deles.
+RESPOSTAS = [
+    "Valeu demais! Amanhã tem mais.",
+    "Obrigada pela força, tava precisando ler isso.",
+    "Bora junto! Me chama na DM.",
+    "Haha a gente se entende.",
+    "Anotado! Depois te conto como foi.",
+    "Isso aí, um passo de cada vez.",
+    "Que bom que serviu pra você também!",
+    "Tamo junto nessa reta final.",
+]
+
 # Conversas da Ada com três mútuos (DMs, decisão 6), para a caixa de mensagens
 # não abrir vazia no vídeo. Cada uma mostra um uso da DM: combinar uma sessão,
 # cobrar um ao outro e desabafar depois do simulado. Cada mensagem é
