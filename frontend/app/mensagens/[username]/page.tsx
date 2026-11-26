@@ -186,17 +186,19 @@ export default function ConversaPage() {
   if (!liberado) return null;
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col">
+    <div className="mx-auto flex max-w-2xl flex-col lg:h-full lg:max-w-none">
       {/* O topo da conversa fica grudado no alto da tela, como nos apps de
           mensagem: por mais que a conversa seja longa, dá para ver com quem
           se fala e voltar sem rolar para cima. O -mx-6/px-6 estica o fundo
-          até a borda da tela no celular (o <main> tem px-6). */}
-      <header className="sticky top-0 z-20 -mx-6 -mt-6 flex items-center gap-2 border-b border-linha bg-fundo px-6 py-2.5">
+          até a borda da tela no celular (o <main> tem px-6). No computador, a
+          conversa fica ao lado da lista (#91): o topo, as mensagens e a caixa
+          de escrever cabem na coluna, e só as mensagens rolam. */}
+      <header className="sticky top-0 z-20 -mx-6 -mt-6 flex items-center gap-2 border-b border-linha bg-fundo px-6 py-2.5 lg:static lg:m-0 lg:flex-none lg:bg-superficie lg:px-4 lg:py-3">
         <Link
           href="/mensagens"
           aria-label="Voltar para Mensagens"
           title="Mensagens"
-          className="-ml-2 grid size-9 flex-none place-items-center rounded-full text-tinta-suave hover:bg-destaque-fundo hover:text-tinta"
+          className="-ml-2 grid size-9 flex-none place-items-center rounded-full text-tinta-suave hover:bg-destaque-fundo hover:text-tinta lg:hidden"
         >
           <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -213,18 +215,18 @@ export default function ConversaPage() {
         )}
       </header>
 
-      <div className="mt-4 empty:hidden">
+      <div className="mt-4 empty:hidden lg:mx-4">
         <AvisoErro texto={erro} />
       </div>
 
       {!carregou && (
-        <div role="status" aria-label="Carregando a conversa" className="mt-4 h-64 animate-pulse rounded-xl bg-linha" />
+        <div role="status" aria-label="Carregando a conversa" className="mt-4 h-64 animate-pulse rounded-xl bg-linha lg:mx-4" />
       )}
 
       {pessoa && (
         <section
           aria-label={`Conversa com ${pessoa.name}`}
-          className="mt-4 flex min-h-64 flex-col gap-2 rounded-xl border border-linha bg-superficie p-4"
+          className="mt-4 flex min-h-64 flex-col gap-2 rounded-xl border border-linha bg-superficie p-4 lg:m-0 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:rounded-none lg:border-0 lg:bg-transparent lg:px-6"
         >
           {mensagens.length === 0 && (
             <p className="m-auto text-center text-sm text-tinta-suave">
@@ -306,7 +308,7 @@ export default function ConversaPage() {
           // A caixa de escrever fica grudada no pé da tela, como o topo no alto.
           <form
             onSubmit={enviar}
-            className="sticky bottom-0 z-20 -mx-6 -mb-6 mt-3 flex items-end gap-2 border-t border-linha bg-fundo px-6 pb-4 pt-3"
+            className="sticky bottom-0 z-20 -mx-6 -mb-6 mt-3 flex items-end gap-2 border-t border-linha bg-fundo px-6 pb-4 pt-3 lg:static lg:m-0 lg:flex-none lg:bg-superficie lg:px-4 lg:pb-3"
           >
             {/* O emoji à esquerda da caixa, como nos apps de mensagem. */}
             <div className="pb-1">
@@ -333,7 +335,7 @@ export default function ConversaPage() {
           </form>
         ) : (
           // A regra da decisão 6, explicada, para não parecer que a tela quebrou.
-          <p className="mt-3 rounded-xl bg-destaque-fundo p-3 text-center text-sm text-tinta-suave">
+          <p className="mt-3 rounded-xl bg-destaque-fundo p-3 text-center text-sm text-tinta-suave lg:m-4">
             As mensagens são só entre quem se segue mutuamente. Quando vocês se seguirem, dá para conversar
             aqui.
           </p>
