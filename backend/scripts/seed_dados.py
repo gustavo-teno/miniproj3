@@ -226,6 +226,21 @@ COMENTARIOS = [
     "Me identifiquei demais.",
 ]
 
+# Respostas de quem postou a quem comentou (comentários em árvore): a conversa
+# continua embaixo do comentário, em vez de virar outro comentário solto.
+RESPOSTAS = [
+    "Valeu demais! Amanhã tem mais.",
+    "Uso as listas do cursinho e o banco de questões das provas antigas.",
+    "Bora sim! Me chama na DM e a gente combina.",
+    "Obrigada pelo incentivo, tava precisando.",
+    "Vou testar isso, valeu pela dica!",
+    "Durmo umas 7h. Menos que isso eu não rendo.",
+    "Manda a videoaula, por favor!",
+    "Pois é, fazendo questão é que a ficha cai.",
+    "Kkkk a gente se entende.",
+    "Anotado! Depois te conto se funcionou.",
+]
+
 # Conversas da Ada com três mútuos (DMs, decisão 6), para a caixa de mensagens
 # não abrir vazia no vídeo. Cada uma mostra um uso da DM: combinar uma sessão,
 # cobrar um ao outro e desabafar depois do simulado. Cada mensagem é
