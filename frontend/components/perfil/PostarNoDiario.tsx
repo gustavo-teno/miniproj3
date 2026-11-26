@@ -60,7 +60,7 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
     <form
       onSubmit={enviar}
       aria-label="Postar no diário"
-      className="flex h-[280px] flex-col gap-3 rounded-2xl border border-linha bg-superficie p-4"
+      className="flex h-[280px] flex-col gap-3 lg:h-[var(--altura-bloco-diario)] rounded-2xl border border-linha bg-superficie p-4"
     >
       <h2 className="text-[17px] font-semibold">Postar no diário</h2>
 

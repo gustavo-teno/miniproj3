@@ -9,7 +9,10 @@
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { BotaoCurtir } from "@/components/BotaoCurtir";
+import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
+import { LinkComentarios } from "@/components/Comentarios";
 import { EditarPerfil } from "@/components/perfil/EditarPerfil";
 import { EstanteCadernos } from "@/components/perfil/EstanteCadernos";
 import { CaixaFogo, useOfensiva } from "@/components/perfil/FogoDoDiario";
@@ -187,7 +190,19 @@ export default function PaginaPerfil() {
             ) : (
               <>
                 {posts.map((p) => (
-                  <CardPost key={p.id} post={p} />
+                  // A mesma barra do feed, da busca e dos salvos: quem visita o
+                  // diário também curte, comenta e salva dali.
+                  <CardPost
+                    key={p.id}
+                    post={p}
+                    rodape={
+                      <>
+                        <BotaoCurtir post={p} />
+                        <LinkComentarios post={p} />
+                        <BotaoSalvar post={p} />
+                      </>
+                    }
+                  />
                 ))}
                 {posts.length < total && (
                   <div className="text-center">
