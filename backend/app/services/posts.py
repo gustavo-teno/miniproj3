@@ -1,10 +1,11 @@
 """Regras dos posts (#9, Pessoa B). O router só recebe a chamada e chama daqui."""
 
 from fastapi import HTTPException
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.models.comment import Comment
+from app.models.curtida_comentario import CurtidaComentario
 from app.models.like import Like
 from app.models.post import Post
 from app.models.salvo import Salvo
@@ -54,9 +55,12 @@ def editar(db: Session, user: User, post_id: int, dados: PostEditar) -> Post:
 
 def apagar(db: Session, user: User, post_id: int) -> None:
     post = _do_autor(db, user, post_id)
-    # O SQLite não apaga em cascata sozinho: curtidas, comentários e salvos vão
+    # O SQLite não apaga em cascata sozinho: curtidas, comentários (com as
+    # curtidas deles) e salvos vão
     # antes, senão ficam apontando para um post que não existe mais.
     db.execute(delete(Like).where(Like.post_id == post.id))
+    do_post = select(Comment.id).where(Comment.post_id == post.id)
+    db.execute(delete(CurtidaComentario).where(CurtidaComentario.comentario_id.in_(do_post)))
     db.execute(delete(Comment).where(Comment.post_id == post.id))
     db.execute(delete(Salvo).where(Salvo.post_id == post.id))
     db.delete(post)
