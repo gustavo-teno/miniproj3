@@ -1,34 +1,39 @@
 "use client";
 
-// A página de uma turma (#17, Pessoa D; decisão 5): quem está nela, com o
-// botão de seguir (aba Chamada), e o que essas pessoas postaram, com filtro
-// por matéria (aba Posts). Toda turma é aberta para qualquer pessoa olhar.
+// A página de uma turma (#17, Pessoa D; decisão 5; desenho "B · Folha", #94):
+// o que as pessoas da turma postaram, com quem estudou hoje e o filtro por
+// matéria (aba Posts), e quem está nela, numa chamada com o botão de seguir
+// (aba Chamada). Toda turma é aberta para qualquer pessoa olhar.
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { Avatar } from "@/components/Avatar";
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
 import { LinkComentarios } from "@/components/Comentarios";
 import { AvisoErro } from "@/components/FormAuth";
+import { SimboloMateria } from "@/components/SimboloMateria";
 import { CartaoMembro } from "@/components/turmas/CartaoMembro";
-import { resumoDaTurma } from "@/components/turmas/CartaoTurma";
+import { resumoDaTurma, useQuemEstudouHoje } from "@/components/turmas/CartaoTurma";
 import {
   buscarEu,
   buscarMembros,
   buscarPostsDaTurma,
   buscarTurma,
+  buscarTurmas,
   type Membro,
   type Post,
   type TipoTurma,
   type Turma,
 } from "@/lib/api";
+import { estiloDaTag } from "@/lib/materias";
 import { useOpcoes } from "@/lib/opcoes";
 import { useExigeLogin } from "@/lib/useExigeLogin";
 
-type Aba = "chamada" | "posts";
+type Aba = "posts" | "chamada";
 
 export default function TurmaPage() {
   const liberado = useExigeLogin();
@@ -37,8 +42,10 @@ export default function TurmaPage() {
   const tipoTurma: TipoTurma | null = tipo === "vestibular" || tipo === "curso" ? tipo : null;
   const [turma, setTurma] = useState<Turma | null>(null);
   const [eu, setEu] = useState<string | null>(null);
+  // As turmas de quem vê: dizem se esta é "sua turma" e qual é a sua dupla.
+  const [minhas, setMinhas] = useState<Turma[]>([]);
   const [erro, setErro] = useState<string | null>(null);
-  const [aba, setAba] = useState<Aba>("chamada");
+  const [aba, setAba] = useState<Aba>("posts");
 
   useEffect(() => {
     if (!liberado || !tipoTurma) return;
@@ -48,18 +55,25 @@ export default function TurmaPage() {
     buscarEu()
       .then((e) => setEu(e.username))
       .catch(() => {});
+    buscarTurmas()
+      .then((t) => setMinhas(t.minhas))
+      .catch(() => {});
   }, [liberado, tipoTurma, chave]);
 
   if (!liberado) return null;
+
+  const minha = turma !== null && minhas.some((t) => t.tipo === turma.tipo && t.chave === turma.chave);
+  const meuVestibular = minhas.find((t) => t.tipo === "vestibular")?.chave ?? "";
+  const meuCurso = minhas.find((t) => t.tipo === "curso")?.chave ?? "";
 
   const estiloAba = (ativa: boolean) =>
     "border-b-[3px] px-1 py-2 text-[15px] " +
     (ativa ? "border-destaque font-semibold text-destaque" : "border-transparent text-tinta-suave hover:text-tinta");
 
   return (
-    <div className="mx-auto max-w-2xl lg:max-w-none">
+    <div className="mx-auto max-w-2xl lg:max-w-5xl">
       <Link href="/turmas" className="text-sm text-tinta-suave hover:text-tinta">
-        ← Todas as turmas
+        ← Turmas
       </Link>
 
       <div className="mt-3 empty:hidden">
@@ -72,25 +86,33 @@ export default function TurmaPage() {
 
       {turma && (
         <>
-          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-tinta-suave">
-            {turma.tipo === "vestibular" ? "Vestibular" : "Curso"}
-          </p>
-          <h1 className="text-2xl font-semibold">Turma {turma.nome}</h1>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h1 className="text-3xl font-semibold">Turma {turma.nome}</h1>
+            {minha && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-destaque-fundo px-2.5 py-0.5 text-xs font-semibold text-destaque">
+                <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+                  <path d="M12 21s-6-5.6-6-11a6 6 0 1 1 12 0c0 5.4-6 11-6 11Z" />
+                  <circle cx="12" cy="10" r="2.2" />
+                </svg>
+                sua turma
+              </span>
+            )}
+          </div>
           <p className="mt-1 text-sm text-tinta-suave">{resumoDaTurma(turma)}</p>
 
           <div role="tablist" aria-label="O que ver na turma" className="mt-4 flex gap-6 border-b border-linha">
-            <button type="button" role="tab" aria-selected={aba === "chamada"} onClick={() => setAba("chamada")} className={estiloAba(aba === "chamada")}>
-              Chamada
-            </button>
             <button type="button" role="tab" aria-selected={aba === "posts"} onClick={() => setAba("posts")} className={estiloAba(aba === "posts")}>
               Posts
             </button>
+            <button type="button" role="tab" aria-selected={aba === "chamada"} onClick={() => setAba("chamada")} className={estiloAba(aba === "chamada")}>
+              Chamada · <span className="font-numeros">{turma.pessoas}</span>
+            </button>
           </div>
 
-          {aba === "chamada" ? (
-            <AbaChamada tipo={turma.tipo} chave={turma.chave} eu={eu} />
+          {aba === "posts" ? (
+            <AbaPosts turma={turma} />
           ) : (
-            <AbaPosts tipo={turma.tipo} chave={turma.chave} />
+            <AbaChamada turma={turma} eu={eu} meuVestibular={meuVestibular} meuCurso={meuCurso} />
           )}
         </>
       )}
@@ -101,8 +123,19 @@ export default function TurmaPage() {
 const MEMBROS_POR_PAGINA = 50;
 const POSTS_POR_PAGINA = 20;
 
-// Quem está na turma, em ordem de nome, com o botão de seguir.
-function AbaChamada({ tipo, chave, eu }: { tipo: TipoTurma; chave: string; eu: string | null }) {
+// Quem está na turma, numa chamada numerada, com o botão de seguir.
+function AbaChamada({
+  turma,
+  eu,
+  meuVestibular,
+  meuCurso,
+}: {
+  turma: Turma;
+  eu: string | null;
+  meuVestibular: string;
+  meuCurso: string;
+}) {
+  const { tipo, chave } = turma;
   const opcoes = useOpcoes();
   const [membros, setMembros] = useState<Membro[] | undefined>(undefined);
   const [total, setTotal] = useState(0);
@@ -133,14 +166,21 @@ function AbaChamada({ tipo, chave, eu }: { tipo: TipoTurma; chave: string; eu: s
     }
   }
 
+  const presentes = turma.estudaram_hoje;
+
   return (
     <>
-      <div className="mt-4 empty:hidden">
+      <h2 className="mt-5 text-xs font-semibold uppercase tracking-wider text-tinta-suave">
+        Chamada de hoje
+        {presentes > 0 && ` · ${presentes} ${presentes === 1 ? "presente" : "presentes"}`}
+      </h2>
+
+      <div className="mt-2 empty:hidden">
         <AvisoErro texto={erro} />
       </div>
 
       {membros === undefined && !erro && (
-        <div role="status" aria-label="Carregando a chamada" className="mt-4 h-40 animate-pulse rounded-xl bg-linha" />
+        <div role="status" aria-label="Carregando a chamada" className="mt-2 h-40 animate-pulse rounded-xl bg-linha" />
       )}
 
       {membros?.length === 0 && (
@@ -150,13 +190,23 @@ function AbaChamada({ tipo, chave, eu }: { tipo: TipoTurma; chave: string; eu: s
       )}
 
       {membros && membros.length > 0 && (
-        <ul className="mt-4 overflow-hidden rounded-xl border border-linha bg-superficie lg:grid lg:grid-cols-2 lg:gap-3 lg:overflow-visible lg:border-0 lg:bg-transparent">
-          {membros.map((m) => (
-            <li key={m.id} className="border-b border-linha last:border-b-0 lg:rounded-xl lg:border lg:bg-superficie lg:last:border-b">
-              <CartaoMembro membro={m} tipo={tipo} chave={chave} opcoes={opcoes} souEu={m.username === eu} />
+        <ol className="mt-2 divide-y divide-linha rounded-xl border border-linha bg-superficie px-3 sm:px-4">
+          {membros.map((m, i) => (
+            <li key={m.id}>
+              <CartaoMembro
+                membro={m}
+                numero={i + 1}
+                tipo={tipo}
+                chave={chave}
+                opcoes={opcoes}
+                souEu={m.username === eu}
+                mesmaDupla={
+                  Boolean(meuVestibular && meuCurso) && m.vestibular === meuVestibular && m.curso === meuCurso
+                }
+              />
             </li>
           ))}
-        </ul>
+        </ol>
       )}
 
       {membros && membros.length < total && (
@@ -164,18 +214,50 @@ function AbaChamada({ tipo, chave, eu }: { tipo: TipoTurma; chave: string; eu: s
           type="button"
           onClick={verMais}
           disabled={carregandoMais}
-          className="mx-auto mt-4 block rounded-lg border border-linha px-4 py-2 text-sm font-semibold hover:bg-destaque-fundo disabled:opacity-60"
+          className="mt-3 text-sm font-semibold text-destaque hover:underline disabled:opacity-60"
         >
-          {carregandoMais ? "Carregando..." : "Ver mais"}
+          {carregandoMais ? "Carregando..." : `Ver as ${total} pessoas`}
         </button>
       )}
     </>
   );
 }
 
+// Quem da turma estudou hoje, com o anel verde: o mesmo da Chamada.
+function EstudaramHoje({ turma }: { turma: Turma }) {
+  const quem = useQuemEstudouHoje(turma, 12);
+  if (!quem || quem.length === 0) return null;
+  return (
+    <section aria-labelledby="estudaram-hoje" className="mt-4 rounded-xl border border-linha bg-superficie p-4">
+      <h2 id="estudaram-hoje" className="text-xs font-semibold uppercase tracking-wider text-tinta-suave">
+        Estudaram hoje
+      </h2>
+      <ul className="mt-3 flex flex-wrap gap-3">
+        {quem.map((m) => (
+          <li key={m.id}>
+            <Link
+              href={`/u/${m.username}`}
+              title={m.name}
+              className="block rounded-full ring-2 ring-presenca ring-offset-2 ring-offset-superficie"
+            >
+              <Avatar autor={m} grande />
+              <span className="sr-only">{m.name}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-sm text-tinta-suave">
+        <span className="font-numeros">{turma.estudaram_hoje}</span> de{" "}
+        <span className="font-numeros">{turma.pessoas}</span> {turma.pessoas === 1 ? "pessoa" : "pessoas"}
+      </p>
+    </section>
+  );
+}
+
 // O que as pessoas da turma postaram, do mais novo para o mais antigo, com
-// filtro por matéria.
-function AbaPosts({ tipo, chave }: { tipo: TipoTurma; chave: string }) {
+// filtro por matéria em etiquetas, nas cores de cada uma.
+function AbaPosts({ turma }: { turma: Turma }) {
+  const { tipo, chave } = turma;
   const opcoes = useOpcoes();
   const [tag, setTag] = useState("");
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);
@@ -216,23 +298,41 @@ function AbaPosts({ tipo, chave }: { tipo: TipoTurma; chave: string }) {
     }
   }
 
+  const chip = "inline-flex flex-none items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm font-semibold";
+
   return (
     <>
-      <label className="mt-4 flex items-center gap-2 text-sm">
-        <span className="text-tinta-suave">Matéria</span>
-        <select
-          value={tag}
-          onChange={(e) => setTag(e.target.value)}
-          className="min-w-0 rounded-lg border border-linha bg-superficie px-3 py-1.5 text-tinta"
+      <EstudaramHoje turma={turma} />
+
+      {/* No celular as etiquetas rolam para o lado numa linha só; no
+          computador, quebram em mais de uma linha. */}
+      <div role="group" aria-label="Filtrar por matéria" className="-mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap">
+        <button
+          type="button"
+          aria-pressed={tag === ""}
+          onClick={() => setTag("")}
+          className={chip + (tag === "" ? " bg-destaque text-sobre-destaque" : " border border-linha bg-superficie text-tinta-suave")}
         >
-          <option value="">Todas</option>
-          {opcoes?.tags.map((t) => (
-            <option key={t.valor} value={t.valor}>
-              {t.nome}
-            </option>
-          ))}
-        </select>
-      </label>
+          Todas
+        </button>
+        {opcoes?.tags.map((t) => (
+          <button
+            key={t.valor}
+            type="button"
+            aria-pressed={tag === t.valor}
+            onClick={() => setTag(tag === t.valor ? "" : t.valor)}
+            style={estiloDaTag(t.valor)}
+            className={
+              chip +
+              " cor-materia" +
+              (tag === t.valor ? " ring-2 ring-destaque ring-offset-2 ring-offset-fundo" : " opacity-90 hover:opacity-100")
+            }
+          >
+            <SimboloMateria tag={t.valor} className="size-3.5" />
+            {t.nome}
+          </button>
+        ))}
+      </div>
 
       <div className="mt-4 empty:hidden">
         <AvisoErro texto={erro} />

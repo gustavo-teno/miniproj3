@@ -1,16 +1,17 @@
 "use client";
 
-// A aba Turmas (#17, Pessoa D; decisão 5): as turmas de quem está vendo em
-// cima e, embaixo, todas as outras, abertas para qualquer pessoa olhar. A
-// turma sai da meta do perfil, então quem não escolheu a meta é convidado a
+// A aba Turmas (#17, Pessoa D; decisão 5; desenho "B · Folha", #94): as turmas
+// de quem está vendo em cima, com o marcador de caderno, e embaixo uma folha
+// de Vestibulares e uma de Cursos, abertas para qualquer pessoa olhar. A turma
+// sai da meta do perfil, então quem não escolheu a meta é convidado a
 // escolher no diário.
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { AvisoErro } from "@/components/FormAuth";
-import { CartaoTurma } from "@/components/turmas/CartaoTurma";
-import { buscarEu, buscarTurmas, type Turma, type Turmas } from "@/lib/api";
+import { CartaoMinhaTurma, FolhaDeTurmas } from "@/components/turmas/CartaoTurma";
+import { buscarEu, buscarTurmas, type Turmas } from "@/lib/api";
 import { useExigeLogin } from "@/lib/useExigeLogin";
 
 export default function TurmasPage() {
@@ -32,11 +33,9 @@ export default function TurmasPage() {
   if (!liberado) return null;
 
   return (
-    <div className="mx-auto max-w-2xl lg:max-w-none">
+    <div className="mx-auto max-w-2xl lg:max-w-5xl">
       <h1 className="text-2xl font-semibold">Turmas</h1>
-      <p className="mt-1 text-sm text-tinta-suave">
-        Cada vestibular e cada curso forma uma turma. Aqui você encontra quem tem a mesma meta que você.
-      </p>
+      <p className="mt-1 text-sm text-tinta-suave">Quem estuda o mesmo que você.</p>
 
       <div className="mt-4 empty:hidden">
         <AvisoErro texto={erro} />
@@ -49,13 +48,13 @@ export default function TurmasPage() {
       {turmas && (
         <>
           <section aria-labelledby="suas-turmas" className="mt-6">
-            <h2 id="suas-turmas" className="font-semibold">
+            <h2 id="suas-turmas" className="text-xs font-semibold uppercase tracking-wider text-tinta-suave">
               Suas turmas
             </h2>
             {turmas.minhas.length > 0 ? (
-              <div className="mt-2 grid gap-3 sm:grid-cols-2">
+              <div className="mt-2 grid gap-3 sm:grid-cols-2 sm:gap-4">
                 {turmas.minhas.map((t) => (
-                  <CartaoTurma key={`${t.tipo}-${t.chave}`} turma={t} destaque />
+                  <CartaoMinhaTurma key={`${t.tipo}-${t.chave}`} turma={t} />
                 ))}
               </div>
             ) : (
@@ -70,25 +69,13 @@ export default function TurmasPage() {
             )}
           </section>
 
-          <ListaDeTurmas titulo="Vestibulares" id="vestibulares" turmas={turmas.vestibulares} />
-          <ListaDeTurmas titulo="Cursos" id="cursos" turmas={turmas.cursos} />
+          {/* Uma folha de cada tipo, lado a lado no computador. */}
+          <div className="mt-4 grid items-start gap-4 lg:grid-cols-2">
+            <FolhaDeTurmas titulo="Vestibulares" id="vestibulares" turmas={turmas.vestibulares} />
+            <FolhaDeTurmas titulo="Cursos" id="cursos" turmas={turmas.cursos} />
+          </div>
         </>
       )}
     </div>
-  );
-}
-
-function ListaDeTurmas({ titulo, id, turmas }: { titulo: string; id: string; turmas: Turma[] }) {
-  return (
-    <section aria-labelledby={id} className="mt-8">
-      <h2 id={id} className="font-semibold">
-        {titulo}
-      </h2>
-      <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {turmas.map((t) => (
-          <CartaoTurma key={t.chave} turma={t} />
-        ))}
-      </div>
-    </section>
   );
 }
