@@ -175,6 +175,7 @@ entram na tabela "Quem faz o quê" de lá.
 | Emoji ao escrever | Pessoa A (Gustavo) | Quem escreve pelo computador também comemora uma lista feita com 🔥 ou 💪, como faria no celular. |
 | Salvar posts | Pessoa A (Gustavo) | Guardar uma explicação boa ou uma lista de questões para rever depois, só para você. |
 | Comentários em árvore e curtir comentário | Pessoa C (Clarisse) | A dúvida de um comentário vira conversa embaixo dele, e uma dica boa ganha um "valeu" sem precisar escrever. |
+| Imagem nos posts de matéria | Pessoa A (Gustavo) | A foto do caderno, do mapa mental ou da lista resolvida mostra o estudo melhor que a descrição; só em post de matéria, porque é registro do estudo, não vitrine (decisão 1). |
 
 **Comentários em árvore: a árvore é montada a cada pedido.** O
 `core/arvore.py` recebe os comentários diretos no post (a página pedida) e
