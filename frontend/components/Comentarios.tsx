@@ -20,7 +20,8 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import { Avatar } from "@/components/Avatar";
 import { AvisoErro } from "@/components/FormAuth";
 import { BotaoCurtir } from "@/components/BotaoCurtir";
-import { apiGet, apiPost, type Comentario, type ComentarioPage, type Post } from "@/lib/api";
+import { apiPost, type Comentario, type ComentarioPage, type Post } from "@/lib/api";
+import { usarPrecarregado } from "@/lib/precarregar";
 import { dataCompleta, tempoDesde } from "@/lib/tempo";
 
 // O mesmo limite do backend (schemas/comentario.py), para avisar antes de enviar.
@@ -46,6 +47,16 @@ export function LinkComentarios({ post }: { post: Pick<Post, "id" | "comentarios
       <span className="sr-only">{post.comentarios === 1 ? "comentário" : "comentários"}</span>
     </Link>
   );
+}
+
+// Os caminhos da conversa, para a página pedi-los junto com o post
+// (FolhaDoPost `precarregar`) e o componente achar o mesmo pedido.
+export function caminhoDosComentarios(postId: number | string, offset = 0): string {
+  return `/posts/${postId}/comentarios?offset=${offset}&limit=${POR_PAGINA}`;
+}
+
+export function caminhoDaConversa(postId: number | string, comentarioId: number | string): string {
+  return `/posts/${postId}/comentarios/${comentarioId}`;
 }
 
 // Põe a resposta nova embaixo do comentário que ela responde, no fim das
@@ -96,9 +107,8 @@ export function Comentarios({ postId }: { postId: number }) {
       setCarregando(true);
       setErro(null);
       try {
-        const pagina = await apiGet<ComentarioPage>(
-          `/posts/${postId}/comentarios?offset=${offset}&limit=${POR_PAGINA}`,
-        );
+        // A primeira página a FolhaDoPost já pediu junto com o post.
+        const pagina = await usarPrecarregado<ComentarioPage>(caminhoDosComentarios(postId, offset));
         setComentarios((atuais) => (offset === 0 ? pagina.items : [...atuais, ...pagina.items]));
         setTotal(pagina.total);
         setTotalGeral(pagina.total_com_respostas);
@@ -144,11 +154,18 @@ export function Comentarios({ postId }: { postId: number }) {
   }
 
   const conversa = { postId, respondendo, setRespondendo, onComentou: adicionar, recolher: true };
+  const primeiraCarga = carregando && comentarios.length === 0 && !erro;
 
   return (
     <section aria-label="Comentários">
+      {/* Antes da primeira página chegar, o número ainda não é conhecido:
+          "0 comentários" faria parecer que ninguém comentou. */}
       <h2 className="text-sm font-semibold text-tinta-suave">
-        {totalGeral === 1 ? "1 comentário" : `${totalGeral} comentários`}
+        {primeiraCarga
+          ? "Comentários"
+          : totalGeral === 1
+            ? "1 comentário"
+            : `${totalGeral} comentários`}
       </h2>
 
       {/* A caixa de comentar fica logo embaixo do post, como no Twitter. */}
@@ -159,6 +176,8 @@ export function Comentarios({ postId }: { postId: number }) {
           Comentário enviado. Ele aparece no fim da conversa, depois dos que faltam carregar.
         </p>
       )}
+
+      {primeiraCarga && <EsqueletoComentarios />}
 
       {comentarios.length > 0 && (
         <ul className="mt-5 space-y-4">
@@ -203,7 +222,7 @@ export function ConversaDoComentario({ postId, comentarioId }: { postId: number;
   const [respondendo, setRespondendo] = useState<number | null>(null);
 
   useEffect(() => {
-    apiGet<Comentario>(`/posts/${postId}/comentarios/${comentarioId}`)
+    usarPrecarregado<Comentario>(caminhoDaConversa(postId, comentarioId))
       .then(setRaiz)
       .catch((falha) =>
         setErro(falha instanceof Error ? falha.message : "Não foi possível carregar a conversa."),
@@ -225,7 +244,7 @@ export function ConversaDoComentario({ postId, comentarioId }: { postId: number;
           <AvisoErro texto={erro} />
         </div>
       )}
-      {!raiz && !erro && <p className="mt-4 text-sm text-tinta-suave">Carregando...</p>}
+      {!raiz && !erro && <EsqueletoComentarios quantos={1} />}
       {raiz && (
         <>
           <h2 className="mt-3 text-sm font-semibold text-tinta-suave">
@@ -246,6 +265,17 @@ export function ConversaDoComentario({ postId, comentarioId }: { postId: number;
         </>
       )}
     </section>
+  );
+}
+
+// Caixinhas pulsando no lugar dos comentários enquanto eles chegam.
+function EsqueletoComentarios({ quantos = 2 }: { quantos?: number }) {
+  return (
+    <div role="status" aria-label="Carregando os comentários" className="mt-5 space-y-4">
+      {Array.from({ length: quantos }, (_, i) => (
+        <div key={i} className="h-20 animate-pulse rounded-xl bg-linha" />
+      ))}
+    </div>
   );
 }
 
@@ -377,6 +407,9 @@ function FormComentario({
 }) {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
+  // A ref muda na hora; o estado só no próximo desenho. Cliques que chegam
+  // juntos ainda veem `enviando` falso, mas já veem a ref ligada.
+  const enviandoAgora = useRef(false);
   const [erro, setErro] = useState<string | null>(null);
   const campo = useRef<HTMLTextAreaElement>(null);
   const resposta = parentId !== undefined;
@@ -395,6 +428,8 @@ function FormComentario({
   async function enviar(e: FormEvent) {
     e.preventDefault();
     if (!texto.trim()) return;
+    if (enviandoAgora.current) return; // cliques que chegam juntos não criam o comentário duas vezes
+    enviandoAgora.current = true;
     setEnviando(true);
     setErro(null);
     try {
@@ -408,6 +443,7 @@ function FormComentario({
       // O texto fica no campo: ninguém perde o que escreveu por causa de um erro.
       setErro(falha instanceof Error ? falha.message : "Não foi possível comentar. Tente de novo.");
     } finally {
+      enviandoAgora.current = false;
       setEnviando(false);
     }
   }

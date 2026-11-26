@@ -16,6 +16,17 @@ export function avisarQueLeu() {
   window.dispatchEvent(new Event(EVENTO_LEU));
 }
 
+// Roda `acao` sempre que uma conversa é lida ou recebe mensagem nova (o mesmo
+// aviso de cima). A lista de conversas usa para a bolinha e a prévia da última
+// mensagem mudarem na hora, sem esperar a próxima volta (#93).
+export function useAoLer(acao: () => void, ligado: boolean) {
+  useEffect(() => {
+    if (!ligado) return;
+    window.addEventListener(EVENTO_LEU, acao);
+    return () => window.removeEventListener(EVENTO_LEU, acao);
+  }, [acao, ligado]);
+}
+
 // ligado = false enquanto ninguém entrou (não há o que contar).
 export function useNaoLidas(ligado: boolean): number {
   const [total, setTotal] = useState(0);
