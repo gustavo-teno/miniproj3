@@ -65,3 +65,6 @@ class PostOut(BaseModel):
     # Depende de quem está vendo: quem preenche é services/curtidas.py
     # (marcar_curtidos). Sem ele, sai False.
     curtido_por_mim: bool = False
+    # Do mesmo jeito, para o botão Salvar (#64): services/salvos.py
+    # (marcar_salvos).
+    salvo_por_mim: bool = False

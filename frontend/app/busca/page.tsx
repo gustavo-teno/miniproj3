@@ -9,7 +9,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Avatar } from "@/components/Avatar";
+import { BotaoCurtir } from "@/components/BotaoCurtir";
+import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
+import { LinkComentarios } from "@/components/Comentarios";
 import { AvisoErro } from "@/components/FormAuth";
 import { buscarPessoas, buscarPosts, type Page, type Post, type User } from "@/lib/api";
 import { useExigeLogin } from "@/lib/useExigeLogin";
@@ -81,7 +84,7 @@ export default function BuscaPage() {
         autoFocus
         maxLength={100}
         aria-label="O que você procura"
-        placeholder="Um colega ou um assunto, como logaritmo"
+        placeholder="Buscar pessoas ou posts"
         className="mt-4 w-full rounded-xl border border-linha bg-superficie px-4 py-3 text-tinta"
       />
 
@@ -140,7 +143,17 @@ export default function BuscaPage() {
           {atual.posts && (
             <div className="mt-2 space-y-4">
               {atual.posts.items.map((p) => (
-                <CardPost key={p.id} post={p} />
+                <CardPost
+                  key={p.id}
+                  post={p}
+                  rodape={
+                    <>
+                      <BotaoCurtir post={p} />
+                      <LinkComentarios post={p} />
+                      <BotaoSalvar post={p} />
+                    </>
+                  }
+                />
               ))}
             </div>
           )}
