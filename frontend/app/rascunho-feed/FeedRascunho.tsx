@@ -63,6 +63,7 @@ function paraPost(p: PostFalso): Post {
     comentarios: p.comentarios,
     curtidas: p.curtidas,
     curtido_por_mim: false,
+    salvo_por_mim: false,
   };
 }
 
