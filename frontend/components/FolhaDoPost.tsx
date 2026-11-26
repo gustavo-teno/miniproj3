@@ -10,7 +10,8 @@ import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
 import { AvisoErro } from "@/components/FormAuth";
-import { apiGet, type Post } from "@/lib/api";
+import { apiGet, buscarEu, type Post } from "@/lib/api";
+import { tirarImagem } from "@/lib/imagem";
 import { precarregar } from "@/lib/precarregar";
 import { useExigeLogin } from "@/lib/useExigeLogin";
 
@@ -28,6 +29,15 @@ export function FolhaDoPost({
   const liberado = useExigeLogin();
   const [post, setPost] = useState<Post | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  // Quem está vendo: o autor pode tirar a imagem do post (#105).
+  const [eu, setEu] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!liberado) return;
+    buscarEu()
+      .then((u) => setEu(u.username))
+      .catch(() => setEu(null));
+  }, [liberado]);
 
   useEffect(() => {
     if (!liberado) return;
@@ -87,6 +97,14 @@ export function FolhaDoPost({
           </>
         }
         embaixo={embaixo(post)}
+        aoTirarImagem={
+          eu === post.autor.username
+            ? async () => {
+                await tirarImagem(post.id);
+                setPost({ ...post, tem_imagem: false });
+              }
+            : undefined
+        }
       />
     </div>
   );

@@ -260,6 +260,7 @@ export type Post = {
   comentarios: number;
   curtido_por_mim: boolean; // depende de quem está vendo
   salvo_por_mim: boolean; // idem, para o botão Salvar (#64)
+  tem_imagem?: boolean; // se o post tem imagem (#105): ela vem de lib/imagem.ts
 };
 
 // Um comentário de GET /posts/{id}/comentarios (#12, Pessoa C), com as
