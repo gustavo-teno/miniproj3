@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { buscarEu, sair, type Eu } from "@/lib/api";
 import { useNaoLidas } from "@/lib/naoLidas";
+import { useNovasNotificacoes } from "@/lib/notificacoes";
 import { NOME_REDE } from "@/lib/rede";
 
 // O topo da rede: nome à esquerda, abas no centro e configurações à direita.
@@ -22,6 +23,8 @@ export function Navegacao() {
 
   // As DMs (decisão 6): o número de não lidas aparece na aba Mensagens.
   const naoLidas = useNaoLidas(Boolean(eu));
+  // As notificações (#103): o número de novas aparece no sino.
+  const novas = useNovasNotificacoes(Boolean(eu));
 
   const abas = [
     { href: "/", rotulo: "Feed" },
@@ -104,6 +107,32 @@ export function Navegacao() {
               }
             >
               <Icone d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM21 21l-4.35-4.35" />
+            </Link>
+          )}
+          {/* As notificações (#103): um sino ao lado da lupa, e não mais uma
+              aba, pelo mesmo motivo. O número fica no canto do sino. */}
+          {eu && (
+            <Link
+              href="/notificacoes"
+              aria-label={novas ? `Notificações, ${novas} ${novas === 1 ? "nova" : "novas"}` : "Notificações"}
+              title="Notificações"
+              aria-current={caminho === "/notificacoes" ? "page" : undefined}
+              className={
+                "relative grid size-9 place-items-center rounded-lg border transition-colors " +
+                (caminho === "/notificacoes"
+                  ? "border-destaque bg-destaque-fundo text-destaque"
+                  : "border-linha text-tinta-suave hover:text-tinta")
+              }
+            >
+              <Icone d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" />
+              {novas ? (
+                <span
+                  aria-hidden
+                  className="absolute -right-1.5 -top-1.5 grid min-w-[18px] place-items-center rounded-full bg-destaque px-1 text-[10px] font-semibold leading-[18px] text-sobre-destaque"
+                >
+                  {novas > 9 ? "9+" : novas}
+                </span>
+              ) : null}
             </Link>
           )}
           {eu === null && (
