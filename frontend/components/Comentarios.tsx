@@ -190,62 +190,66 @@ function ItemComentario({
         : [];
 
   return (
-    <div className="flex gap-3">
-      <Avatar autor={c.autor} />
-      <div className="min-w-0 flex-1">
-        <p className="flex items-baseline gap-2 text-sm">
-          <Link href={`/u/${c.autor.username}`} className="truncate font-semibold hover:underline">
-            {c.autor.name}
-          </Link>
-          <time
-            dateTime={c.created_at}
-            title={dataCompleta(c.created_at)}
-            suppressHydrationWarning
-            className="flex-none text-tinta-suave"
-          >
-            {tempoDesde(c.created_at)}
-          </time>
-        </p>
-        {respondeA && <p className="text-xs text-tinta-suave">em resposta a {respondeA}</p>}
-        <p className="mt-0.5 whitespace-pre-line break-words font-light">{c.texto}</p>
+    <div>
+      <div className="flex gap-3">
+        <Avatar autor={c.autor} />
+        <div className="min-w-0 flex-1">
+          <p className="flex items-baseline gap-2 text-sm">
+            <Link href={`/u/${c.autor.username}`} className="truncate font-semibold hover:underline">
+              {c.autor.name}
+            </Link>
+            <time
+              dateTime={c.created_at}
+              title={dataCompleta(c.created_at)}
+              suppressHydrationWarning
+              className="flex-none text-tinta-suave"
+            >
+              {tempoDesde(c.created_at)}
+            </time>
+          </p>
+          {respondeA && <p className="text-xs text-tinta-suave">em resposta a {respondeA}</p>}
+          <p className="mt-0.5 whitespace-pre-line break-words font-light">{c.texto}</p>
 
-        <div className="mt-1.5 flex items-center gap-5 text-xs text-tinta-suave">
-          <BotaoCurtir post={c} caminho={`/posts/${postId}/comentarios/${c.id}/curtir`} />
-          <button
-            type="button"
-            onClick={() => setRespondendo(respondendo === c.id ? null : c.id)}
-            aria-expanded={respondendo === c.id}
-            className="font-semibold hover:text-destaque"
-          >
-            Responder
-          </button>
+          <div className="mt-1.5 flex items-center gap-5 text-xs text-tinta-suave">
+            <BotaoCurtir post={c} caminho={`/posts/${postId}/comentarios/${c.id}/curtir`} />
+            <button
+              type="button"
+              onClick={() => setRespondendo(respondendo === c.id ? null : c.id)}
+              aria-expanded={respondendo === c.id}
+              className="font-semibold hover:text-destaque"
+            >
+              Responder
+            </button>
+          </div>
+
+          {respondendo === c.id && (
+            <FormComentario
+              postId={postId}
+              parentId={c.id}
+              paraQuem={c.autor.name}
+              onComentou={onComentou}
+              onCancelar={() => setRespondendo(null)}
+            />
+          )}
         </div>
-
-        {respondendo === c.id && (
-          <FormComentario
-            postId={postId}
-            parentId={c.id}
-            paraQuem={c.autor.name}
-            onComentou={onComentou}
-            onCancelar={() => setRespondendo(null)}
-          />
-        )}
-
-        {respostas.length > 0 && (
-          <ul className="mt-3 space-y-3 border-l-2 border-linha pl-3">
-            {respostas.map(({ comentario, respondeA }) => (
-              <li key={comentario.id}>
-                <ItemComentario
-                  comentario={comentario}
-                  nivel={nivel + 1}
-                  respondeA={respondeA}
-                  {...conversa}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
+
+      {/* As respostas ficam fora da coluna do texto: no celular, recuar também
+          a largura da foto deixaria o texto espremido. */}
+      {respostas.length > 0 && (
+        <ul className="ml-4 mt-3 space-y-3 border-l-2 border-linha pl-3 sm:ml-12">
+          {respostas.map(({ comentario, respondeA }) => (
+            <li key={comentario.id}>
+              <ItemComentario
+                comentario={comentario}
+                nivel={nivel + 1}
+                respondeA={respondeA}
+                {...conversa}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
