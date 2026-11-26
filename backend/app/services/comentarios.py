@@ -65,6 +65,29 @@ def listar(
     return raizes, total, total_geral
 
 
+def conversa(db: Session, user: User, post_id: int, comentario_id: int) -> Comment:
+    """Um comentário com todas as respostas dele penduradas, em qualquer nível:
+    a tela "Ver conversa". 404 se o comentário não existe ou é de outro post."""
+    buscar(db, post_id)
+    raiz = _buscar(db, post_id, comentario_id)
+    respostas = list(
+        db.scalars(
+            select(Comment)
+            .where(Comment.post_id == post_id, Comment.parent_id.is_not(None))
+            .order_by(Comment.created_at, Comment.id)
+        )
+    )
+    pendurar_respostas(
+        [raiz],
+        respostas,
+        id_de=lambda c: c.id,
+        pai_de=lambda c: c.parent_id,
+        guardar=lambda c, filhos: setattr(c, "respostas", filhos),
+    )
+    _marcar_curtidos(db, user, [raiz, *respostas])
+    return raiz
+
+
 def _marcar_curtidos(db: Session, user: User, comentarios: list[Comment]) -> None:
     """Preenche o `curtido_por_mim` de cada comentário numa consulta só."""
     ids = [c.id for c in comentarios]

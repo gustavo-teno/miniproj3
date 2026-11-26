@@ -5,6 +5,8 @@ Rotas:
   comentários diretos no post, em ordem cronológica, e cada um traz as
   respostas dentro (comentários em árvore, CONTRATO.md). O POST aceita
   `parent_id` para responder a um comentário do mesmo post.
+- GET /posts/{id}/comentarios/{comentario_id}: um comentário com toda a árvore
+  de respostas dele (a tela "Ver conversa").
 - POST/DELETE /posts/{id}/comentarios/{comentario_id}/curtir: curtir um
   comentário, como se curte um post.
 O número de comentários (com as respostas) vem no próprio post (PostOut).
@@ -48,6 +50,16 @@ def listar_comentarios(
         limit=limit,
         total_com_respostas=total_com_respostas,
     )
+
+
+@router.get("/{post_id}/comentarios/{comentario_id}", response_model=ComentarioOut)
+def ver_conversa(
+    post_id: int,
+    comentario_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return service.conversa(db, user, post_id, comentario_id)
 
 
 @router.post("/{post_id}/comentarios/{comentario_id}/curtir", status_code=204)
