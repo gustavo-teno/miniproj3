@@ -74,7 +74,9 @@ export default function BuscaPage() {
     (ativa ? "border-destaque font-semibold text-destaque" : "border-transparent text-tinta-suave hover:text-tinta");
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl lg:max-w-none">
+      {/* No computador a página abre para duas colunas de cards; cada card continua com
+        uma largura boa para ler (#84). */}
       <h1 className="text-2xl font-semibold">Buscar</h1>
 
       <input
@@ -119,12 +121,12 @@ export default function BuscaPage() {
             {(atual.pessoas ?? atual.posts)!.items.length < total! && ", mostrando os primeiros"}
           </p>
           {atual.pessoas && (
-            <div className="mt-2 overflow-hidden rounded-xl border border-linha bg-superficie">
+            <div className="mt-2 overflow-hidden rounded-xl border border-linha bg-superficie lg:grid lg:grid-cols-2 lg:gap-3 lg:overflow-visible lg:border-0 lg:bg-transparent">
               {atual.pessoas.items.map((u) => (
                 <Link
                   key={u.id}
                   href={`/u/${u.username}`}
-                  className="flex items-center gap-3 border-b border-linha p-4 last:border-b-0 hover:bg-destaque-fundo"
+                  className="flex items-center gap-3 border-b border-linha p-4 last:border-b-0 hover:bg-destaque-fundo lg:rounded-xl lg:border lg:bg-superficie lg:last:border-b"
                 >
                   <Avatar autor={u} />
                   <span className="min-w-0">
@@ -141,7 +143,7 @@ export default function BuscaPage() {
           {/* Os posts ficam soltos, como no feed: cada um já é uma folha com
               a própria borda (#52). */}
           {atual.posts && (
-            <div className="mt-2 space-y-4">
+            <div className="mt-2 space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
               {atual.posts.items.map((p) => (
                 <CardPost
                   key={p.id}

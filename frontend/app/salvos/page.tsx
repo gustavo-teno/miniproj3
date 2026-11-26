@@ -53,7 +53,8 @@ export default function SalvosPage() {
   if (!liberado) return null;
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl lg:max-w-none">
+      {/* Duas colunas de cards no computador (#84); no celular, uma só. */}
       <h1 className="text-2xl font-semibold">Salvos</h1>
       <p className="mt-1 text-sm text-tinta-suave">Só você vê os posts que salvou.</p>
 
@@ -78,7 +79,7 @@ export default function SalvosPage() {
 
       {/* Os posts ficam soltos, como no feed e na busca: cada um já é uma folha. */}
       {posts && posts.length > 0 && (
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
           {posts.map((p) => (
             <CardPost
               key={p.id}
