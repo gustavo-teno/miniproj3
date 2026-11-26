@@ -15,7 +15,16 @@ import { useEffect, useState } from "react";
 
 import { podeMandarMensagem } from "@/lib/api";
 
-export function BotaoMensagem({ username, seguidores }: { username: string; seguidores: number }) {
+export function BotaoMensagem({
+  username,
+  seguidores,
+  cheioNoCelular = false,
+}: {
+  username: string;
+  seguidores: number;
+  // No celular, o botão ocupa a largura que o pai der, ao lado do Seguir.
+  cheioNoCelular?: boolean;
+}) {
   const [pode, setPode] = useState(false);
 
   useEffect(() => {
@@ -36,10 +45,14 @@ export function BotaoMensagem({ username, seguidores }: { username: string; segu
     <Link
       href={`/mensagens/${encodeURIComponent(username)}`}
       title="Mensagem"
-      // No celular, só o balão (como a aba Mensagens): com a palavra, ele não
-      // cabia ao lado do Seguir e caía para a linha de baixo. O min-h deixa o
-      // botão só com o ícone da mesma altura do Seguir.
-      className="inline-flex min-h-[34px] items-center gap-1.5 whitespace-nowrap rounded-lg border border-destaque px-2.5 py-1.5 text-sm font-semibold text-destaque hover:bg-destaque-fundo sm:px-4"
+      // Sem o cheioNoCelular, no celular só o balão (como a aba Mensagens): com a
+      // palavra, ele não cabia ao lado do Seguir. Com ele, o botão divide a
+      // linha com o Seguir e a palavra volta. O min-h deixa o botão só com o
+      // ícone da mesma altura do Seguir.
+      className={
+        "inline-flex min-h-[34px] items-center gap-1.5 whitespace-nowrap rounded-lg border border-destaque py-1.5 text-sm font-semibold text-destaque hover:bg-destaque-fundo sm:px-4 " +
+        (cheioNoCelular ? "px-4 max-sm:flex-1 max-sm:justify-center" : "px-2.5")
+      }
     >
       <svg
         viewBox="0 0 24 24"
@@ -53,8 +66,9 @@ export function BotaoMensagem({ username, seguidores }: { username: string; segu
       >
         <path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z" />
       </svg>
-      {/* No celular a palavra some da tela, mas o leitor de tela continua lendo. */}
-      <span className="sr-only sm:not-sr-only">Mensagem</span>
+      {/* Sem o cheioNoCelular, a palavra some da tela no celular, mas o leitor de
+          tela continua lendo. */}
+      <span className={cheioNoCelular ? "" : "sr-only sm:not-sr-only"}>Mensagem</span>
     </Link>
   );
 }
