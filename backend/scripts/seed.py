@@ -37,6 +37,7 @@ from scripts.seed_dados import (
     ASSUNTOS,
     BATE_PAPO,
     COMENTARIOS,
+    CONVERSA_DEMO,
     CONVERSAS_DEMO,
     FIRME,
     QUEBROU,
@@ -258,6 +259,27 @@ def _criar_respostas(db: Session, posts: list[Post], seguidores: dict[int, list[
                            texto=rng.choice(RESPOSTAS), created_at=momento))
 
 
+def _criar_conversa_demo(db: Session, usuarios: list[User], seguidores: dict[int, list[User]],
+                         agora: datetime) -> None:
+    """A CONVERSA_DEMO no post mais recente da Ada que tem pelo menos um dia:
+    assim as falas cabem entre o post e agora, cada uma depois da anterior."""
+    demo = next(u for u in usuarios if u.username == USUARIO_DEMO)
+    fa = seguidores[demo.id][0]
+    post = db.scalar(
+        select(Post)
+        .where(Post.autor_id == demo.id, Post.created_at <= agora - timedelta(days=1))
+        .order_by(Post.created_at.desc())
+    )
+    pai_id, momento = None, post.created_at
+    for quem, texto in CONVERSA_DEMO:
+        momento += timedelta(minutes=40)
+        fala = Comment(autor_id=(fa if quem == "fa" else demo).id, post_id=post.id,
+                       parent_id=pai_id, texto=texto, created_at=momento)
+        db.add(fala)
+        db.flush()  # o id dela é o pai da próxima fala
+        pai_id = fala.id
+
+
 def seed_fake(db: Session, agora: datetime | None = None) -> None:
     """Popula a rede: a demo nunca começa vazia (contrato do teste do núcleo)."""
     agora = agora or datetime.now(timezone.utc)
@@ -270,6 +292,7 @@ def seed_fake(db: Session, agora: datetime | None = None) -> None:
     db.flush()  # dá os ids dos comentários, para as respostas e as curtidas
     # Outra semente: assim o resto da rede continua igual ao de antes das respostas.
     _criar_respostas(db, posts, seguidores, agora, random.Random(SEMENTE + 1))
+    _criar_conversa_demo(db, usuarios, seguidores, agora)
     db.commit()
 
 

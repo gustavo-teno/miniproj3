@@ -12,6 +12,21 @@ from app.models.user import User
 from app.schemas.comentario import ComentarioCriar
 from app.services.posts import buscar
 
+# Até quantos níveis a conversa desce (o comentário direto no post é o 1).
+# Sem limite, uma corrente de respostas criada de propósito pela API deixaria
+# a árvore funda demais para a recursão do core/ (o Python para em ~1.000).
+PROFUNDIDADE_MAXIMA = 10
+
+
+def _nivel(db: Session, comentario: Comment) -> int:
+    """Em que nível o comentário está, subindo pelos pais. Para no limite: com
+    ele, nenhuma conversa passa de PROFUNDIDADE_MAXIMA níveis."""
+    nivel = 1
+    while comentario.parent_id is not None and nivel <= PROFUNDIDADE_MAXIMA:
+        comentario = db.get(Comment, comentario.parent_id)
+        nivel += 1
+    return nivel
+
 
 def _buscar(db: Session, post_id: int, comentario_id: int) -> Comment:
     """O comentário, se ele existe e é deste post; senão 404."""
@@ -24,7 +39,12 @@ def _buscar(db: Session, post_id: int, comentario_id: int) -> Comment:
 def criar(db: Session, user: User, post_id: int, dados: ComentarioCriar) -> Comment:
     buscar(db, post_id)  # 404 se o post não existe
     if dados.parent_id is not None:
-        _buscar(db, post_id, dados.parent_id)  # 404 se o pai não existe ou é de outro post
+        pai = _buscar(db, post_id, dados.parent_id)  # 404 se o pai não existe ou é de outro post
+        if _nivel(db, pai) >= PROFUNDIDADE_MAXIMA:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Esta conversa chegou ao limite de {PROFUNDIDADE_MAXIMA} níveis de resposta.",
+            )
     comentario = Comment(
         autor_id=user.id, post_id=post_id, parent_id=dados.parent_id, texto=dados.texto
     )
@@ -63,6 +83,29 @@ def listar(
     )
     _marcar_curtidos(db, user, raizes + respostas)
     return raizes, total, total_geral
+
+
+def conversa(db: Session, user: User, post_id: int, comentario_id: int) -> Comment:
+    """Um comentário com todas as respostas dele penduradas, em qualquer nível:
+    a tela "Ver conversa". 404 se o comentário não existe ou é de outro post."""
+    buscar(db, post_id)
+    raiz = _buscar(db, post_id, comentario_id)
+    respostas = list(
+        db.scalars(
+            select(Comment)
+            .where(Comment.post_id == post_id, Comment.parent_id.is_not(None))
+            .order_by(Comment.created_at, Comment.id)
+        )
+    )
+    pendurar_respostas(
+        [raiz],
+        respostas,
+        id_de=lambda c: c.id,
+        pai_de=lambda c: c.parent_id,
+        guardar=lambda c, filhos: setattr(c, "respostas", filhos),
+    )
+    _marcar_curtidos(db, user, [raiz, *respostas])
+    return raiz
 
 
 def _marcar_curtidos(db: Session, user: User, comentarios: list[Comment]) -> None:

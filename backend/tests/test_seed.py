@@ -18,7 +18,7 @@ from app.models.post import Post
 from app.models.user import User
 
 from scripts import seed
-from scripts.seed_dados import CONVERSAS_DEMO, FIRME, QUEBROU, VESTIBULANDOS
+from scripts.seed_dados import CONVERSA_DEMO, CONVERSAS_DEMO, FIRME, QUEBROU, VESTIBULANDOS
 
 AGORA = datetime(2026, 11, 25, 15, 0, tzinfo=timezone.utc)
 
@@ -59,16 +59,36 @@ def test_comentario_vem_depois_do_post(db):
         assert post.created_at <= comentario.created_at <= AGORA
 
 
-def test_conversas_tem_respostas_do_autor_e_curtidas(db):
+def test_conversas_tem_respostas_e_curtidas(db):
     respostas = list(db.scalars(select(Comment).where(Comment.parent_id.is_not(None))))
     assert respostas, "a conversa dos posts precisa ter respostas para a demo"
     for resposta in respostas:
         pai = db.get(Comment, resposta.parent_id)
-        # Quem responde é quem postou, depois do comentário e no mesmo post.
+        # A resposta vem depois do comentário que ela responde, no mesmo post.
         assert resposta.post_id == pai.post_id
-        assert resposta.autor_id == db.get(Post, resposta.post_id).autor_id
         assert pai.created_at <= resposta.created_at <= AGORA
     assert db.scalar(select(func.count()).select_from(CurtidaComentario)) > 0
+
+
+def test_demo_tem_uma_conversa_recolhida(db, client):
+    # Um post da Ada tem uma conversa com mais de 3 respostas, para o "Ver
+    # conversa" aparecer no vídeo sem ninguém precisar responder antes.
+    token = client.post(
+        "/auth/login", json={"username": "ada", "password": seed.SENHA_SEED}
+    ).json()["token"]
+    ada = db.scalar(select(User).where(User.username == "ada"))
+    primeira = db.scalar(select(Comment).where(Comment.texto == CONVERSA_DEMO[0][1]))
+    assert db.get(Post, primeira.post_id).autor_id == ada.id
+
+    r = client.get(f"/posts/{primeira.post_id}/comentarios/{primeira.id}",
+                   headers={"Authorization": f"Bearer {token}"})
+    falas, atual = [], r.json()
+    while True:
+        falas.append(atual["texto"])
+        if not atual["respostas"]:
+            break
+        atual = atual["respostas"][0]
+    assert falas == [texto for _quem, texto in CONVERSA_DEMO]
 
 
 def test_ofensiva_aparece_de_todos_os_jeitos(db):
