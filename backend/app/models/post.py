@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 from app.constantes import TAG_PADRAO
 from app.db import Base, CriadoEm
 from app.models.comment import Comment
+from app.models.imagem_post import ImagemPost
 from app.models.like import Like
 
 # Só para o editor conhecer o tipo: importar de verdade daria import circular.
@@ -43,4 +44,10 @@ class Post(Base):
         .where(Comment.post_id == id)
         .correlate_except(Comment)
         .scalar_subquery()
+    )
+    # Se o post tem imagem (#105, Pessoa A). Do mesmo jeito das contagens: vem
+    # na mesma consulta, sem carregar os bytes. A imagem em si vem de
+    # GET /posts/{id}/imagem.
+    tem_imagem: Mapped[bool] = column_property(
+        select(ImagemPost.id).where(ImagemPost.post_id == id).correlate_except(ImagemPost).exists()
     )
