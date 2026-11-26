@@ -3,11 +3,13 @@
 // Comentários (#12, Pessoa C). Dois pedaços:
 // - <LinkComentarios post={post} /> vai no `rodape` do <CardPost>, ao lado do
 //   <BotaoCurtir>, e leva para a página do post (/posts/{id}).
-// - <Comentarios postId=... /> é a conversa, na página do post: do mais antigo
-//   para o mais novo, com "carregar mais" e o campo para comentar no fim.
+// - <Comentarios postId=... /> é a conversa, na página do post, dentro da folha
+//   do post (CardPost `embaixo`): o campo para comentar vem logo embaixo do post,
+//   e os comentários, do mais antigo para o mais novo, em caixinhas, com
+//   "carregar mais".
 
 import Link from "next/link";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
 import { Avatar } from "@/components/Avatar";
 import { apiGet, apiPost, type Comentario, type Page, type Post } from "@/lib/api";
@@ -82,15 +84,29 @@ export function Comentarios({ postId }: { postId: number }) {
   }
 
   return (
-    <section aria-label="Comentários" className="rounded-2xl border border-linha bg-superficie">
-      <h2 className="border-b border-linha px-4 py-3 font-semibold">
+    <section aria-label="Comentários">
+      <h2 className="text-sm font-semibold text-tinta-suave">
         {total === 1 ? "1 comentário" : `${total} comentários`}
       </h2>
 
+      {/* A caixa de comentar fica logo embaixo do post, como no Twitter. */}
+      <FormComentario postId={postId} onComentou={adicionar} />
+
+      {enviadoNoFim && (
+        <p className="mt-3 text-sm text-tinta-suave">
+          Comentário enviado. Ele aparece no fim da conversa, depois dos que faltam carregar.
+        </p>
+      )}
+
       {comentarios.length > 0 && (
-        <ul>
+        <ul className="mt-5 space-y-4">
           {comentarios.map((c) => (
-            <li key={c.id} className="flex gap-3 border-b border-linha px-4 py-3">
+            // Cada comentário é uma caixinha com uma fitinha no topo, como um papel
+            // colado na folha do post.
+            <li
+              key={c.id}
+              className="relative flex gap-3 rounded-xl border border-linha bg-superficie px-3 py-2.5 before:absolute before:-top-1.5 before:left-3.5 before:h-3 before:w-11 before:rounded-[3px] before:bg-[color-mix(in_srgb,var(--destaque)_16%,var(--superficie))]"
+            >
               <Avatar autor={c.autor} />
               <div className="min-w-0 flex-1">
                 <p className="flex items-baseline gap-2 text-sm">
@@ -114,27 +130,20 @@ export function Comentarios({ postId }: { postId: number }) {
       )}
 
       {!carregando && !erro && total === 0 && (
-        <p className="px-4 py-3 text-sm text-tinta-suave">Ninguém comentou ainda. Que tal uma dica ou um incentivo?</p>
+        <p className="mt-4 text-sm text-tinta-suave">Ninguém comentou ainda. Que tal uma dica ou um incentivo?</p>
       )}
-      {erro && <p className="px-4 py-3 text-sm text-erro">{erro}</p>}
+      {erro && <p className="mt-4 text-sm text-erro">{erro}</p>}
 
       {comentarios.length < total && (
         <button
           type="button"
           onClick={() => carregar(comentarios.length)}
           disabled={carregando}
-          className="w-full border-b border-linha px-4 py-2 text-sm text-destaque hover:bg-destaque-fundo disabled:opacity-60"
+          className="mt-4 w-full rounded-lg border border-linha px-4 py-2 text-sm text-destaque hover:bg-destaque-fundo disabled:opacity-60"
         >
           {carregando ? "Carregando..." : "Carregar mais comentários"}
         </button>
       )}
-
-      {enviadoNoFim && (
-        <p className="px-4 pt-3 text-sm text-tinta-suave">
-          Comentário enviado. Ele aparece no fim da conversa, depois dos que faltam carregar.
-        </p>
-      )}
-      <FormComentario postId={postId} onComentou={adicionar} />
     </section>
   );
 }
@@ -143,6 +152,17 @@ function FormComentario({ postId, onComentou }: { postId: number; onComentou: (c
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const campo = useRef<HTMLTextAreaElement>(null);
+
+  // O campo cresce com o texto (uma linha, no começo) e volta ao tamanho de uma
+  // linha depois de enviar.
+  function ajustarAltura() {
+    const el = campo.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }
+  useEffect(ajustarAltura, [texto]);
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
@@ -162,30 +182,31 @@ function FormComentario({ postId, onComentou }: { postId: number; onComentou: (c
   }
 
   return (
-    <form onSubmit={enviar} className="space-y-2 p-4">
-      <label htmlFor="comentario" className="sr-only">
-        Escreva um comentário
-      </label>
-      <textarea
-        id="comentario"
-        value={texto}
-        onChange={(e) => setTexto(e.target.value)}
-        maxLength={MAX_TEXTO}
-        required
-        rows={2}
-        placeholder="Escreva um comentário"
-        className="w-full resize-y rounded-lg border border-linha bg-superficie px-3 py-2 text-sm text-tinta"
-      />
-      {erro && <p className="text-sm text-erro">{erro}</p>}
-      <div className="flex justify-end">
+    <form onSubmit={enviar} className="mt-3">
+      <div className="flex items-end gap-2 rounded-xl border border-destaque/40 bg-superficie p-2 pl-3">
+        <label htmlFor="comentario" className="sr-only">
+          Escreva um comentário
+        </label>
+        <textarea
+          id="comentario"
+          ref={campo}
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+          maxLength={MAX_TEXTO}
+          required
+          rows={1}
+          placeholder="Escreva um comentário"
+          className="max-h-40 min-w-0 flex-1 resize-none bg-transparent py-1 text-sm text-tinta outline-none placeholder:text-tinta-suave"
+        />
         <button
           type="submit"
           disabled={enviando || !texto.trim()}
-          className="rounded-lg bg-destaque px-4 py-1.5 text-sm font-semibold text-sobre-destaque disabled:opacity-60"
+          className="flex-none rounded-full bg-destaque px-4 py-1.5 text-sm font-semibold text-sobre-destaque disabled:opacity-60"
         >
           {enviando ? "Enviando..." : "Comentar"}
         </button>
       </div>
+      {erro && <p className="mt-2 text-sm text-erro">{erro}</p>}
     </form>
   );
 }
