@@ -19,8 +19,7 @@ from app.models.follow import Follow
 from app.models.post import Post
 from app.models.user import User
 from app.schemas.turmas import TipoTurma, TurmaOut, TurmasOut
-from app.services.curtidas import marcar_curtidos
-from app.services.salvos import marcar_salvos
+from app.services.listagem import pagina_de_posts
 
 # Para cada tipo: a lista de constantes.py, o campo do User que forma a turma e
 # o nome da turma "outro".
@@ -168,17 +167,4 @@ def posts(
     if tag is not None:
         filtro.append(Post.tag == tag)
 
-    total = db.scalar(select(func.count(Post.id)).where(*filtro)) or 0
-    lista = list(
-        db.scalars(
-            select(Post)
-            .where(*filtro)
-            # id desempata posts do mesmo segundo, para a página não repetir.
-            .order_by(Post.created_at.desc(), Post.id.desc())
-            .offset(offset)
-            .limit(limit)
-        )
-    )
-    marcar_curtidos(db, eu, lista)
-    marcar_salvos(db, eu, lista)
-    return lista, total
+    return pagina_de_posts(db, eu, filtro, offset, limit)
