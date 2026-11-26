@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
+import { EsqueletoPosts } from "@/components/EsqueletoPosts";
 import { LinkComentarios } from "@/components/Comentarios";
 import { EditarPerfil } from "@/components/perfil/EditarPerfil";
 import { EstanteCadernos } from "@/components/perfil/EstanteCadernos";
@@ -118,7 +119,14 @@ export default function PaginaPerfil() {
     );
   }
   if (!perfil) {
-    return <div role="status" aria-label="Carregando o perfil" className="h-48 animate-pulse rounded-2xl bg-linha" />;
+    // O topo do perfil e, embaixo, as folhas dos posts: a página já tem a cara
+    // do diário enquanto o perfil chega.
+    return (
+      <div className="space-y-6">
+        <div role="status" aria-label="Carregando o perfil" className="h-48 animate-pulse rounded-2xl bg-linha" />
+        <EsqueletoPosts quantos={3} />
+      </div>
+    );
   }
 
   const eu = perfil.meu_perfil;
@@ -180,7 +188,7 @@ export default function PaginaPerfil() {
             )}
             {posts === null ? (
               erroPosts ? null : (
-                <div role="status" aria-label="Carregando os posts" className="h-24 animate-pulse rounded-xl bg-linha" />
+                <EsqueletoPosts quantos={3} />
               )
             ) : posts.length === 0 ? (
               // O mesmo formato da lista vazia do feed (combinado em 24/11).

@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
+import { EsqueletoPosts } from "@/components/EsqueletoPosts";
 import { LinkComentarios } from "@/components/Comentarios";
 import { AvisoErro } from "@/components/FormAuth";
 import { buscarSalvos, type Post } from "@/lib/api";
@@ -63,7 +64,9 @@ export default function SalvosPage() {
       </div>
 
       {posts === undefined && !erro && (
-        <div role="status" aria-label="Carregando os salvos" className="mt-4 h-40 animate-pulse rounded-xl bg-linha" />
+        <div className="mt-4">
+          <EsqueletoPosts rotulo="Carregando os salvos" />
+        </div>
       )}
 
       {posts?.length === 0 && (

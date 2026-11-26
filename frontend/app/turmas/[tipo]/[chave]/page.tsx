@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
+import { EsqueletoPosts } from "@/components/EsqueletoPosts";
 import { LinkComentarios } from "@/components/Comentarios";
 import { AvisoErro } from "@/components/FormAuth";
 import { CartaoMembro } from "@/components/turmas/CartaoMembro";
@@ -239,7 +240,9 @@ function AbaPosts({ tipo, chave }: { tipo: TipoTurma; chave: string }) {
       </div>
 
       {posts === undefined && !erro && (
-        <div role="status" aria-label="Carregando os posts" className="mt-4 h-40 animate-pulse rounded-xl bg-linha" />
+        <div className="mt-4">
+          <EsqueletoPosts />
+        </div>
       )}
 
       {posts?.length === 0 && (
