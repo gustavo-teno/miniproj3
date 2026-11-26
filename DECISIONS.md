@@ -236,10 +236,8 @@ fork do time e merge só depois da aprovação de outra pessoa.
   PRs da Camila e me guiar no deploy do Render, que eu configurei.
 - **O que foi meu:** escolher o papel e o escopo, decidir o que entrava e o que
   ficava de fora, testar no navegador e repassar as correções que o Gustavo e a
-  Camila pediam nas revisões. Algumas decisões contrariaram a sugestão da IA:
-  não usei um "ping" para o Render não dormir, para não gastar as horas grátis
-  da conta, e desisti de pôr os meus comentários e os de quem eu sigo no topo
-  da conversa, porque o núcleo pede ordem cronológica.
+  Camila pediam nas revisões, e ainda tomar algumas decisões contrariando a
+  sugestão da IA.
 - **Onde a IA ajudou além do código:** apontou que a ordem cronológica dos
   comentários é exigida pelo `CATALOGO.md` e pelo teste do núcleo, e achou no
   `CONTRATO.md` o formato de "Comentários em árvore", que segui nas respostas.
