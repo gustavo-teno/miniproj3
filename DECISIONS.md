@@ -176,6 +176,7 @@ entram na tabela "Quem faz o quê" de lá.
 | Salvar posts | Pessoa A (Gustavo) | Guardar uma explicação boa ou uma lista de questões para rever depois, só para você. |
 | Comentários em árvore e curtir comentário | Pessoa C (Clarisse) | A dúvida de um comentário vira conversa embaixo dele, e uma dica boa ganha um "valeu" sem precisar escrever. |
 | Imagem nos posts de matéria | Pessoa A (Gustavo) | A foto do caderno, do mapa mental ou da lista resolvida mostra o estudo melhor que a descrição; só em post de matéria, porque é registro do estudo, não vitrine (decisão 1). |
+| Notificações | Pessoa A (Gustavo) | Quem postou a sessão fica sabendo que a turma curtiu, comentou ou começou a seguir, sem precisar abrir o post de novo para descobrir. |
 
 **Comentários em árvore: a árvore é montada a cada pedido.** O
 `core/arvore.py` recebe os comentários diretos no post (a página pedida) e
@@ -186,6 +187,22 @@ comentário uma vez, O(n) no número de respostas do post. Não guardamos a
 montar de novo é barato e ela nunca fica desatualizada quando alguém responde
 ou um post é apagado. A página continua contando só os comentários diretos, e
 a ordem é cronológica em todo nível, como pede o contrato.
+
+**Notificações: o contador é montado a cada pedido.** O sino pergunta
+`GET /notificacoes/novas` a cada 30 s, com a aba à vista. O
+`services/notificacoes.py` faz cinco consultas (curtidas e comentários nos
+seus posts, respostas e curtidas nos seus comentários, novos seguidores), cada
+uma pelo índice da coluna que filtra (`post_id`, `parent_id`,
+`comentario_id`, `seguido_id`). Depois, em Python, agrupa as curtidas por post
+num dict em uma passada e conta o que veio depois da marca "visto até": O(n)
+no número de ações sobre as suas coisas, mais O(m log m) para ordenar as m
+linhas da página. Para a conta com mais movimento do seed (centenas de ações)
+responde em uns 10 ms. Não guardamos uma tabela de notificações porque montar
+na leitura faz desfazer (descurtir, deixar de seguir, apagar o post) tirar o
+aviso sozinho. Numa rede grande, o n cresce com a fama da pessoa: aí valeria
+guardar as notificações numa tabela com índice em (destinatário, data) e
+contar só as novas no banco, em O(novas), pagando com apagar a linha a cada
+"desfazer".
 
 **Login sem prazo de validade (escolha consciente).** O token do login vale
 até a pessoa clicar em sair, que apaga a sessão no banco. Uma validade (por

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { buscarEu, sair, type Eu } from "@/lib/api";
 import { useNaoLidas } from "@/lib/naoLidas";
+import { useNovasNotificacoes } from "@/lib/notificacoes";
 import { LogoPostIt } from "@/components/LogoPostIt";
 import { NOME_REDE } from "@/lib/rede";
 
@@ -23,6 +24,8 @@ export function Navegacao() {
 
   // As DMs (decisão 6): o número de não lidas aparece na aba Mensagens.
   const naoLidas = useNaoLidas(Boolean(eu));
+  // As notificações (#103): o número de novas aparece no sino.
+  const novas = useNovasNotificacoes(Boolean(eu));
 
   const abas = [
     { href: "/", rotulo: "Feed" },
@@ -32,7 +35,9 @@ export function Navegacao() {
           // No celular, só o balão: com a palavra e o número, as abas passavam
           // de 375px e empurravam a lupa e a engrenagem para fora da tela.
           { href: "/mensagens", rotulo: "Mensagens", contador: naoLidas, icone: BALAO },
-          { href: `/u/${eu.username}`, rotulo: "Meu diário" },
+          // Também só o ícone no celular: com o sino das notificações (#103)
+          // ao lado da lupa, a palavra empurrava a engrenagem para fora.
+          { href: `/u/${eu.username}`, rotulo: "Meu diário", icone: CADERNO },
         ]
       : []),
   ];
@@ -106,6 +111,32 @@ export function Navegacao() {
               }
             >
               <Icone d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM21 21l-4.35-4.35" />
+            </Link>
+          )}
+          {/* As notificações (#103): um sino ao lado da lupa, e não mais uma
+              aba, pelo mesmo motivo. O número fica no canto do sino. */}
+          {eu && (
+            <Link
+              href="/notificacoes"
+              aria-label={novas ? `Notificações, ${novas} ${novas === 1 ? "nova" : "novas"}` : "Notificações"}
+              title="Notificações"
+              aria-current={caminho === "/notificacoes" ? "page" : undefined}
+              className={
+                "relative grid size-9 place-items-center rounded-lg border transition-colors " +
+                (caminho === "/notificacoes"
+                  ? "border-destaque bg-destaque-fundo text-destaque"
+                  : "border-linha text-tinta-suave hover:text-tinta")
+              }
+            >
+              <Icone d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" />
+              {novas ? (
+                <span
+                  aria-hidden
+                  className="absolute -right-1.5 -top-1.5 grid min-w-[18px] place-items-center rounded-full bg-destaque px-1 text-[10px] font-semibold leading-[18px] text-sobre-destaque"
+                >
+                  {novas > 9 ? "9+" : novas}
+                </span>
+              ) : null}
             </Link>
           )}
           {eu === null && (
@@ -243,6 +274,7 @@ function Configuracoes({ logado }: { logado: boolean }) {
 
 // O balão de conversa da aba Mensagens no celular.
 const BALAO = "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z";
+const CADERNO = "M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14ZM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5";
 
 // Ícone de traço simples, sempre do mesmo tamanho e espessura.
 function Icone({ d }: { d: string }) {
