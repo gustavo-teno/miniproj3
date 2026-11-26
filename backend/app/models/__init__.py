@@ -7,6 +7,7 @@ from app.models.follow import Follow  # noqa: F401
 from app.models.leitura import Leitura  # noqa: F401
 from app.models.like import Like  # noqa: F401
 from app.models.mensagem import Mensagem  # noqa: F401
+from app.models.notificacao_vista import NotificacaoVista  # noqa: F401
 from app.models.post import Post  # noqa: F401
 from app.models.salvo import Salvo  # noqa: F401
 from app.models.sessao import Sessao  # noqa: F401
