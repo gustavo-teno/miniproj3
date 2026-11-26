@@ -1,6 +1,7 @@
 "use client";
 
 import { BoasVindasDeVolta } from "@/components/BoasVindasDeVolta";
+import { Feed } from "@/components/Feed";
 import { useExigeLogin } from "@/lib/useExigeLogin";
 
 export default function Home() {
@@ -10,17 +11,10 @@ export default function Home() {
   if (!liberado) return null;
   return (
     <div className="space-y-3">
-      {/* Pessoa B: a linha de boas-vindas depois do login. Fica no topo quando o feed de verdade (D) entrar. */}
+      {/* Pessoa B: a linha de boas-vindas depois do login, no topo do feed. */}
       <BoasVindasDeVolta />
-      <h1 className="text-2xl font-bold">Feed</h1>
-      <p className="text-zinc-600">
-        Aqui nasce o feed do seu nicho (feature do núcleo). Enquanto isso, veja
-        o slice de exemplo em{" "}
-        <a href="/usuarios" className="underline">
-          /usuarios
-        </a>{" "}
-        — toda feature sua imita aquele caminho.
-      </p>
+      {/* Pessoa D (#16): o feed de quem você segue. */}
+      <Feed />
     </div>
   );
 }
