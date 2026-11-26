@@ -25,10 +25,10 @@ trava outra pessoa vira issue, com o link aqui.
     os testes do núcleo passam. É a meta da terça à noite.
 
 **Qua 25: Turmas** (decisão 5).
-- [ ] Rotas para listar as turmas (uma por vestibular e uma por curso, tiradas de
+- [x] Rotas para listar as turmas (uma por vestibular e uma por curso, tiradas de
     `app/constantes.py`, com o número de membros), os membros de uma turma e os posts deles, com filtro por
     matéria.
-- [ ] "Outro" também é turma: "Outros vestibulares" e "Outros cursos". Nelas, o
+- [x] "Outro" também é turma: "Outros vestibulares" e "Outros cursos". Nelas, o
     card do membro mostra o que ele escreveu ("quer Geografia").
 - [ ] Aba Turmas e a página da turma: membros com `<BotaoSeguir />` e posts com
     `<CardPost>`.
@@ -50,6 +50,12 @@ estiver mais atrasado.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **qui 26:** API das Turmas (#17), no formato que a Camila pediu para as telas:
+  `GET /turmas` (minhas, vestibulares e cursos, com `pessoas` e
+  `estudaram_hoje`), `GET /turmas/{tipo}/{chave}` e, paginados, `/membros`
+  (meta, texto do "Outro", `estudou_hoje`, `segue_voce`) e `/posts?tag=`
+  (PostOut). "Estudou hoje" usa o dia de Brasília e ignora bate-papo, como a
+  ofensiva. Quem não escolheu a meta não entra em turma. Telas ainda faltam.
 - **ter 24:** revisão do follow (Camila, #33): textos de erro do `<BotaoSeguir>`
   no padrão do DESIGN.md; clique duplo rápido não dá mais 500 (o
   `IntegrityError` vira 204, como nas curtidas, com teste); `@skip` do teste de
