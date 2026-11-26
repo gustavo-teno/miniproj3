@@ -216,7 +216,7 @@ function AbaChamada({
           disabled={carregandoMais}
           className="mt-3 text-sm font-semibold text-destaque hover:underline disabled:opacity-60"
         >
-          {carregandoMais ? "Carregando..." : `Ver as ${total} pessoas`}
+          {carregandoMais ? "Carregando..." : "Ver mais pessoas"}
         </button>
       )}
     </>
@@ -306,7 +306,7 @@ function AbaPosts({ turma }: { turma: Turma }) {
 
       {/* No celular as etiquetas rolam para o lado numa linha só; no
           computador, quebram em mais de uma linha. */}
-      <div role="group" aria-label="Filtrar por matéria" className="-mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap">
+      <div role="group" aria-label="Filtrar por matéria" className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1 pt-1 sm:flex-wrap">
         <button
           type="button"
           aria-pressed={tag === ""}

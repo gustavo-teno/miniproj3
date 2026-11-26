@@ -60,9 +60,9 @@ export function CartaoMembro({ membro: m, numero, tipo, chave, opcoes, souEu, me
         <Avatar autor={m} />
       </span>
       <div className="min-w-0 flex-1 text-sm">
-        {/* No celular, o nome tem uma linha só e o resto tem duas: o "decidindo
-            entre Direito e Psicologia" das turmas "Outros" não pode ser cortado.
-            No computador, tudo corre numa linha, como no desenho. */}
+        {/* No celular, o nome tem até duas linhas e o resto até três: o
+            "decidindo entre Direito e Psicologia" das turmas "Outros" não pode
+            ser cortado. No computador, tudo corre numa linha, como no desenho. */}
         <p className="line-clamp-2 sm:inline">
           <Link href={`/u/${m.username}`} className="text-[15px] font-semibold hover:underline">
             {m.name}
