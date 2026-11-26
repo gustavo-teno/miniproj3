@@ -323,7 +323,14 @@ function ItemComentario({
       {/* As respostas ficam fora da coluna do texto: no celular, recuar também
           a largura da foto deixaria o texto espremido. */}
       {respostas.length > 0 && (
-        <ul className="ml-4 mt-3 space-y-3 border-l-2 border-linha pl-3 sm:ml-12">
+        // No celular, só o primeiro nível de respostas recua: as do terceiro
+        // nível em diante ficam alinhadas a ele (o "em resposta a" já diz a
+        // quem respondem). No computador, cada nível recua.
+        <ul
+          className={`mt-3 space-y-3 sm:ml-12 sm:border-l-2 sm:border-linha sm:pl-3 ${
+            nivel === 0 ? "ml-4 border-l-2 border-linha pl-3" : ""
+          }`}
+        >
           {respostas.map(({ comentario, respondeA }) => (
             <li key={comentario.id}>
               <ItemComentario
