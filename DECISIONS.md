@@ -174,6 +174,17 @@ entram na tabela "Quem faz o quê" de lá.
 | Curtir mensagem nas DMs | Pessoa A (Gustavo) | Dois toques num balão dizem "valeu" ou "tamo junto" sem precisar escrever, como nos apps de mensagem. |
 | Emoji ao escrever | Pessoa A (Gustavo) | Quem escreve pelo computador também comemora uma lista feita com 🔥 ou 💪, como faria no celular. |
 | Salvar posts | Pessoa A (Gustavo) | Guardar uma explicação boa ou uma lista de questões para rever depois, só para você. |
+| Comentários em árvore e curtir comentário | Pessoa C (Clarisse) | A dúvida de um comentário vira conversa embaixo dele, e uma dica boa ganha um "valeu" sem precisar escrever. |
+
+**Comentários em árvore: a árvore é montada a cada pedido.** O
+`core/arvore.py` recebe os comentários diretos no post (a página pedida) e
+todas as respostas do post, numa consulta só, e pendura cada resposta no pai:
+um dict de filhos por pai numa passada e uma recursão que visita cada
+comentário uma vez, O(n) no número de respostas do post. Não guardamos a
+árvore em memória: a conversa de um post tem dezenas de comentários, então
+montar de novo é barato e ela nunca fica desatualizada quando alguém responde
+ou um post é apagado. A página continua contando só os comentários diretos, e
+a ordem é cronológica em todo nível, como pede o contrato.
 
 **Login sem prazo de validade (escolha consciente).** O token do login vale
 até a pessoa clicar em sair, que apaga a sessão no banco. Uma validade (por

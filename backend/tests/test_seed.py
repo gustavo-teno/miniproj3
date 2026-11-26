@@ -7,12 +7,13 @@ demonstração entrando e a ofensiva aparecendo de todos os jeitos.
 from datetime import datetime, timezone
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.constantes import CURSOS, TAGS, TAG_PADRAO, VESTIBULARES
 from app.core.ofensiva import calcular, dia_em_brasilia, hoje_em_brasilia
 from app.db import SessionLocal
 from app.models.comment import Comment
+from app.models.curtida_comentario import CurtidaComentario
 from app.models.post import Post
 from app.models.user import User
 
@@ -56,6 +57,18 @@ def test_comentario_vem_depois_do_post(db):
     for comentario in db.scalars(select(Comment)):
         post = db.get(Post, comentario.post_id)
         assert post.created_at <= comentario.created_at <= AGORA
+
+
+def test_conversas_tem_respostas_do_autor_e_curtidas(db):
+    respostas = list(db.scalars(select(Comment).where(Comment.parent_id.is_not(None))))
+    assert respostas, "a conversa dos posts precisa ter respostas para a demo"
+    for resposta in respostas:
+        pai = db.get(Comment, resposta.parent_id)
+        # Quem responde é quem postou, depois do comentário e no mesmo post.
+        assert resposta.post_id == pai.post_id
+        assert resposta.autor_id == db.get(Post, resposta.post_id).autor_id
+        assert pai.created_at <= resposta.created_at <= AGORA
+    assert db.scalar(select(func.count()).select_from(CurtidaComentario)) > 0
 
 
 def test_ofensiva_aparece_de_todos_os_jeitos(db):

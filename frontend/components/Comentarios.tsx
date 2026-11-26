@@ -6,13 +6,15 @@
 // - <Comentarios postId=... /> é a conversa, na página do post, dentro da folha
 //   do post (CardPost `embaixo`): o campo para comentar vem logo embaixo do post,
 //   e os comentários, do mais antigo para o mais novo, em caixinhas, com
-//   "carregar mais".
+//   "carregar mais". Cada comentário tem curtida e "Responder", e as respostas
+//   ficam recuadas dentro da caixinha (comentários em árvore).
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
 import { Avatar } from "@/components/Avatar";
-import { apiGet, apiPost, type Comentario, type Page, type Post } from "@/lib/api";
+import { BotaoCurtir } from "@/components/BotaoCurtir";
+import { apiGet, apiPost, type Comentario, type ComentarioPage, type Post } from "@/lib/api";
 import { dataCompleta, tempoDesde } from "@/lib/tempo";
 
 // O mesmo limite do backend (schemas/comentario.py), para avisar antes de enviar.
@@ -37,24 +39,46 @@ export function LinkComentarios({ post }: { post: Pick<Post, "id" | "comentarios
   );
 }
 
+// Põe a resposta nova embaixo do comentário que ela responde, no fim das
+// respostas dele (a ordem é cronológica), em qualquer nível da árvore.
+function pendurar(lista: Comentario[], nova: Comentario): Comentario[] {
+  return lista.map((c) =>
+    c.id === nova.parent_id
+      ? { ...c, respostas: [...c.respostas, nova] }
+      : { ...c, respostas: pendurar(c.respostas, nova) },
+  );
+}
+
+// Do terceiro nível em diante as respostas não recuam mais (no celular o texto
+// ficaria espremido): elas vêm numa lista só, cada uma dizendo a quem responde.
+function achatar(c: Comentario): { comentario: Comentario; respondeA: string }[] {
+  return c.respostas.flatMap((r) => [{ comentario: r, respondeA: c.autor.name }, ...achatar(r)]);
+}
+
 export function Comentarios({ postId }: { postId: number }) {
   const [comentarios, setComentarios] = useState<Comentario[]>([]);
+  // `total` conta só os comentários diretos no post (é o que a página pagina);
+  // `totalGeral` conta as respostas também, para o "N comentários".
   const [total, setTotal] = useState(0);
+  const [totalGeral, setTotalGeral] = useState(0);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   // A pessoa comentou antes de carregar a conversa toda (ver adicionar).
   const [enviadoNoFim, setEnviadoNoFim] = useState(false);
+  // O comentário cuja caixa de resposta está aberta (uma por vez).
+  const [respondendo, setRespondendo] = useState<number | null>(null);
 
   const carregar = useCallback(
     async (offset: number) => {
       setCarregando(true);
       setErro(null);
       try {
-        const pagina = await apiGet<Page<Comentario>>(
+        const pagina = await apiGet<ComentarioPage>(
           `/posts/${postId}/comentarios?offset=${offset}&limit=${POR_PAGINA}`,
         );
         setComentarios((atuais) => (offset === 0 ? pagina.items : [...atuais, ...pagina.items]));
         setTotal(pagina.total);
+        setTotalGeral(pagina.total_com_respostas);
         // Chegou ao fim: o comentário que a pessoa mandou já está na lista.
         if (offset + pagina.items.length >= pagina.total) setEnviadoNoFim(false);
       } catch {
@@ -71,6 +95,13 @@ export function Comentarios({ postId }: { postId: number }) {
   }, [carregar]);
 
   function adicionar(novo: Comentario) {
+    setTotalGeral((t) => t + 1);
+    // Uma resposta entra embaixo do comentário que ela responde, que já está na tela.
+    if (novo.parent_id !== null) {
+      setComentarios((atuais) => pendurar(atuais, novo));
+      setRespondendo(null);
+      return;
+    }
     setTotal((t) => t + 1);
     // O novo é o mais recente, então o lugar dele é o fim da conversa. Se ainda
     // faltam comentários para carregar, ele não entra agora: o "carregar mais"
@@ -83,10 +114,12 @@ export function Comentarios({ postId }: { postId: number }) {
     setComentarios((atuais) => [...atuais, novo]);
   }
 
+  const conversa = { postId, respondendo, setRespondendo, onComentou: adicionar };
+
   return (
     <section aria-label="Comentários">
       <h2 className="text-sm font-semibold text-tinta-suave">
-        {total === 1 ? "1 comentário" : `${total} comentários`}
+        {totalGeral === 1 ? "1 comentário" : `${totalGeral} comentários`}
       </h2>
 
       {/* A caixa de comentar fica logo embaixo do post, como no Twitter. */}
@@ -102,28 +135,12 @@ export function Comentarios({ postId }: { postId: number }) {
         <ul className="mt-5 space-y-4">
           {comentarios.map((c) => (
             // Cada comentário é uma caixinha com uma fitinha no topo, como um papel
-            // colado na folha do post.
+            // colado na folha do post. As respostas ficam dentro dela.
             <li
               key={c.id}
-              className="relative flex gap-3 rounded-xl border border-linha bg-superficie px-3 py-2.5 before:absolute before:-top-1.5 before:left-3.5 before:h-3 before:w-11 before:rounded-[3px] before:bg-[color-mix(in_srgb,var(--destaque)_16%,var(--superficie))]"
+              className="relative rounded-xl border border-linha bg-superficie px-3 py-2.5 before:absolute before:-top-1.5 before:left-3.5 before:h-3 before:w-11 before:rounded-[3px] before:bg-[color-mix(in_srgb,var(--destaque)_16%,var(--superficie))]"
             >
-              <Avatar autor={c.autor} />
-              <div className="min-w-0 flex-1">
-                <p className="flex items-baseline gap-2 text-sm">
-                  <Link href={`/u/${c.autor.username}`} className="truncate font-semibold hover:underline">
-                    {c.autor.name}
-                  </Link>
-                  <time
-                    dateTime={c.created_at}
-                    title={dataCompleta(c.created_at)}
-                    suppressHydrationWarning
-                    className="flex-none text-tinta-suave"
-                  >
-                    {tempoDesde(c.created_at)}
-                  </time>
-                </p>
-                <p className="mt-0.5 whitespace-pre-line break-words font-light">{c.texto}</p>
-              </div>
+              <ItemComentario comentario={c} nivel={0} {...conversa} />
             </li>
           ))}
         </ul>
@@ -148,11 +165,115 @@ export function Comentarios({ postId }: { postId: number }) {
   );
 }
 
-function FormComentario({ postId, onComentou }: { postId: number; onComentou: (c: Comentario) => void }) {
+type Conversa = {
+  postId: number;
+  respondendo: number | null;
+  setRespondendo: (id: number | null) => void;
+  onComentou: (c: Comentario) => void;
+};
+
+// Um comentário com a curtida, o "Responder" e as respostas dele. O nível 0 é o
+// comentário direto no post; o 1, a resposta dele, recuada; do 2 em diante as
+// respostas vêm numa lista só (achatar), sem recuar mais.
+function ItemComentario({
+  comentario: c,
+  nivel,
+  respondeA,
+  ...conversa
+}: Conversa & { comentario: Comentario; nivel: number; respondeA?: string }) {
+  const { postId, respondendo, setRespondendo, onComentou } = conversa;
+  const respostas =
+    nivel === 0
+      ? c.respostas.map((r) => ({ comentario: r, respondeA: undefined }))
+      : nivel === 1
+        ? achatar(c)
+        : [];
+
+  return (
+    <div>
+      <div className="flex gap-3">
+        <Avatar autor={c.autor} />
+        <div className="min-w-0 flex-1">
+          <p className="flex items-baseline gap-2 text-sm">
+            <Link href={`/u/${c.autor.username}`} className="truncate font-semibold hover:underline">
+              {c.autor.name}
+            </Link>
+            <time
+              dateTime={c.created_at}
+              title={dataCompleta(c.created_at)}
+              suppressHydrationWarning
+              className="flex-none text-tinta-suave"
+            >
+              {tempoDesde(c.created_at)}
+            </time>
+          </p>
+          {respondeA && <p className="text-xs text-tinta-suave">em resposta a {respondeA}</p>}
+          <p className="mt-0.5 whitespace-pre-line break-words font-light">{c.texto}</p>
+
+          <div className="mt-1.5 flex items-center gap-5 text-xs text-tinta-suave">
+            <BotaoCurtir post={c} caminho={`/posts/${postId}/comentarios/${c.id}/curtir`} />
+            <button
+              type="button"
+              onClick={() => setRespondendo(respondendo === c.id ? null : c.id)}
+              aria-expanded={respondendo === c.id}
+              className="font-semibold hover:text-destaque"
+            >
+              Responder
+            </button>
+          </div>
+
+          {respondendo === c.id && (
+            <FormComentario
+              postId={postId}
+              parentId={c.id}
+              paraQuem={c.autor.name}
+              onComentou={onComentou}
+              onCancelar={() => setRespondendo(null)}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* As respostas ficam fora da coluna do texto: no celular, recuar também
+          a largura da foto deixaria o texto espremido. */}
+      {respostas.length > 0 && (
+        <ul className="ml-4 mt-3 space-y-3 border-l-2 border-linha pl-3 sm:ml-12">
+          {respostas.map(({ comentario, respondeA }) => (
+            <li key={comentario.id}>
+              <ItemComentario
+                comentario={comentario}
+                nivel={nivel + 1}
+                respondeA={respondeA}
+                {...conversa}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function FormComentario({
+  postId,
+  onComentou,
+  parentId,
+  paraQuem,
+  onCancelar,
+}: {
+  postId: number;
+  onComentou: (c: Comentario) => void;
+  // Para responder a um comentário: o id dele e o nome de quem escreveu.
+  parentId?: number;
+  paraQuem?: string;
+  onCancelar?: () => void;
+}) {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const campo = useRef<HTMLTextAreaElement>(null);
+  const resposta = parentId !== undefined;
+  const rotulo = resposta ? `Responder a ${paraQuem}` : "Escreva um comentário";
 
   // O campo cresce com o texto (uma linha, no começo) e volta ao tamanho de uma
   // linha depois de enviar.
@@ -170,7 +291,10 @@ function FormComentario({ postId, onComentou }: { postId: number; onComentou: (c
     setEnviando(true);
     setErro(null);
     try {
-      const novo = await apiPost<Comentario>(`/posts/${postId}/comentarios`, { texto: texto.trim() });
+      const novo = await apiPost<Comentario>(`/posts/${postId}/comentarios`, {
+        texto: texto.trim(),
+        parent_id: parentId ?? null,
+      });
       onComentou(novo);
       setTexto("");
     } catch (falha) {
@@ -182,28 +306,42 @@ function FormComentario({ postId, onComentou }: { postId: number; onComentou: (c
   }
 
   return (
-    <form onSubmit={enviar} className="mt-3">
+    <form onSubmit={enviar} className={resposta ? "mt-2" : "mt-3"}>
       <div className="flex items-end gap-2 rounded-xl border border-destaque/40 bg-superficie p-2 pl-3">
-        <label htmlFor="comentario" className="sr-only">
-          Escreva um comentário
+        <label htmlFor={`comentario-${parentId ?? "post"}`} className="sr-only">
+          {rotulo}
         </label>
         <textarea
-          id="comentario"
+          id={`comentario-${parentId ?? "post"}`}
           ref={campo}
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape" && onCancelar) onCancelar();
+          }}
           maxLength={MAX_TEXTO}
           required
           rows={1}
-          placeholder="Escreva um comentário"
+          // Quem clicou em "Responder" já vai escrevendo.
+          autoFocus={resposta}
+          placeholder={rotulo}
           className="max-h-40 min-w-0 flex-1 resize-none bg-transparent py-1 text-sm text-tinta outline-none placeholder:text-tinta-suave"
         />
+        {onCancelar && (
+          <button
+            type="button"
+            onClick={onCancelar}
+            className="flex-none px-2 py-1.5 text-sm text-tinta-suave hover:text-tinta"
+          >
+            Cancelar
+          </button>
+        )}
         <button
           type="submit"
           disabled={enviando || !texto.trim()}
           className="flex-none rounded-full bg-destaque px-4 py-1.5 text-sm font-semibold text-sobre-destaque disabled:opacity-60"
         >
-          {enviando ? "Enviando..." : "Comentar"}
+          {enviando ? "Enviando..." : resposta ? "Responder" : "Comentar"}
         </button>
       </div>
       {erro && <p className="mt-2 text-sm text-erro">{erro}</p>}
