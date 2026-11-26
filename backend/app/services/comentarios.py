@@ -12,6 +12,21 @@ from app.models.user import User
 from app.schemas.comentario import ComentarioCriar
 from app.services.posts import buscar
 
+# Até quantos níveis a conversa desce (o comentário direto no post é o 1).
+# Sem limite, uma corrente de respostas criada de propósito pela API deixaria
+# a árvore funda demais para a recursão do core/ (o Python para em ~1.000).
+PROFUNDIDADE_MAXIMA = 10
+
+
+def _nivel(db: Session, comentario: Comment) -> int:
+    """Em que nível o comentário está, subindo pelos pais. Para no limite: com
+    ele, nenhuma conversa passa de PROFUNDIDADE_MAXIMA níveis."""
+    nivel = 1
+    while comentario.parent_id is not None and nivel <= PROFUNDIDADE_MAXIMA:
+        comentario = db.get(Comment, comentario.parent_id)
+        nivel += 1
+    return nivel
+
 
 def _buscar(db: Session, post_id: int, comentario_id: int) -> Comment:
     """O comentário, se ele existe e é deste post; senão 404."""
@@ -24,7 +39,12 @@ def _buscar(db: Session, post_id: int, comentario_id: int) -> Comment:
 def criar(db: Session, user: User, post_id: int, dados: ComentarioCriar) -> Comment:
     buscar(db, post_id)  # 404 se o post não existe
     if dados.parent_id is not None:
-        _buscar(db, post_id, dados.parent_id)  # 404 se o pai não existe ou é de outro post
+        pai = _buscar(db, post_id, dados.parent_id)  # 404 se o pai não existe ou é de outro post
+        if _nivel(db, pai) >= PROFUNDIDADE_MAXIMA:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Esta conversa chegou ao limite de {PROFUNDIDADE_MAXIMA} níveis de resposta.",
+            )
     comentario = Comment(
         autor_id=user.id, post_id=post_id, parent_id=dados.parent_id, texto=dados.texto
     )

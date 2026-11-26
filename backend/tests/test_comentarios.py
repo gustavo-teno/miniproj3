@@ -181,3 +181,19 @@ def test_ver_conversa_de_outro_post_ou_inexistente_da_404(client, logar):
     assert client.get(f"/posts/{outro}/comentarios/{pai_id}", headers=ana).status_code == 404
     assert client.get(f"/posts/{post_id}/comentarios/999", headers=ana).status_code == 404
     assert client.get(f"/posts/{post_id}/comentarios/{pai_id}").status_code == 401
+
+
+def test_respostas_param_no_limite_de_profundidade(client, logar):
+    from app.services.comentarios import PROFUNDIDADE_MAXIMA
+
+    ana, _bia, post_id, pai_id = _post_com_comentario(client, logar)
+    url = f"/posts/{post_id}/comentarios"
+    # O comentário direto é o nível 1; as respostas vão até o último nível permitido.
+    for _ in range(PROFUNDIDADE_MAXIMA - 1):
+        r = client.post(url, json={"texto": "mais uma", "parent_id": pai_id}, headers=ana)
+        assert r.status_code == 201
+        pai_id = r.json()["id"]
+
+    r = client.post(url, json={"texto": "funda demais", "parent_id": pai_id}, headers=ana)
+    assert r.status_code == 422
+    assert "limite" in r.json()["detail"]
