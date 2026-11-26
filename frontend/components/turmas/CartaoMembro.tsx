@@ -36,7 +36,9 @@ export function CartaoMembro({ membro: m, tipo, chave, opcoes, souEu }: Props) {
           </Link>
           {souEu && <span className="flex-none text-xs font-semibold text-destaque">você</span>}
         </p>
-        {meta && <p className="truncate text-sm text-tinta-suave">{meta}</p>}
+        {/* Duas linhas, e não uma: no celular, o "decidindo entre Direito e
+            Psicologia" das turmas "Outros" não cabe numa linha só. */}
+        {meta && <p className="line-clamp-2 break-words text-sm text-tinta-suave">{meta}</p>}
         {(m.estudou_hoje || m.segue_voce) && (
           <p className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-tinta-suave">
             {m.estudou_hoje && (
