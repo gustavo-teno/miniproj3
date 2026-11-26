@@ -404,3 +404,19 @@ export function descurtirMensagem(id: number): Promise<void> {
 export function buscarSalvos(offset = 0, limit = 20): Promise<Page<Post>> {
   return apiGet<Page<Post>>(`/salvos?offset=${offset}&limit=${limit}`);
 }
+
+// ---- feed (#16, Pessoa D; espelha backend/app/routers/feed.py) ----
+
+export type FiltrosFeed = {
+  materias: string[]; // vazio = todas as matérias
+  esconderBatePapo: boolean;
+};
+
+// Cronológico, só de quem você segue (decisão 3). O bate-papo não é matéria:
+// só o esconderBatePapo decide se ele aparece.
+export function buscarFeed(filtros: FiltrosFeed, offset = 0, limit = 20): Promise<Page<Post>> {
+  const params = new URLSearchParams({ offset: String(offset), limit: String(limit) });
+  for (const m of filtros.materias) params.append("tag", m);
+  if (filtros.esconderBatePapo) params.set("esconder_bate_papo", "true");
+  return apiGet<Page<Post>>(`/feed?${params}`);
+}
