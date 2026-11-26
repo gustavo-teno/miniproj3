@@ -4,8 +4,8 @@ import { apagarToken, lerToken, salvarToken } from "@/lib/sessao";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-function headers(): HeadersInit {
-  const h: Record<string, string> = { "Content-Type": "application/json" };
+function headers(tipo: string): HeadersInit {
+  const h: Record<string, string> = { "Content-Type": tipo };
   // O token do login (guia 01, Passo 4): é ele que diz ao backend quem é você.
   const token = lerToken();
   if (token) h["Authorization"] = `Bearer ${token}`;
@@ -20,15 +20,17 @@ function headers(): HeadersInit {
   return h;
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+// O pedido ao backend e o tratamento das falhas, em um lugar só. O corpo vai
+// como veio: o request abaixo manda JSON, e o lib/imagem.ts manda os bytes da
+// imagem. Devolve a resposta, para quem chama ler JSON ou bytes.
+export async function pedirAoBackend(
+  method: string,
+  path: string,
+  { corpo, tipo = "application/json", cache = "no-store" }: { corpo?: BodyInit; tipo?: string; cache?: RequestCache } = {},
+): Promise<Response> {
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, {
-      method,
-      headers: headers(),
-      body: body === undefined ? undefined : JSON.stringify(body),
-      cache: "no-store",
-    });
+    res = await fetch(`${BASE}${path}`, { method, headers: headers(tipo), body: corpo, cache });
   } catch {
     // Sem resposta nenhuma (backend fora do ar, internet caiu). O navegador
     // diria "Failed to fetch", em inglês e sem explicar nada.
@@ -47,7 +49,13 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     const erro = await res.json().catch(() => null);
     throw new Error(mensagemDoErro(erro?.detail) ?? `Não foi possível concluir o pedido (erro ${res.status}).`);
   }
+  return res;
+}
 
+async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  const res = await pedirAoBackend(method, path, {
+    corpo: body === undefined ? undefined : JSON.stringify(body),
+  });
   // 204 No Content (seguir, curtir, apagar...) não tem corpo: não há JSON para ler.
   if (res.status === 204) return undefined as T;
   return res.json();
