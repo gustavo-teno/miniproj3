@@ -407,6 +407,9 @@ function FormComentario({
 }) {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
+  // A ref muda na hora; o estado só no próximo desenho. Cliques que chegam
+  // juntos ainda veem `enviando` falso, mas já veem a ref ligada.
+  const enviandoAgora = useRef(false);
   const [erro, setErro] = useState<string | null>(null);
   const campo = useRef<HTMLTextAreaElement>(null);
   const resposta = parentId !== undefined;
@@ -425,6 +428,8 @@ function FormComentario({
   async function enviar(e: FormEvent) {
     e.preventDefault();
     if (!texto.trim()) return;
+    if (enviandoAgora.current) return; // cliques que chegam juntos não criam o comentário duas vezes
+    enviandoAgora.current = true;
     setEnviando(true);
     setErro(null);
     try {
@@ -438,6 +443,7 @@ function FormComentario({
       // O texto fica no campo: ninguém perde o que escreveu por causa de um erro.
       setErro(falha instanceof Error ? falha.message : "Não foi possível comentar. Tente de novo.");
     } finally {
+      enviandoAgora.current = false;
       setEnviando(false);
     }
   }
