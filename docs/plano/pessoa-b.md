@@ -56,12 +56,17 @@ caminho.
 - [x] Colocar no perfil o botão de seguir (D) e, quando sair, o `<Ofensiva />` (A).
 
 **Qua 25:** ajustes visuais nas telas de todo mundo, estados vazios e tela de
-celular. Escrever o roteiro do vídeo.
+celular.
+- [x] Estados vazios e tela de celular conferidos em 375px e 360px (#58, #61 e #71).
 
-**Qui 26:** gravar o vídeo (cerca de 4 minutos), no seu computador com o seed,
-para não depender do deploy: cadastro, login, post, follow
-e feed, depois a ofensiva e as Turmas, e uma decisão de produto ("a rede não
-compara por você").
+**Qui 26:** passada final no front, no celular e no computador, nos modos claro
+e noturno, como a banca faria (cadastro, login, post, follow, feed), e os
+prints para o time.
+- [x] Página do post com o post e os comentários na mesma folha (#73).
+- [ ] Respostas dentro dos comentários e curtidas em comentário: backend da
+    Clarisse; o desenho está aprovado e o lugar no código está avisado no #73.
+
+O vídeo (#19) saiu da minha lista em 25/11: o responsável novo está a definir.
 
 **Revisa:** PRs que mexem em layout, navegação, `lib/api.ts` e componentes
 compartilhados.
@@ -71,6 +76,27 @@ compartilhados.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **qui 26:** página do post e fechamento do front. Abri o #73: o post e os
+  comentários ficam na mesma folha (a listra lavanda desce por toda ela), com a
+  caixa de comentar logo embaixo do post e cada comentário numa caixinha com
+  fitinha no topo. Clicar num post, em qualquer lista, abre a página dele (os
+  botões e a seleção de texto continuam funcionando), e a pauta do caderno
+  também está nas caixas de escrever o post (não nas mensagens nem nos
+  comentários). As respostas dentro dos comentários e as curtidas em comentário
+  ficam com a Clarisse (precisam de backend): já avisei ela e deixei no PR o
+  lugar certo no código. Revisei os PRs do Gustavo (DMs na tela, botão
+  Mensagem, salvar, emoji e curtir mensagem) e, com todos aprovados, mergeei o
+  #58, o #65, o #67 e o #69 na `main`. Atualizei o DESIGN.md com o topo do
+  perfil no celular, a página do post e as DMs.
+- **qua 25:** estados vazios, celular e o lavanda. Conferi todas as telas em
+  375px (e a barra do topo em 360px): no celular, o Meu diário passou a mostrar o
+  perfil primeiro, e o texto da busca coube na caixa (#58). O lavanda ficou mais
+  claro e pastel (`#7263b0`, com contraste acima de 4,5 nos botões e nos textos),
+  os avatares sem foto ganharam uma cor pastel por pessoa e os números passaram
+  para a Lexend (#54). Abri o #71: o topo do perfil no celular, com o avatar ao
+  lado do nome e o resto em largura total, e os três blocos da coluna do diário
+  no computador com a mesma altura (264px). Pedi mudanças e depois aprovei as
+  telas das DMs (#61 e #62). O botão de seguir entrou no perfil (#50).
 - **ter 24:** feedback de design do Gustavo e botão de seguir. O DESIGN.md (#35)
   e os ajustes do feedback (#52) entraram na `main`: uma cor por área de matéria
   (Exatas azul, Natureza verde, Linguagens vermelho, Humanas amarelo, Idiomas

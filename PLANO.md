@@ -123,8 +123,8 @@ rota.
 | **dom 22** | Auth no backend | Posts: backend + tela + card | | |
 | **seg 23** | Auth na tela | Perfil: backend + topo com a meta | Curtidas | Follow |
 | **ter 24** | DMs: backend + testes (ofensiva já pronta) | Perfil: divisórias e edição | Comentários | Feed + tirar os `@skip` |
-| **qua 25** | DMs: tela e contador de não lidas | Ajustes visuais nas telas de todo mundo + roteiro do vídeo | Seed com cara de vestibulando | Turmas |
-| **qui 26** | Busca + DECISIONS final | Gravar o vídeo (local, com o seed) | Deploy (+10) | Revisar o fluxo inteiro na tela |
+| **qua 25** | DMs: tela e contador de não lidas | Ajustes visuais nas telas de todo mundo, estados vazios e celular | Seed com cara de vestibulando | Turmas |
+| **qui 26** | Busca + DECISIONS final | Passada final no front (celular e computador) e os prints | Deploy (+10) | Revisar o fluxo inteiro na tela |
 | **sex 27** | **Todos:** pitch, uso de IA no DECISIONS, folga para imprevistos e entrega | | | |
 
 **Meta da terça à noite:** o fluxo cadastro → login → post → follow → feed
@@ -141,7 +141,7 @@ arquivo dos outros.
 - [Pessoa C — Clarisse (Dados)](docs/plano/pessoa-c.md): Curtidas (#11) → Comentários (#12) → Seed (#13) → Deploy (#14)
 - [Pessoa D — Pedro (Reforço)](docs/plano/pessoa-d.md): Follow (#15) → Feed (#16) → Turmas (#17)
 - Extras da Pessoa A (Gustavo): DMs entre mútuos (#18) → Busca (#38)
-- Entregas: vídeo (#19, Camila), pitch (#20, todos) e DECISIONS final
+- Entregas: vídeo (#19, saiu da Camila em 25/11; responsável a definir), pitch (#20, todos) e DECISIONS final
   (#21, Gustavo e todos). Vídeo e pitch não viram PR: quem é responsável
   fecha a issue à mão quando entregar.
 
