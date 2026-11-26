@@ -259,6 +259,7 @@ export type Post = {
   curtidas: number;
   comentarios: number;
   curtido_por_mim: boolean; // depende de quem está vendo
+  salvo_por_mim: boolean; // idem, para o botão Salvar (#64)
 };
 
 // Um comentário de GET /posts/{id}/comentarios (#12, Pessoa C).
@@ -386,4 +387,11 @@ export function curtirMensagem(id: number): Promise<void> {
 
 export function descurtirMensagem(id: number): Promise<void> {
   return apiDelete(`/dms/mensagens/${id}/curtir`);
+}
+
+// ---- posts salvos (#64, Pessoa A) ----
+
+// Os posts que você salvou, do salvo mais recente para o mais antigo.
+export function buscarSalvos(offset = 0, limit = 20): Promise<Page<Post>> {
+  return apiGet<Page<Post>>(`/salvos?offset=${offset}&limit=${limit}`);
 }

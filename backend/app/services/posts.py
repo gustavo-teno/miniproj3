@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.models.comment import Comment
 from app.models.like import Like
 from app.models.post import Post
+from app.models.salvo import Salvo
 from app.models.user import User
 from app.schemas.post import PostCriar, PostEditar
 
@@ -53,9 +54,10 @@ def editar(db: Session, user: User, post_id: int, dados: PostEditar) -> Post:
 
 def apagar(db: Session, user: User, post_id: int) -> None:
     post = _do_autor(db, user, post_id)
-    # O SQLite não apaga em cascata sozinho: curtidas e comentários vão antes,
-    # senão ficam apontando para um post que não existe mais.
+    # O SQLite não apaga em cascata sozinho: curtidas, comentários e salvos vão
+    # antes, senão ficam apontando para um post que não existe mais.
     db.execute(delete(Like).where(Like.post_id == post.id))
     db.execute(delete(Comment).where(Comment.post_id == post.id))
+    db.execute(delete(Salvo).where(Salvo.post_id == post.id))
     db.delete(post)
     db.commit()
