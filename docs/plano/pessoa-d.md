@@ -30,7 +30,7 @@ trava outra pessoa vira issue, com o link aqui.
     matéria.
 - [x] "Outro" também é turma: "Outros vestibulares" e "Outros cursos". Nelas, o
     card do membro mostra o que ele escreveu ("quer Geografia").
-- [ ] Aba Turmas e a página da turma: membros com `<BotaoSeguir />` e posts com
+- [x] Aba Turmas e a página da turma: membros com `<BotaoSeguir />` e posts com
     `<CardPost>`.
 - **Combinar com A:** o cadastro leva para a turma. **Com C:** o seed precisa
     encher as turmas.
@@ -50,6 +50,14 @@ estiver mais atrasado.
 <!-- Uma linha por anotação, a mais nova em cima. Ex.:
 - **ter 24:** feed pronto; a paginação devolvia o post repetido (#12, corrigido).
 -->
+- **qui 26 (Gustavo, que assumiu o resto da Pessoa D):** telas das Turmas
+  (#17). `/turmas` mostra as suas turmas em cima e todas as outras embaixo;
+  `/turmas/{tipo}/{chave}` tem a Chamada (com Seguir, "você" no próprio card
+  e, nas turmas "Outros", o texto da pessoa em até duas linhas, que no celular
+  cortava) e os Posts, com filtro por matéria. O cadastro com meta leva para a
+  turma do vestibular (ou do curso), a meta no topo do perfil virou link e o
+  `/rascunho-feed` saiu. Com isso o "Conhecer a sua turma" do feed vazio
+  funciona.
 - **qui 26:** API das Turmas (#17), no formato que a Camila pediu para as telas:
   `GET /turmas` (minhas, vestibulares e cursos, com `pessoas` e
   `estudaram_hoje`), `GET /turmas/{tipo}/{chave}` e, paginados, `/membros`

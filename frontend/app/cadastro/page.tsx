@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { EscolhaMeta } from "@/components/EscolhaMeta";
 import { AvisoErro, CaixaAuth, Campo, estiloBotao, estiloCampo } from "@/components/FormAuth";
-import { cadastrar, type Cadastro } from "@/lib/api";
+import { cadastrar, enderecoDaTurma, type Cadastro } from "@/lib/api";
 import { useOpcoes } from "@/lib/opcoes";
 import { NOME_REDE } from "@/lib/rede";
 import { useSoSemLogin } from "@/lib/useExigeLogin";
@@ -52,10 +52,14 @@ export default function CadastroPage() {
         window.location.href = "/login?conta=criada";
         return;
       }
-      // Por enquanto vai para o feed. Quando a tela de Turmas existir (D, #17),
-      // vai para a turma da pessoa (decisão 3). Recarrega a página inteira para
-      // o topo descobrir quem entrou.
-      window.location.href = "/";
+      // Quem escolheu a meta cai na própria turma, onde está quem seguir
+      // (decisão 3): a do vestibular, ou a do curso. Sem meta, o feed.
+      // Recarrega a página inteira para o topo descobrir quem entrou.
+      window.location.href = dados.vestibular
+        ? enderecoDaTurma("vestibular", dados.vestibular)
+        : dados.curso
+          ? enderecoDaTurma("curso", dados.curso)
+          : "/";
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível criar a conta.");
       setEnviando(false);
