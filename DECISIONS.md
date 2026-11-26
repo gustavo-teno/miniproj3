@@ -258,3 +258,29 @@ fork do time e merge só depois da aprovação de outra pessoa.
   ser feitos arquivo por arquivo. Os textos de erro também saíram fora do
   padrão do time ("Não deu para...") e foram trocados por "Não foi possível..."
   depois da revisão do Gustavo.
+
+**Pedro (Pessoa D: follow, feed e turmas).** Usei o Claude Code (Claude Opus)
+no projeto, com o `CLAUDE.md` do time para ele seguir o nosso fluxo: uma
+branch por feature, commits pequenos em português, PR para o fork do time e
+merge só depois da aprovação de outra pessoa.
+
+- **Para quê:** preparar o ambiente no Windows (só o uv e o Node, sem o
+  `make`); escrever o backend, os testes e as telas das minhas features (o
+  follow com o `<BotaoSeguir>`, o feed com os filtros e o "Carregar mais" em
+  cima do rascunho da Camila, e a API das Turmas); abrir os PRs; testar o
+  fluxo inteiro no navegador, como a banca, no computador e no celular; e me
+  explicar cada passo, porque eu pedi para entender o que estava sendo feito.
+- **O que foi meu:** pedir que cada parte fosse explicada antes de seguir;
+  conferir se o trabalho estava de acordo com o plano do time antes de abrir
+  cada PR; decidir instalar só o indispensável; escolher quem revisava cada
+  PR; e levar para a IA as revisões da Camila e do Gustavo.
+- **Onde a IA ajudou além do código:** percebeu que o teste de follow do
+  núcleo dependia do perfil da Camila e manteve o `@skip` até ele entrar; viu
+  que o PR da Camila que pôs o botão no perfil mexia no mesmo `BotaoSeguir` e
+  deixou os dois arquivos iguais para não dar conflito; lembrou que o Feed,
+  que é do núcleo, ainda faltava na véspera; e juntou o código repetido entre
+  o feed e as turmas.
+- **Onde precisei corrigir:** a revisão da Camila apontou textos de erro fora
+  do padrão do `DESIGN.md` e um erro 500 quando o Seguir levava dois cliques
+  rápidos. Os dois foram corrigidos, o segundo com um teste que simula os
+  cliques ao mesmo tempo.
