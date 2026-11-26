@@ -34,7 +34,9 @@ export function Navegacao() {
           // No celular, só o balão: com a palavra e o número, as abas passavam
           // de 375px e empurravam a lupa e a engrenagem para fora da tela.
           { href: "/mensagens", rotulo: "Mensagens", contador: naoLidas, icone: BALAO },
-          { href: `/u/${eu.username}`, rotulo: "Meu diário" },
+          // Também só o ícone no celular: com o sino das notificações (#103)
+          // ao lado da lupa, a palavra empurrava a engrenagem para fora.
+          { href: `/u/${eu.username}`, rotulo: "Meu diário", icone: CADERNO },
         ]
       : []),
   ];
@@ -270,6 +272,7 @@ function Configuracoes({ logado }: { logado: boolean }) {
 
 // O balão de conversa da aba Mensagens no celular.
 const BALAO = "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z";
+const CADERNO = "M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14ZM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5";
 
 // Ícone de traço simples, sempre do mesmo tamanho e espessura.
 function Icone({ d }: { d: string }) {
