@@ -259,6 +259,7 @@ export type Post = {
   curtidas: number;
   comentarios: number;
   curtido_por_mim: boolean; // depende de quem está vendo
+  salvo_por_mim: boolean; // idem, para o botão Salvar (#64)
 };
 
 // Um comentário de GET /posts/{id}/comentarios (#12, Pessoa C).
@@ -342,10 +343,15 @@ export type Mensagem = {
 export type Conversa = { pessoa: Autor; ultima: Mensagem; nao_lidas: number };
 
 // A conversa aberta: as mensagens da mais antiga para a mais nova.
+// Um coração numa mensagem (#68): em qual e se foi quem está vendo que curtiu.
+export type CurtidaMensagem = { mensagem_id: number; minha: boolean };
+
 export type ConversaAberta = {
   pessoa: Autor;
   pode_responder: boolean; // só entre mútuos (decisão 6)
   mensagens: Mensagem[];
+  // Todas as curtidas da conversa, mesmo quando só vêm as mensagens novas.
+  curtidas: CurtidaMensagem[];
 };
 
 export function buscarConversas(): Promise<Conversa[]> {
@@ -372,4 +378,20 @@ export async function podeMandarMensagem(username: string): Promise<boolean> {
 
 export function enviarMensagem(username: string, texto: string): Promise<Mensagem> {
   return apiPost<Mensagem>(`/dms/${encodeURIComponent(username)}`, { texto });
+}
+
+// O coração dos dois toques (#68). As duas são idempotentes.
+export function curtirMensagem(id: number): Promise<void> {
+  return apiPost<void>(`/dms/mensagens/${id}/curtir`);
+}
+
+export function descurtirMensagem(id: number): Promise<void> {
+  return apiDelete(`/dms/mensagens/${id}/curtir`);
+}
+
+// ---- posts salvos (#64, Pessoa A) ----
+
+// Os posts que você salvou, do salvo mais recente para o mais antigo.
+export function buscarSalvos(offset = 0, limit = 20): Promise<Page<Post>> {
+  return apiGet<Page<Post>>(`/salvos?offset=${offset}&limit=${limit}`);
 }

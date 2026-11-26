@@ -218,6 +218,12 @@ function Configuracoes({ logado }: { logado: boolean }) {
           {/* "Editar perfil" entra aqui quando a edição do perfil existir (ter 24). */}
           {logado && (
             <>
+              {/* Os posts salvos (#64): só de quem entrou, por isso fica aqui e
+                  não nas abas do topo. */}
+              <Link href="/salvos" onClick={() => setAberto(false)} className={item}>
+                <Icone d="M6.5 4.5h11v15.5L12 16.2 6.5 20Z" />
+                Salvos
+              </Link>
               <div className="my-1 border-t border-linha" />
               <button type="button" onClick={clicarSair} className={item + " text-tinta-suave"}>
                 <Icone d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />

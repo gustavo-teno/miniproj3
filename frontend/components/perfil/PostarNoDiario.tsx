@@ -5,8 +5,9 @@
 // (a do caderno aberto já vem marcada), o tempo de estudo e o botão na largura
 // toda. Salva com o mesmo POST /posts do feed.
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
+import { BotaoEmoji, inserirNoCursor } from "@/components/BotaoEmoji";
 import { SimboloMateria } from "@/components/SimboloMateria";
 import { apiPost, type Post } from "@/lib/api";
 import { estiloDaTag } from "@/lib/materias";
@@ -23,6 +24,7 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
   const [minutos, setMinutos] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const caixaTexto = useRef<HTMLTextAreaElement>(null);
 
   // Trocou de caderno: a matéria marcada acompanha. Em "Todas" (""), fica a
   // que a pessoa já tinha escolhido.
@@ -63,6 +65,7 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
       <h2 className="text-[17px] font-semibold">Postar no diário</h2>
 
       <textarea
+        ref={caixaTexto}
         required
         maxLength={MAX_TEXTO}
         value={texto}
@@ -96,6 +99,11 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
             ))}
           </select>
         </label>
+        {/* O emoji (Pessoa A) na linha de baixo do campo, depois da matéria. */}
+        <BotaoEmoji
+          abrirPara="baixo"
+          aoEscolher={(emoji) => setTexto(inserirNoCursor(caixaTexto.current, texto, emoji, MAX_TEXTO))}
+        />
         <input
           type="number"
           min={1}
