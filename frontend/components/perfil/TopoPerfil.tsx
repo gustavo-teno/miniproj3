@@ -6,13 +6,14 @@
 // botões Seguir e Mensagem e o fogo num painel à direita (no diário da dona o
 // fogo fica na coluna da direita).
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { Avatar } from "@/components/Avatar";
 import { BotaoMensagem } from "@/components/BotaoMensagem";
 import { BotaoSeguir } from "@/components/BotaoSeguir";
 import { PainelFogo } from "@/components/perfil/FogoDoDiario";
-import type { Perfil } from "@/lib/api";
+import { enderecoDaTurma, type Perfil } from "@/lib/api";
 import { nomeDaOpcao, useOpcoes } from "@/lib/opcoes";
 import { NOME_REDE } from "@/lib/rede";
 
@@ -39,8 +40,12 @@ export function TopoPerfil({
   const vestibular =
     perfil.vestibular === "outro" ? perfil.vestibular_outro : nomeDaOpcao(opcoes?.vestibulares, perfil.vestibular);
   const curso = perfil.curso === "outro" ? perfil.curso_outro : nomeDaOpcao(opcoes?.cursos, perfil.curso);
-  // O que a pessoa não preencheu some, junto com a bolinha.
-  const meta = [vestibular, curso].filter(Boolean);
+  // O que a pessoa não preencheu some, junto com a bolinha. Cada parte da meta
+  // leva para a turma dela (decisão 5).
+  const meta = [
+    { texto: vestibular, href: enderecoDaTurma("vestibular", perfil.vestibular) },
+    { texto: curso, href: enderecoDaTurma("curso", perfil.curso) },
+  ].filter((m) => m.texto);
 
   return (
     <section
@@ -81,8 +86,9 @@ export function TopoPerfil({
                 // A posição como chave: vestibular e curso "Outro" podem ter o mesmo texto.
                 <span key={i}>
                   {i > 0 && <span className="mx-2 text-tinta-suave">·</span>}
-                  {/* As turmas viram link quando a tela de Turmas (Pessoa D) existir. */}
-                  <span className="font-semibold">{item}</span>
+                  <Link href={item.href} className="font-semibold hover:underline">
+                    {item.texto}
+                  </Link>
                 </span>
               ))}
               {perfil.universidade && (
