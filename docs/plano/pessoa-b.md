@@ -63,10 +63,10 @@ celular.
 e noturno, como a banca faria (cadastro, login, post, follow, feed), e os
 prints para o time.
 - [x] Página do post com o post e os comentários na mesma folha (#73).
-- [ ] Respostas dentro dos comentários e curtidas em comentário: backend da
-    Clarisse; o desenho está aprovado e o lugar no código está avisado no #73.
+- [x] Respostas dentro dos comentários e curtidas em comentário: a Clarisse fez
+    o backend e a tela seguindo o desenho aprovado (#83).
 
-O vídeo (#19) saiu da minha lista em 25/11: o responsável novo está a definir.
+O vídeo (#19) saiu da minha lista em 25/11 e, em 26/11, ficou com a Clarisse.
 
 **Revisa:** PRs que mexem em layout, navegação, `lib/api.ts` e componentes
 compartilhados.
@@ -83,8 +83,8 @@ compartilhados.
   botões e a seleção de texto continuam funcionando), e a pauta do caderno
   também está nas caixas de escrever o post (não nas mensagens nem nos
   comentários). As respostas dentro dos comentários e as curtidas em comentário
-  ficam com a Clarisse (precisam de backend): já avisei ela e deixei no PR o
-  lugar certo no código. Revisei os PRs do Gustavo (DMs na tela, botão
+  ficaram com a Clarisse (precisam de backend): avisei ela, deixei no PR o
+  lugar certo no código, e ela entregou tudo no #83, que já entrou na `main`. Revisei os PRs do Gustavo (DMs na tela, botão
   Mensagem, salvar, emoji e curtir mensagem) e, com todos aprovados, mergeei o
   #58, o #65, o #67 e o #69 na `main`. Atualizei o DESIGN.md com o topo do
   perfil no celular, a página do post e as DMs.

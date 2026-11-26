@@ -141,7 +141,7 @@ arquivo dos outros.
 - [Pessoa C — Clarisse (Dados)](docs/plano/pessoa-c.md): Curtidas (#11) → Comentários (#12) → Seed (#13) → Deploy (#14)
 - [Pessoa D — Pedro (Reforço)](docs/plano/pessoa-d.md): Follow (#15) → Feed (#16) → Turmas (#17)
 - Extras da Pessoa A (Gustavo): DMs entre mútuos (#18) → Busca (#38)
-- Entregas: vídeo (#19, saiu da Camila em 25/11; responsável a definir), pitch (#20, todos) e DECISIONS final
+- Entregas: vídeo (#19, saiu da Camila em 25/11; ficou com a Clarisse, decidido em 26/11), pitch (#20, todos) e DECISIONS final
   (#21, Gustavo e todos). Vídeo e pitch não viram PR: quem é responsável
   fecha a issue à mão quando entregar.
 

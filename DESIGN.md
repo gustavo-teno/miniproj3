@@ -168,8 +168,9 @@ de caixas, `p-6` em caixas de formulário. A página tem largura máxima de
 `1320px` com `px-6`, já no `layout.tsx`. No perfil, a coluna da direita (postar,
 fogo e horas) tem 248px, com `gap-4` entre as colunas. No computador, os três
 blocos dessa coluna têm a **mesma altura**, definida num lugar só: a variável
-`--altura-bloco-diario` (264px, no `globals.css`). No celular, cada bloco tem a
-altura que o conteúdo pede.
+`--altura-bloco-diario` (264px, no `globals.css`). Abaixo de `lg`, os três têm
+`280px` fixos (`h-[280px]`), também iguais entre si. Aqui, "computador" quer
+dizer a partir de `lg` (1024px), não de `sm`.
 
 **O topo do perfil no celular.** O avatar divide a linha só com o nome e o @; a
 meta, a bio, os contadores e os botões usam a largura toda embaixo. Os botões
@@ -214,9 +215,12 @@ O post e os comentários ficam na **mesma folha**, sem caixas separadas: o
 ("N comentários") e a caixa de **comentar**, com contorno contínuo, que cresce
 com o texto. Cada **comentário** é uma caixinha de fundo branco, com uma
 **fitinha** lavanda no topo, como um papel colado na folha. As respostas dentro
-de um comentário e a curtida em cada comentário estão desenhadas (a curtida com
-número e o "Responder" embaixo do texto, as respostas recuadas dentro da
-caixinha) e dependem do backend dos comentários.
+de um comentário e a curtida em cada comentário já existem (#83): embaixo do
+texto ficam o coração com o número e o "Responder", que abre um campo na hora, e
+as respostas ficam recuadas dentro da mesma caixinha. Do terceiro nível em
+diante as respostas não recuam mais (no celular o texto ficaria espremido):
+elas vêm numa lista só, cada uma dizendo "em resposta a" e o nome de quem
+respondem.
 
 ## Padrões prontos
 
@@ -259,7 +263,7 @@ Use o que já existe antes de criar um novo.
 |---|---|
 | `<CardPost post rodape embaixo abrirAoClicar>` | o post, igual no feed, no perfil e nas turmas. Botões (curtir, comentar, salvar) entram no `rodape`; a conversa da página do post entra em `embaixo`. Clicar nele abre a página do post |
 | `<FormPost autor onPostado>` | o atalho de postar: uma linha fechada, que abre com matéria e tempo de estudo |
-| `<BotaoCurtir post>`, `<LinkComentarios post>` e `<BotaoSalvar post>` | curtir, comentar e salvar, no `rodape` do `<CardPost>`. Os salvos ficam na página `/salvos`, que abre pelo menu da engrenagem |
+| `<BotaoCurtir post>`, `<LinkComentarios post>` e `<BotaoSalvar post>` | curtir, comentar e salvar, no `rodape` do `<CardPost>`. Os salvos ficam na página `/salvos`, que abre pelo menu da engrenagem. O `<BotaoCurtir>` também curte um comentário: `<BotaoCurtir post={comentario} caminho=".../curtir" />`, com o `caminho` da rota de curtir do comentário |
 | `<Comentarios postId>` | a conversa da página do post: a caixa de comentar e as caixinhas dos comentários |
 | `<BotaoEmoji aoEscolher>` | o botão de emoji (carinha) nas caixas de escrever: uma barra com os mais usados e um "+" com todos |
 | `<BotaoMensagem username seguidores>` | o botão do perfil que leva à conversa; só aparece entre mútuos |
