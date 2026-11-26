@@ -6,7 +6,7 @@
 
 import { useParams } from "next/navigation";
 
-import { ConversaDoComentario } from "@/components/Comentarios";
+import { caminhoDaConversa, ConversaDoComentario } from "@/components/Comentarios";
 import { FolhaDoPost } from "@/components/FolhaDoPost";
 
 export default function PaginaDaConversa() {
@@ -14,6 +14,7 @@ export default function PaginaDaConversa() {
   return (
     <FolhaDoPost
       id={id}
+      precarregar={caminhoDaConversa(id, comentarioId)}
       embaixo={(post) => <ConversaDoComentario postId={post.id} comentarioId={comentarioId} />}
     />
   );

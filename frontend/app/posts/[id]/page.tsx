@@ -6,10 +6,16 @@
 
 import { useParams } from "next/navigation";
 
-import { Comentarios } from "@/components/Comentarios";
+import { caminhoDosComentarios, Comentarios } from "@/components/Comentarios";
 import { FolhaDoPost } from "@/components/FolhaDoPost";
 
 export default function PaginaDoPost() {
   const { id } = useParams<{ id: string }>();
-  return <FolhaDoPost id={id} embaixo={(post) => <Comentarios postId={post.id} />} />;
+  return (
+    <FolhaDoPost
+      id={id}
+      precarregar={caminhoDosComentarios(id)}
+      embaixo={(post) => <Comentarios postId={post.id} />}
+    />
+  );
 }
