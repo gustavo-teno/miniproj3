@@ -258,3 +258,38 @@ fork do time e merge só depois da aprovação de outra pessoa.
   ser feitos arquivo por arquivo. Os textos de erro também saíram fora do
   padrão do time ("Não deu para...") e foram trocados por "Não foi possível..."
   depois da revisão do Gustavo.
+
+**Camila (Pessoa B: base visual, posts, perfil-diário, página do post e
+design).** Usei o Claude Code (Claude Opus e Sonnet) no projeto, com o
+`CLAUDE.md` do time para ele seguir o nosso fluxo. Os commits eu mesma rodava,
+com mensagens no meu jeito, explicando o porquê.
+
+- **Para quê:** escrever o front das minhas features (a base visual, o post, o
+  perfil-diário com o fogo e as horas estudadas, a página do post com os
+  comentários e o topo do perfil no celular) e o `DESIGN.md`, e desenhar
+  propostas em HTML antes de mexer no código, como as pranchas do computador e
+  do celular e as Turmas. Também abri as issues e os PRs, revisei os PRs do
+  Gustavo e fiz os merges. No fim, fiz uma passada final: conferi todas as
+  telas no celular e no computador, nos modos claro e noturno, e o fluxo de
+  cadastro, login, post e seguir, como a banca faria.
+- **O que foi meu:** o gosto e as decisões do design. Recusei layouts que a IA
+  propôs (um com o post e os comentários muito divididos, outro parecido demais
+  com o Twitter), escolhi o que ficava com a cara do projeto, tirei o bloco
+  lavanda dos comentários (e troquei "anotações" por "comentários"), pedi um
+  contorno contínuo no lugar do pontilhado, ajustei o lavanda até ficar pastel
+  e legível, e escolhi o desenho das Turmas e das Mensagens. Também decidi
+  abrir o post e os comentários numa página própria: a ideia veio das outras
+  redes, mas o visual continuou o nosso, de caderno.
+- **Onde a IA ajudou além do código:** a passada final achou três problemas que
+  eu não tinha visto: o topo estourava a tela em celulares de 360px, a aba
+  não tinha ícone e os posts do diário não tinham curtir, comentar e salvar.
+  Quando a Clarisse avisou sobre o `marcar_curtidos`, a IA confirmou que a
+  rota do diário mostrava o coração sempre vazio, mesmo para quem já tinha
+  curtido, e o corrigiu com um teste.
+- **Onde precisei corrigir:** um print do celular saiu com uma área em branco
+  enorme embaixo, e eu percebi e pedi para refazer. Um merge perdeu uma chave
+  no `api.ts`, e ela foi corrigida na hora. A IA também mediu
+  errado a sobra de largura em 320px na descrição de um PR, e o Gustavo
+  apontou o número certo na revisão. Também deixei combinado com a IA que ela
+  pergunta antes de decidir qualquer coisa de design e não muda um desenho já
+  aprovado.
