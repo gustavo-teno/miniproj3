@@ -227,18 +227,18 @@ COMENTARIOS = [
 ]
 
 # Respostas de quem postou a quem comentou (comentários em árvore): a conversa
-# continua embaixo do comentário, em vez de virar outro comentário solto.
+# continua embaixo do comentário, em vez de virar outro comentário solto. O
+# seed sorteia qual resposta vai em qual comentário, então todas servem para
+# qualquer um deles.
 RESPOSTAS = [
     "Valeu demais! Amanhã tem mais.",
-    "Uso as listas do cursinho e o banco de questões das provas antigas.",
-    "Bora sim! Me chama na DM e a gente combina.",
-    "Obrigada pelo incentivo, tava precisando.",
-    "Vou testar isso, valeu pela dica!",
-    "Durmo umas 7h. Menos que isso eu não rendo.",
-    "Manda a videoaula, por favor!",
-    "Pois é, fazendo questão é que a ficha cai.",
-    "Kkkk a gente se entende.",
-    "Anotado! Depois te conto se funcionou.",
+    "Obrigada pela força, tava precisando ler isso.",
+    "Bora junto! Me chama na DM.",
+    "Haha a gente se entende.",
+    "Anotado! Depois te conto como foi.",
+    "Isso aí, um passo de cada vez.",
+    "Que bom que serviu pra você também!",
+    "Tamo junto nessa reta final.",
 ]
 
 # Conversas da Ada com três mútuos (DMs, decisão 6), para a caixa de mensagens
