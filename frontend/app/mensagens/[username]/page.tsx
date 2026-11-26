@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 
 import { Avatar } from "@/components/Avatar";
+import { BotaoEmoji, inserirNoCursor } from "@/components/BotaoEmoji";
 import { AvisoErro } from "@/components/FormAuth";
 import { buscarConversa, enviarMensagem, type Autor, type Mensagem } from "@/lib/api";
 import { avisarQueLeu } from "@/lib/naoLidas";
@@ -43,6 +44,7 @@ export default function ConversaPage() {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const fim = useRef<HTMLDivElement>(null);
+  const caixaTexto = useRef<HTMLTextAreaElement>(null);
 
   // O id da última mensagem que a tela tem, para pedir só as novas.
   const ultimoId = mensagens.at(-1)?.id;
@@ -75,10 +77,12 @@ export default function ConversaPage() {
 
   useRepetir(buscarNovas, 4_000, carregou && pessoa !== null);
 
-  // Mensagem nova (enviada ou recebida): rola até ela.
+  // Mensagem nova (enviada ou recebida): rola até ela. Rola de novo quando o
+  // carregamento termina: o bloco de "Carregando" sai da tela logo depois das
+  // mensagens chegarem, e a página encolhe.
   useEffect(() => {
     fim.current?.scrollIntoView({ block: "end" });
-  }, [mensagens.length]);
+  }, [mensagens.length, carregou]);
 
   async function enviar(e?: FormEvent) {
     e?.preventDefault();
@@ -109,19 +113,31 @@ export default function ConversaPage() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col">
-      <Link href="/mensagens" className="text-sm text-tinta-suave hover:text-tinta">
-        ← Mensagens
-      </Link>
-
-      {pessoa && (
-        <Link href={`/u/${pessoa.username}`} className="mt-3 flex items-center gap-3 self-start hover:underline">
-          <Avatar autor={pessoa} />
-          <span>
-            <span className="block font-semibold leading-tight">{pessoa.name}</span>
-            <span className="block text-sm text-tinta-suave">@{pessoa.username}</span>
-          </span>
+      {/* O topo da conversa fica grudado no alto da tela, como nos apps de
+          mensagem: por mais que a conversa seja longa, dá para ver com quem
+          se fala e voltar sem rolar para cima. O -mx-6/px-6 estica o fundo
+          até a borda da tela no celular (o <main> tem px-6). */}
+      <header className="sticky top-0 z-20 -mx-6 -mt-6 flex items-center gap-2 border-b border-linha bg-fundo px-6 py-2.5">
+        <Link
+          href="/mensagens"
+          aria-label="Voltar para Mensagens"
+          title="Mensagens"
+          className="-ml-2 grid size-9 flex-none place-items-center rounded-full text-tinta-suave hover:bg-destaque-fundo hover:text-tinta"
+        >
+          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
         </Link>
-      )}
+        {pessoa && (
+          <Link href={`/u/${pessoa.username}`} className="flex min-w-0 items-center gap-3 hover:underline">
+            <Avatar autor={pessoa} />
+            <span className="min-w-0">
+              <span className="block truncate font-semibold leading-tight">{pessoa.name}</span>
+              <span className="block truncate text-sm text-tinta-suave">@{pessoa.username}</span>
+            </span>
+          </Link>
+        )}
+      </header>
 
       <div className="mt-4 empty:hidden">
         <AvisoErro texto={erro} />
@@ -163,14 +179,25 @@ export default function ConversaPage() {
               </time>
             </div>
           ))}
-          <div ref={fim} />
+          {/* A margem faz a última mensagem parar acima da caixa de escrever,
+              que fica grudada no pé da tela. */}
+          <div ref={fim} className="scroll-mb-28" />
         </section>
       )}
 
       {pessoa &&
         (podeResponder ? (
-          <form onSubmit={enviar} className="mt-3 flex items-end gap-2">
+          // A caixa de escrever fica grudada no pé da tela, como o topo no alto.
+          <form
+            onSubmit={enviar}
+            className="sticky bottom-0 z-20 -mx-6 -mb-6 mt-3 flex items-end gap-2 border-t border-linha bg-fundo px-6 pb-4 pt-3"
+          >
+            {/* O emoji à esquerda da caixa, como nos apps de mensagem. */}
+            <div className="pb-1">
+              <BotaoEmoji aoEscolher={(emoji) => setTexto(inserirNoCursor(caixaTexto.current, texto, emoji, MAX_TEXTO))} />
+            </div>
             <textarea
+              ref={caixaTexto}
               value={texto}
               onChange={(e) => setTexto(e.target.value)}
               onKeyDown={aoTeclar}
@@ -178,7 +205,7 @@ export default function ConversaPage() {
               rows={2}
               aria-label={`Mensagem para ${pessoa.name}`}
               placeholder="Escreva uma mensagem"
-              className="flex-1 resize-none rounded-xl border border-linha bg-superficie px-3 py-2 text-tinta"
+              className="min-w-0 flex-1 resize-none rounded-xl border border-linha bg-superficie px-3 py-2 text-tinta"
             />
             <button
               type="submit"
