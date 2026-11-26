@@ -28,6 +28,13 @@ class ConversaOut(BaseModel):
     nao_lidas: int
 
 
+class CurtidaOut(BaseModel):
+    """Um coração numa mensagem (#68): em qual e se foi eu que curti."""
+
+    mensagem_id: int
+    minha: bool
+
+
 class ConversaAberta(BaseModel):
     """GET /dms/{username}: as mensagens, da mais antiga para a mais nova."""
 
@@ -36,6 +43,10 @@ class ConversaAberta(BaseModel):
     # continua visível, mas a caixa de escrever some.
     pode_responder: bool
     mensagens: list[MensagemOut]
+    # Todas as curtidas da conversa, e não só das mensagens novas: a tela
+    # pergunta só pelas mensagens novas (?depois_de=), mas uma curtida pode
+    # chegar numa mensagem antiga. São poucas, então vão sempre todas.
+    curtidas: list[CurtidaOut] = []
 
 
 class PodeMandarOut(BaseModel):

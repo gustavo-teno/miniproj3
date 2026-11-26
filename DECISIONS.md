@@ -171,6 +171,7 @@ entram na tabela "Quem faz o quê" de lá.
 | Turmas | Pessoa D | Quem acabou de chegar encontra quem tem a mesma meta e sai do feed vazio (decisão 5). |
 | DMs entre mútuos | Pessoa A (Gustavo) | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
 | Busca de pessoas e posts | Pessoa A (Gustavo) | Achar um colega pelo nome ou um post sobre um assunto, sem depender da meta. |
+| Curtir mensagem nas DMs | Pessoa A (Gustavo) | Dois toques num balão dizem "valeu" ou "tamo junto" sem precisar escrever, como nos apps de mensagem. |
 | Emoji ao escrever | Pessoa A (Gustavo) | Quem escreve pelo computador também comemora uma lista feita com 🔥 ou 💪, como faria no celular. |
 | Salvar posts | Pessoa A (Gustavo) | Guardar uma explicação boa ou uma lista de questões para rever depois, só para você. |
 

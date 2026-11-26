@@ -11,7 +11,15 @@ import { useCallback, useEffect, useRef, useState, type FormEvent, type Keyboard
 import { Avatar } from "@/components/Avatar";
 import { BotaoEmoji, inserirNoCursor } from "@/components/BotaoEmoji";
 import { AvisoErro } from "@/components/FormAuth";
-import { buscarConversa, enviarMensagem, type Autor, type Mensagem } from "@/lib/api";
+import {
+  buscarConversa,
+  curtirMensagem,
+  descurtirMensagem,
+  enviarMensagem,
+  type Autor,
+  type CurtidaMensagem,
+  type Mensagem,
+} from "@/lib/api";
 import { avisarQueLeu } from "@/lib/naoLidas";
 import { dataCompleta } from "@/lib/tempo";
 import { useExigeLogin } from "@/lib/useExigeLogin";
@@ -26,6 +34,21 @@ function juntar(atuais: Mensagem[], novas: Mensagem[]): Mensagem[] {
   const ids = new Set(atuais.map((m) => m.id));
   return [...atuais, ...novas.filter((m) => !ids.has(m.id))];
 }
+
+// Quem curtiu cada mensagem: eu, a outra pessoa ou os dois (#68).
+type Curtidas = Record<number, { minha: boolean; outro: boolean }>;
+
+function porMensagem(lista: CurtidaMensagem[]): Curtidas {
+  const curtidas: Curtidas = {};
+  for (const { mensagem_id, minha } of lista) {
+    const atual = curtidas[mensagem_id] ?? { minha: false, outro: false };
+    curtidas[mensagem_id] = minha ? { ...atual, minha: true } : { ...atual, outro: true };
+  }
+  return curtidas;
+}
+
+// Dois toques em até este tempo contam como "toque duplo".
+const TOQUE_DUPLO_MS = 350;
 
 // "18:41"; o dia e a hora completos aparecem ao passar o mouse.
 function hora(iso: string): string {
@@ -43,6 +66,12 @@ export default function ConversaPage() {
   const [erro, setErro] = useState<string | null>(null);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [curtidas, setCurtidas] = useState<Curtidas>({});
+  // As curtidas que a tela acabou de mudar e o backend ainda não confirmou: a
+  // pergunta por novidades não as desfaz enquanto isso.
+  const curtindo = useRef(new Set<number>());
+  // O último toque num balão, para reconhecer o segundo.
+  const ultimoToque = useRef({ id: 0, quando: 0 });
   const fim = useRef<HTMLDivElement>(null);
   const caixaTexto = useRef<HTMLTextAreaElement>(null);
 
@@ -56,6 +85,7 @@ export default function ConversaPage() {
         setPessoa(c.pessoa);
         setPodeResponder(c.pode_responder);
         setMensagens(c.mensagens);
+        setCurtidas(porMensagem(c.curtidas));
         avisarQueLeu();
       })
       .catch((e: Error) => setErro(e.message))
@@ -66,6 +96,16 @@ export default function ConversaPage() {
     buscarConversa(username, ultimoId ?? 0)
       .then((c) => {
         setPodeResponder(c.pode_responder);
+        // As curtidas vêm todas, então substituem as da tela, menos as que
+        // acabaram de ser mudadas aqui e ainda estão a caminho do backend.
+        setCurtidas((atuais) => {
+          const novas = porMensagem(c.curtidas);
+          for (const id of curtindo.current) {
+            if (atuais[id]) novas[id] = atuais[id];
+            else delete novas[id];
+          }
+          return novas;
+        });
         if (c.mensagens.length) {
           setMensagens((atuais) => juntar(atuais, c.mensagens));
           avisarQueLeu();
@@ -98,6 +138,40 @@ export default function ConversaPage() {
       setErro((err as Error).message);
     } finally {
       setEnviando(false);
+    }
+  }
+
+  // Põe ou tira o meu coração. Muda na hora e desfaz se o backend recusar,
+  // como o curtir dos posts. Sem ser mútuos, só dá para tirar.
+  async function alternarCurtida(id: number) {
+    if (curtindo.current.has(id)) return;
+    const antes = curtidas[id] ?? { minha: false, outro: false };
+    if (!antes.minha && !podeResponder) return;
+    const depois = { ...antes, minha: !antes.minha };
+    setCurtidas((atuais) => ({ ...atuais, [id]: depois }));
+    curtindo.current.add(id);
+    try {
+      if (antes.minha) await descurtirMensagem(id);
+      else await curtirMensagem(id);
+    } catch {
+      setCurtidas((atuais) => ({ ...atuais, [id]: antes }));
+    } finally {
+      curtindo.current.delete(id);
+    }
+  }
+
+  // Dois cliques (computador) ou dois toques (celular) no balão curtem. O
+  // onClick serve para os dois: o "dblclick" não chega em todo celular.
+  function tocarNoBalao(id: number) {
+    const agora = Date.now();
+    const anterior = ultimoToque.current;
+    if (anterior.id === id && agora - anterior.quando < TOQUE_DUPLO_MS) {
+      ultimoToque.current = { id: 0, quando: 0 };
+      // O clique duplo do computador seleciona a palavra; aqui ele curte.
+      window.getSelection()?.removeAllRanges();
+      alternarCurtida(id);
+    } else {
+      ultimoToque.current = { id, quando: agora };
     }
   }
 
@@ -157,28 +231,70 @@ export default function ConversaPage() {
               Nenhuma mensagem ainda.{podeResponder && " Que tal combinar uma sessão de estudo?"}
             </p>
           )}
-          {mensagens.map((m) => (
-            <div
-              key={m.id}
-              className={
-                "max-w-[80%] rounded-2xl px-3.5 py-2 " +
-                (m.minha
-                  ? "self-end rounded-br-md bg-destaque text-sobre-destaque"
-                  : "self-start rounded-bl-md bg-destaque-fundo text-tinta")
-              }
-            >
-              <p className="whitespace-pre-line break-words">{m.texto}</p>
-              <time
-                dateTime={m.created_at}
-                title={dataCompleta(m.created_at)}
-                // No balão lavanda de quem escreveu, a hora vai sem transparência:
-                // com opacity-75 o branco dava contraste 3,65 (o mínimo é 4,5).
-                className={"mt-0.5 block text-right font-numeros text-[11px] " + (m.minha ? "" : "opacity-75")}
+          {mensagens.map((m) => {
+            const curtida = curtidas[m.id];
+            const quantas = (curtida?.minha ? 1 : 0) + (curtida?.outro ? 1 : 0);
+            return (
+              <div
+                key={m.id}
+                onClick={() => tocarNoBalao(m.id)}
+                title="Dois cliques para curtir"
+                // touch-action: manipulation tira o zoom do toque duplo no celular.
+                className={
+                  "relative max-w-[80%] touch-manipulation rounded-2xl px-3.5 py-2 " +
+                  (quantas ? "mb-3 " : "") +
+                  (m.minha
+                    ? "self-end rounded-br-md bg-destaque text-sobre-destaque"
+                    : "self-start rounded-bl-md bg-destaque-fundo text-tinta")
+                }
               >
-                {hora(m.created_at)}
-              </time>
-            </div>
-          ))}
+                <p className="whitespace-pre-line break-words">{m.texto}</p>
+                <time
+                  dateTime={m.created_at}
+                  title={dataCompleta(m.created_at)}
+                  // No balão lavanda de quem escreveu, a hora vai sem transparência:
+                  // com opacity-75 o branco dava contraste 3,65 (o mínimo é 4,5).
+                  className={"mt-0.5 block text-right font-numeros text-[11px] " + (m.minha ? "" : "opacity-75")}
+                >
+                  {hora(m.created_at)}
+                </time>
+                {/* Para quem usa teclado ou leitor de tela: o toque duplo não
+                    serve, então há um botão, que só aparece ao receber o foco. */}
+                {(podeResponder || curtida?.minha) && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      alternarCurtida(m.id);
+                    }}
+                    className="sr-only focus:not-sr-only focus:mt-1 focus:block focus:text-xs focus:underline"
+                  >
+                    {curtida?.minha ? "Descurtir mensagem" : "Curtir mensagem"}
+                  </button>
+                )}
+                {/* O coração fica no canto de baixo do balão, do lado de dentro
+                    da conversa, como nos apps de mensagem. Com os dois, "2". */}
+                {quantas > 0 && (
+                  <span
+                    aria-label={
+                      curtida?.minha && curtida?.outro
+                        ? "Vocês dois curtiram"
+                        : curtida?.minha
+                          ? "Você curtiu"
+                          : `${pessoa.name} curtiu`
+                    }
+                    className={
+                      "absolute -bottom-3 flex items-center gap-0.5 rounded-full border border-linha bg-superficie px-1.5 text-xs leading-5 text-tinta " +
+                      (m.minha ? "left-2" : "right-2")
+                    }
+                  >
+                    <span aria-hidden>❤️</span>
+                    {quantas > 1 && <span aria-hidden className="font-numeros">{quantas}</span>}
+                  </span>
+                )}
+              </div>
+            );
+          })}
           {/* A margem faz a última mensagem parar acima da caixa de escrever,
               que fica grudada no pé da tela. */}
           <div ref={fim} className="scroll-mb-28" />

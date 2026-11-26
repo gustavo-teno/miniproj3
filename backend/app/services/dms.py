@@ -6,16 +6,19 @@ mensagem cada pessoa já leu em cada conversa.
 """
 
 from fastapi import HTTPException
-from sqlalchemy import and_, case, func, or_, select
+from sqlalchemy import and_, case, delete, func, or_, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session
 
+from app.models.curtida_mensagem import CurtidaMensagem
 from app.models.follow import Follow
 from app.models.leitura import Leitura
 from app.models.mensagem import Mensagem
 from app.models.user import User
 from app.schemas.dm import (
     ConversaAberta,
+    CurtidaOut,
     ConversaOut,
     MensagemCriar,
     MensagemOut,
@@ -140,7 +143,65 @@ def abrir_conversa(
         pessoa=AutorOut.model_validate(outro),
         pode_responder=sao_mutuos(db, eu, outro),
         mensagens=[_para_out(m, eu) for m in mensagens],
+        curtidas=_curtidas_da_conversa(db, eu, outro),
     )
+
+
+def _curtidas_da_conversa(db: Session, eu: User, outro: User) -> list[CurtidaOut]:
+    """Todas as curtidas das mensagens desta conversa, numa consulta só."""
+    linhas = db.execute(
+        select(CurtidaMensagem.mensagem_id, CurtidaMensagem.user_id)
+        .join(Mensagem, Mensagem.id == CurtidaMensagem.mensagem_id)
+        .where(_entre(eu, outro))
+        .order_by(CurtidaMensagem.mensagem_id)
+    ).all()
+    return [CurtidaOut(mensagem_id=m, minha=quem == eu.id) for m, quem in linhas]
+
+
+def _mensagem_da_conversa(db: Session, eu: User, mensagem_id: int) -> Mensagem:
+    """A mensagem, se "eu" estiver na conversa dela. Para quem está fora, 404,
+    como se ela não existisse: não dá para descobrir mensagens dos outros."""
+    mensagem = db.get(Mensagem, mensagem_id)
+    if mensagem is None or eu.id not in (mensagem.remetente_id, mensagem.destinatario_id):
+        raise HTTPException(status_code=404, detail="mensagem não encontrada")
+    return mensagem
+
+
+def curtir(db: Session, eu: User, mensagem_id: int) -> None:
+    """Põe o coração. Idempotente, como curtir post. Só entre mútuos, como
+    mandar mensagem: quem deixou de seguir vê a conversa, mas não mexe nela."""
+    mensagem = _mensagem_da_conversa(db, eu, mensagem_id)
+    outro_id = (
+        mensagem.destinatario_id if mensagem.remetente_id == eu.id else mensagem.remetente_id
+    )
+    if not sao_mutuos(db, eu, db.get(User, outro_id)):
+        raise HTTPException(
+            status_code=403, detail="mensagens só entre quem se segue mutuamente"
+        )
+    ja_curtiu = select(CurtidaMensagem.id).where(
+        CurtidaMensagem.user_id == eu.id, CurtidaMensagem.mensagem_id == mensagem_id
+    )
+    if db.scalar(ja_curtiu) is not None:
+        return
+    db.add(CurtidaMensagem(user_id=eu.id, mensagem_id=mensagem_id))
+    try:
+        db.commit()
+    except IntegrityError:
+        # Dois toques duplos ao mesmo tempo: o segundo bate no par único. A
+        # curtida já existe, que é o que foi pedido.
+        db.rollback()
+
+
+def descurtir(db: Session, eu: User, mensagem_id: int) -> None:
+    """Tira o coração. Idempotente; vale mesmo se deixaram de ser mútuos, para
+    ninguém ficar preso a uma curtida."""
+    _mensagem_da_conversa(db, eu, mensagem_id)
+    db.execute(
+        delete(CurtidaMensagem).where(
+            CurtidaMensagem.user_id == eu.id, CurtidaMensagem.mensagem_id == mensagem_id
+        )
+    )
+    db.commit()
 
 
 def _nao_lidas_por_pessoa(db: Session, eu: User) -> dict[int, int]:

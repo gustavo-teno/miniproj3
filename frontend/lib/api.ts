@@ -343,10 +343,15 @@ export type Mensagem = {
 export type Conversa = { pessoa: Autor; ultima: Mensagem; nao_lidas: number };
 
 // A conversa aberta: as mensagens da mais antiga para a mais nova.
+// Um coração numa mensagem (#68): em qual e se foi quem está vendo que curtiu.
+export type CurtidaMensagem = { mensagem_id: number; minha: boolean };
+
 export type ConversaAberta = {
   pessoa: Autor;
   pode_responder: boolean; // só entre mútuos (decisão 6)
   mensagens: Mensagem[];
+  // Todas as curtidas da conversa, mesmo quando só vêm as mensagens novas.
+  curtidas: CurtidaMensagem[];
 };
 
 export function buscarConversas(): Promise<Conversa[]> {
@@ -373,6 +378,15 @@ export async function podeMandarMensagem(username: string): Promise<boolean> {
 
 export function enviarMensagem(username: string, texto: string): Promise<Mensagem> {
   return apiPost<Mensagem>(`/dms/${encodeURIComponent(username)}`, { texto });
+}
+
+// O coração dos dois toques (#68). As duas são idempotentes.
+export function curtirMensagem(id: number): Promise<void> {
+  return apiPost<void>(`/dms/mensagens/${id}/curtir`);
+}
+
+export function descurtirMensagem(id: number): Promise<void> {
+  return apiDelete(`/dms/mensagens/${id}/curtir`);
 }
 
 // ---- posts salvos (#64, Pessoa A) ----
