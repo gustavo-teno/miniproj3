@@ -14,6 +14,9 @@ export default function MensagensLayout({ children }: { children: ReactNode }) {
   // O @ da conversa aberta; null em /mensagens, sem nenhuma aberta.
   const aberta = useSelectedLayoutSegment();
 
+  // 7rem (112px) = a altura do menu do topo (uns 61px) + o espaço em cima e
+  // embaixo da página (o py-6 do <main>, 48px), com uns 3px de folga. Se o topo
+  // mudar de altura, ajuste aqui para a página não rolar no computador.
   return (
     <div className="lg:grid lg:h-[calc(100dvh-7rem)] lg:grid-cols-[380px_minmax(0,1fr)] lg:overflow-hidden lg:rounded-2xl lg:border lg:border-linha lg:bg-superficie">
       {/* No celular, a lista só aparece enquanto nenhuma conversa está aberta. */}

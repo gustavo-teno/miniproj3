@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Avatar } from "@/components/Avatar";
 import { AvisoErro } from "@/components/FormAuth";
 import { buscarConversas, type Conversa } from "@/lib/api";
+import { useAoLer } from "@/lib/naoLidas";
 import { dataCompleta, tempoDesde } from "@/lib/tempo";
 import { useExigeLogin } from "@/lib/useExigeLogin";
 import { useRepetir } from "@/lib/useRepetir";
@@ -34,21 +35,17 @@ export function ListaConversas({ aberta }: { aberta: string | null }) {
       .catch((e: Error) => setErro(e.message));
   }, []);
 
+  // Pede a lista ao abrir a tela e de novo a cada troca de conversa: ela mora
+  // no layout e não é remontada quando a conversa muda.
   useEffect(() => {
     if (liberado) atualizar();
-  }, [liberado, atualizar]);
-  // Uma conversa nova ou uma resposta sobe para o topo sem recarregar.
-  useRepetir(atualizar, 15_000, liberado);
-
-  // A lista não é mais remontada a cada conversa. Ao abrir uma (ou voltar),
-  // ela pergunta de novo, e de novo logo depois, para o número de não lidas
-  // sumir assim que o backend marca a conversa como lida.
-  useEffect(() => {
-    if (!liberado) return;
-    atualizar();
-    const depois = setTimeout(atualizar, 1_500);
-    return () => clearTimeout(depois);
   }, [aberta, liberado, atualizar]);
+  // Quando a conversa aberta é lida ou recebe mensagem nova, a bolinha de não
+  // lidas e a prévia da última mensagem mudam na hora (o mesmo aviso que o
+  // número do topo escuta).
+  useAoLer(atualizar, liberado);
+  // Uma conversa nova ou uma resposta de outra pessoa sobe para o topo sem recarregar.
+  useRepetir(atualizar, 15_000, liberado);
 
   if (!liberado) return null;
 
