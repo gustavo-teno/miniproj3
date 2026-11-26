@@ -6,15 +6,14 @@ bate-papo". O bate-papo não é matéria, então só o "Esconder" decide se ele
 aparece, qualquer que seja a matéria marcada.
 """
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.constantes import TAG_PADRAO
 from app.models.follow import Follow
 from app.models.post import Post
 from app.models.user import User
-from app.services.curtidas import marcar_curtidos
-from app.services.salvos import marcar_salvos
+from app.services.listagem import pagina_de_posts
 
 
 def listar(
@@ -36,18 +35,4 @@ def listar(
     else:
         filtro.append(or_(Post.tag == TAG_PADRAO, materia_ok))
 
-    total = db.scalar(select(func.count(Post.id)).where(*filtro)) or 0
-    posts = list(
-        db.scalars(
-            select(Post)
-            .where(*filtro)
-            # id desempata posts do mesmo segundo, para o "carregar mais" não
-            # repetir nem pular nenhum.
-            .order_by(Post.created_at.desc(), Post.id.desc())
-            .offset(offset)
-            .limit(limit)
-        )
-    )
-    marcar_curtidos(db, eu, posts)
-    marcar_salvos(db, eu, posts)
-    return posts, total
+    return pagina_de_posts(db, eu, filtro, offset, limit)
