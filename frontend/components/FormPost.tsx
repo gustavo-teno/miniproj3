@@ -104,11 +104,6 @@ export function FormPost({
       </div>
 
       <div className={`flex flex-wrap items-center gap-2 ${autor ? "pl-11" : ""}`}>
-        {/* O emoji (Pessoa A) na linha de baixo do campo, antes da matéria. */}
-        <BotaoEmoji
-          abrirPara="baixo"
-          aoEscolher={(emoji) => setTexto(inserirNoCursor(caixaTexto.current, texto, emoji, MAX_TEXTO))}
-        />
         <select
           required
           value={tag}
@@ -125,6 +120,11 @@ export function FormPost({
             </option>
           ))}
         </select>
+        {/* O emoji (Pessoa A) na linha de baixo do campo, depois da matéria. */}
+        <BotaoEmoji
+          abrirPara="baixo"
+          aoEscolher={(emoji) => setTexto(inserirNoCursor(caixaTexto.current, texto, emoji, MAX_TEXTO))}
+        />
         <input
           type="number"
           min={1}

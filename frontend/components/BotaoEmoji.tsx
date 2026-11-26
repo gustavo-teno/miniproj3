@@ -13,7 +13,7 @@
 // fecha ao clicar fora ou com Esc (aí o foco volta para o botão), como o menu
 // da engrenagem.
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 // Os mais usados por quem estuda: comemorar a lista feita, sofrer junto com o
 // simulado, agradecer a dica. Poucos, para a barra caber no celular.
@@ -74,10 +74,31 @@ export function BotaoEmoji({
   const caixa = useRef<HTMLDivElement>(null);
   const botao = useRef<HTMLButtonElement>(null);
   const lugarDaSelecao = useRef<HTMLDivElement>(null);
+  const janela = useRef<HTMLDivElement>(null);
   // A seleção completa é criada uma vez e guarda a função que recebeu; pelo
   // ref, ela sempre chama a versão atual (que conhece o texto de agora).
   const escolher = useRef(aoEscolher);
   escolher.current = aoEscolher;
+
+  // A caixinha nasce encostada à esquerda do botão. Se assim ela passar da
+  // borda da tela (no celular, com o botão no meio da linha), ela anda para
+  // dentro, sempre com 8px de folga: nada fica cortado nem cria rolagem lateral.
+  function caberNaTela() {
+    const el = janela.current;
+    if (!el) return;
+    el.style.transform = "";
+    const caixa = el.getBoundingClientRect();
+    const largura = document.documentElement.clientWidth;
+    let desvio = 0;
+    if (caixa.right > largura - 8) desvio = largura - 8 - caixa.right;
+    if (caixa.left + desvio < 8) desvio = 8 - caixa.left;
+    if (desvio) el.style.transform = `translateX(${Math.round(desvio)}px)`;
+  }
+
+  // Antes de pintar: a caixinha já aparece no lugar certo, sem pular.
+  useLayoutEffect(() => {
+    if (aberto) caberNaTela();
+  }, [aberto, todos]);
 
   function fechar() {
     setAberto(false);
@@ -130,6 +151,7 @@ export function BotaoEmoji({
         // Mais baixa que o padrão (435px), para caber na tela do celular.
         (selecao as unknown as HTMLElement).style.height = "330px";
         lugarDaSelecao.current.replaceChildren(selecao as unknown as Node);
+        caberNaTela(); // a seleção é mais larga que a barra
       })
       .catch(() => valendo && setErro(true));
     return () => {
@@ -168,6 +190,7 @@ export function BotaoEmoji({
       {/* Encostada à esquerda, como o botão. */}
       {aberto && (
         <div
+          ref={janela}
           id={idDaCaixa}
           className={`absolute left-0 z-10 ${abrirPara === "cima" ? "bottom-12" : "top-12"} rounded-2xl border border-linha bg-superficie shadow-[0_8px_24px_rgb(0_0_0/0.12)]`}
         >

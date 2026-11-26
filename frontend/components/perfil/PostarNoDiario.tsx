@@ -76,11 +76,6 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
       />
 
       <div className="flex flex-wrap items-center gap-1.5">
-        {/* O emoji (Pessoa A) na linha de baixo do campo, antes da matéria. */}
-        <BotaoEmoji
-          abrirPara="baixo"
-          aoEscolher={(emoji) => setTexto(inserirNoCursor(caixaTexto.current, texto, emoji, MAX_TEXTO))}
-        />
         {/* A matéria aparece com a cor e o símbolo dela, como uma etiqueta. */}
         <label
           className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-semibold ${tag ? "cor-materia" : "border border-linha text-tinta-suave"}`}
@@ -104,6 +99,11 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
             ))}
           </select>
         </label>
+        {/* O emoji (Pessoa A) na linha de baixo do campo, depois da matéria. */}
+        <BotaoEmoji
+          abrirPara="baixo"
+          aoEscolher={(emoji) => setTexto(inserirNoCursor(caixaTexto.current, texto, emoji, MAX_TEXTO))}
+        />
         <input
           type="number"
           min={1}
