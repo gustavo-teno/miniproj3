@@ -250,10 +250,11 @@ prazo de validade está explicado acima. Além deles:
   deixar de seguir já fecha a conversa. Bloquear de verdade (esconder os
   posts e impedir de seguir de novo) mexeria no feed, nas turmas e na busca, e
   não cabia no prazo.
-- **Ver a rede sem conta.** Tudo pede login. Uma tela aberta, que mostrasse
-  as turmas e alguns posts para quem ainda não entrou, ajudaria a convencer
-  quem chega, mas expõe o diário de estudantes em boa parte menores de idade e
-  pediria um desenho próprio.
+- **Ver a rede de verdade sem conta.** A tela de abertura mostra o que é a
+  rede com dois posts de exemplo, escritos para ela, mas o feed, as turmas e
+  os perfis pedem login. Abrir os posts reais para quem ainda não entrou
+  ajudaria a convencer quem chega, mas expõe o diário de estudantes em boa
+  parte menores de idade.
 - **Respostas rápidas nas DMs.** Botões com frases prontas ("bora estudar?")
   eram fáceis de fazer, mas deixam a conversa impessoal, justamente o
   contrário do que faz dois colegas virarem parceiros de estudo.
@@ -302,7 +303,8 @@ O time todo usou o **Claude Code** (Anthropic). Os commits feitos com ele
 levam a linha `Co-Authored-By: Claude`, e os PRs, o rodapé "Generated with
 Claude Code", então o histórico do Git mostra onde ele entrou. Dois
 combinados valeram para todo mundo: cada PR foi revisado por outra pessoa do
-time, que testava a versão na tela antes de aprovar; e as decisões de produto
+time, que testava a versão na tela (ou lia, nos PRs só de texto) antes de
+aprovar; e as decisões de produto
 deste arquivo foram discutidas e aprovadas pelo time, não pela ferramenta.
 
 **Gustavo (Pessoa A: auth, ofensiva, DMs, busca e extras).** Usei o Claude
@@ -315,8 +317,8 @@ mesmo jeito para todo mundo.
 - **Para quê:** organizar o brainstorm do nicho e escrever o rascunho deste
   arquivo e do [PLANO.md](PLANO.md) (papéis, issues e cronograma); escrever o
   código e os testes das minhas features (o esqueleto, a auth, a ofensiva, as
-  DMs, a busca, salvar posts, emoji, curtir mensagem, notificações e imagem
-  nos posts), as telas das Turmas, que assumi na véspera, e o README; revisar
+  DMs, a busca, salvar posts, emoji, curtir mensagem, notificações, imagem
+  nos posts, o "← Voltar" do post e a tela de abertura), as telas das Turmas, que assumi na véspera, e o README; revisar
   os PRs dos colegas, subindo uma cópia de cada PR e testando no navegador, no
   computador e no celular; e escrever as mensagens para o grupo do time.
 - **O que foi meu:** escolher com o time o nicho, o problema e as decisões de
