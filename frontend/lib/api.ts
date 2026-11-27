@@ -269,6 +269,10 @@ export type Post = {
   curtido_por_mim: boolean; // depende de quem está vendo
   salvo_por_mim: boolean; // idem, para o botão Salvar (#64)
   tem_imagem?: boolean; // se o post tem imagem (#105): ela vem de lib/imagem.ts
+  // O tamanho dela em pixels (#127), para a caixa da foto nascer no formato
+  // certo. null se não tem imagem ou se o backend não conseguiu ler.
+  imagem_largura?: number | null;
+  imagem_altura?: number | null;
 };
 
 // Um comentário de GET /posts/{id}/comentarios (#12, Pessoa C), com as

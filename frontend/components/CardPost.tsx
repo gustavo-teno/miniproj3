@@ -102,7 +102,14 @@ export function CardPost({
           <p className="pauta mt-1 whitespace-pre-line break-words font-light leading-6">{post.texto}</p>
 
           {/* A foto do caderno ou da lista (#105, Pessoa A), embaixo do texto. */}
-          {post.tem_imagem && <ImagemDoPost postId={post.id} aoTirar={aoTirarImagem} />}
+          {post.tem_imagem && (
+            <ImagemDoPost
+              postId={post.id}
+              largura={post.imagem_largura}
+              altura={post.imagem_altura}
+              aoTirar={aoTirarImagem}
+            />
+          )}
 
           {rodape && <div className="mt-2 flex gap-6 text-sm text-tinta-suave">{rodape}</div>}
         </div>

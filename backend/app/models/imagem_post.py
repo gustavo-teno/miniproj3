@@ -10,9 +10,12 @@ class ImagemPost(Base):
 
     Os bytes ficam no banco, e não em disco, porque o disco do Render zera a
     cada reinício. A tela reduz a imagem antes de mandar (uns 300 KB), então o
-    banco não incha. Fica numa tabela própria, e não numa coluna do Post, por
-    dois motivos: o create_all cria tabela nova sozinho (ninguém precisa apagar
-    o banco), e o feed não carrega os bytes junto com cada post."""
+    banco não incha. Fica numa tabela própria, e não numa coluna do Post, para
+    o feed não carregar os bytes junto com cada post.
+
+    A largura e a altura entraram depois (#127): o create_all não acrescenta
+    coluna em tabela que já existe, então um banco local criado antes precisa
+    ser apagado e refeito (rm backend/app.db && make seed)."""
 
     __tablename__ = "imagens_post"
 
@@ -21,4 +24,9 @@ class ImagemPost(Base):
     dados: Mapped[bytes] = mapped_column(LargeBinary)
     # O formato, descoberto pelos primeiros bytes: image/jpeg, image/png ou image/webp.
     tipo: Mapped[str] = mapped_column(String(20))
+    # Em pixels, lidas do cabeçalho do arquivo ao guardar (services/imagens.py).
+    # A tela usa para montar a caixa da foto no formato dela antes de a foto
+    # chegar (#127). None quando não deu para ler: a caixa fica em 4:3.
+    largura: Mapped[int | None]
+    altura: Mapped[int | None]
     created_at: Mapped[CriadoEm]

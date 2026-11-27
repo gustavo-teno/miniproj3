@@ -9,7 +9,26 @@ import { useEffect, useRef, useState } from "react";
 
 import { buscarImagem } from "@/lib/imagem";
 
-export function ImagemDoPost({ postId, aoTirar }: { postId: number; aoTirar?: () => Promise<void> }) {
+// A caixa da foto segue o formato dela (#127), com dois limites: a altura até
+// 28rem (o mesmo da largura máxima, max-w-md), e a proporção entre 1:2 (bem em
+// pé) e 2:1 (bem deitada). Fora disso, a foto aparece inteira com faixas.
+const ALTURA_MAXIMA_REM = 28;
+const PROPORCAO_MINIMA = 1 / 2;
+const PROPORCAO_MAXIMA = 2;
+// Sem o tamanho (o backend não conseguiu ler), a caixa fica deitada, em 4:3.
+const PROPORCAO_PADRAO = 4 / 3;
+
+export function ImagemDoPost({
+  postId,
+  largura,
+  altura,
+  aoTirar,
+}: {
+  postId: number;
+  largura?: number | null;
+  altura?: number | null;
+  aoTirar?: () => Promise<void>;
+}) {
   const caixa = useRef<HTMLDivElement>(null);
   const [perto, setPerto] = useState(false);
   const [url, setUrl] = useState<string | null>(null);
@@ -62,6 +81,11 @@ export function ImagemDoPost({ postId, aoTirar }: { postId: number; aoTirar?: ()
     }
   }
 
+  const proporcao =
+    largura && altura
+      ? Math.min(PROPORCAO_MAXIMA, Math.max(PROPORCAO_MINIMA, largura / altura))
+      : PROPORCAO_PADRAO;
+
   // Sem a imagem (erro de rede, ou ela foi tirada noutra aba), o card segue sem ela.
   if (falhou) return null;
 
@@ -70,8 +94,12 @@ export function ImagemDoPost({ postId, aoTirar }: { postId: number; aoTirar?: ()
       {/* A caixa tem o mesmo tamanho antes e depois de a foto chegar: assim
           o card não cresce quando ela carrega, a lista não pula enquanto as
           fotos chegam, e o voltar (MemoriaDaNavegacao) cai no ponto certo.
-          A foto aparece inteira dentro dela (em pé ou deitada), sem corte. */}
-      <div className="aspect-[4/3] w-full max-w-md overflow-hidden rounded-lg border border-linha bg-fundo">
+          O formato vem do post (largura e altura), então a foto em pé ganha
+          uma caixa em pé, sem as faixas dos lados (#127). */}
+      <div
+        style={{ aspectRatio: proporcao, width: `min(100%, ${ALTURA_MAXIMA_REM * proporcao}rem)` }}
+        className="max-w-md overflow-hidden rounded-lg border border-linha bg-fundo"
+      >
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element -- endereço local (blob:), o next/image não serve
           <img src={url} alt="Imagem do post" className="size-full object-contain" />
