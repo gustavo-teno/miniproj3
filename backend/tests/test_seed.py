@@ -169,3 +169,31 @@ def test_fotos_vao_para_posts_do_mesmo_assunto(db):
             assert all(trecho in post.texto for trecho in foto["contem"])
         assert imagem.tipo == formato(imagem.dados) is not None
         assert len(imagem.dados) <= TAMANHO_MAXIMO
+
+
+def test_post_de_foto_que_pergunta_tem_a_resposta(db):
+    # Os posts de foto que fazem uma pergunta não ficam sem resposta: cada "fa"
+    # é um comentário de quem segue o autor, e "autor" responde ao último "fa".
+    from app.models.follow import Follow
+    from app.models.imagem_post import ImagemPost
+    from scripts.seed_dados import FOTOS
+
+    for foto in (f for f in FOTOS if "comentarios" in f):
+        dados = (seed.PASTA_FOTOS / foto["arquivo"]).read_bytes()
+        post = db.get(Post, db.scalar(select(ImagemPost.post_id).where(ImagemPost.dados == dados)))
+        comentarios = {c.texto: c for c in db.scalars(select(Comment).where(Comment.post_id == post.id))}
+        fas, ultimo_fa, antes = set(), None, post.created_at
+        for quem, texto in foto["comentarios"]:
+            c = comentarios[texto]
+            if quem == "fa":
+                assert c.parent_id is None and c.autor_id != post.autor_id
+                assert db.scalar(select(Follow).where(Follow.seguidor_id == c.autor_id,
+                                                      Follow.seguido_id == post.autor_id))
+                fas.add(c.autor_id)
+                ultimo_fa = c
+            else:
+                assert c.autor_id == post.autor_id and c.parent_id == ultimo_fa.id
+            # Cada fala depois da anterior, e nunca no futuro.
+            assert antes < c.created_at <= AGORA
+            antes = c.created_at
+        assert len(fas) == sum(quem == "fa" for quem, _ in foto["comentarios"])

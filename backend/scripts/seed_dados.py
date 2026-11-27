@@ -236,6 +236,10 @@ COMENTARIOS = [
 #   fotos do time, que mostram algo específico (uma questão, uma redação).
 # "vestibular" (opcional) limita a quem presta aquela prova: questão e
 # redação do Enem só vão para quem está na turma do Enem.
+# "comentarios" (opcional) é a conversa embaixo de um post que pergunta algo,
+# para a pergunta não ficar sem resposta no vídeo: "fa" é um comentário de
+# quem segue o autor (cada "fa" é uma pessoa diferente) e "autor" é quem
+# postou respondendo ao último "fa".
 # Toda foto tem matéria: uma foto genérica (um mapa mental qualquer) caía num
 # post que dizia um assunto que ela não mostrava (#123).
 _SESSOES_DE_CADERNO = ("Fiz ", "Refiz", "Videoaula", "Resumo", "Primeira vez")
@@ -247,15 +251,37 @@ FOTOS = [
     {"arquivo": "biologia-enem-agua.jpg", "tag": "biologia", "vestibular": "enem",
      "texto": "Questão do Enem 2005 sobre água e sais minerais. Marcariam qual? "
               "Achei legal porque envolve um pouquinho 🤏 de matemática num assunto "
-              "diferente de genética."},
+              "diferente de genética.",
+     "comentarios": [
+         ("fa", "Marquei a D, tecido conjuntivo! Saíram 120 mg de água dos 200 mg, "
+                "então 60% era água, e na tabela 60% é o conjuntivo."),
+         ("autor", "Isso! Na primeira vez eu fiz 80 de 200 e achei 40%, mas os 80 mg "
+                   "são o que sobrou seco 😅"),
+         ("fa", "Boa pra lembrar de ler o que o número quer dizer antes de fazer a conta."),
+     ]},
     {"arquivo": "biologia-enem-etileno.png", "tag": "biologia", "vestibular": "enem",
      "texto": "Enem 2023, a questão dos abacates no recipiente fechado. Fiquei entre "
-              "a A e a C, alguém me explica por que não é o CO₂?"},
+              "a A e a C, alguém me explica por que não é o CO₂?",
+     "comentarios": [
+         ("fa", "É a A! A fruta madura libera etileno, o hormônio que acelera o "
+                "amadurecimento. No recipiente fechado o gás não escapa e se acumula."),
+         ("autor", "Ahh, então o CO₂ vem da respiração da fruta, mas quem amadurece é "
+                   "o etileno. Valeu!"),
+         ("fa", "É o mesmo motivo de embrulhar banana verde no jornal 🍌"),
+     ]},
     {"arquivo": "redacao-participacao-politica.jpg", "tag": "redacao", "vestibular": "enem",
      "texto": "Redação de treino: a participação política dos jovens. Usei a Grécia "
               "antiga e a Revolta da Vacina de repertório, e na proposta de "
               "intervenção pus aulas de ciência política nas escolas. Quem quiser "
-              "corrigir, aceito!"},
+              "corrigir, aceito!",
+     "comentarios": [
+         ("fa", "Li! A Grécia antiga e a Revolta da Vacina ficaram bem amarradas com a "
+                "tese. E a proposta tem agente (a mídia), meio (Instagram e X) e "
+                "finalidade, isso conta muito na competência 5."),
+         ("autor", "Valeu demais!! Tava com medo de a proposta estar incompleta."),
+         ("fa", "Só cuidado com as rasuras, tem umas palavras riscadas no meio. Na "
+                "prova vale passar a limpo com calma."),
+     ]},
     {"arquivo": "mapa-mental-caderno.jpg", "tag": "sociologia",
      "texto": "Revisão de Marx e Weber com mapa mental. Trabalho, dinheiro e "
               "família, tudo ligado."},
