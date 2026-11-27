@@ -175,6 +175,7 @@ entram na tabela "Quem faz o quê" de lá.
 | Emoji ao escrever | Pessoa A (Gustavo) | Quem escreve pelo computador também comemora uma lista feita com 🔥 ou 💪, como faria no celular. |
 | Salvar posts | Pessoa A (Gustavo) | Guardar uma explicação boa ou uma lista de questões para rever depois, só para você. |
 | Comentários em árvore e curtir comentário | Pessoa C (Clarisse) | A dúvida de um comentário vira conversa embaixo dele, e uma dica boa ganha um "valeu" sem precisar escrever. |
+| Notificações | Pessoa A (Gustavo) | Quem postou a sessão fica sabendo que a turma curtiu, comentou ou começou a seguir, sem precisar abrir o post de novo para descobrir. |
 
 **Comentários em árvore: a árvore é montada a cada pedido.** O
 `core/arvore.py` recebe os comentários diretos no post (a página pedida) e
@@ -185,6 +186,22 @@ comentário uma vez, O(n) no número de respostas do post. Não guardamos a
 montar de novo é barato e ela nunca fica desatualizada quando alguém responde
 ou um post é apagado. A página continua contando só os comentários diretos, e
 a ordem é cronológica em todo nível, como pede o contrato.
+
+**Notificações: o contador é montado a cada pedido.** O sino pergunta
+`GET /notificacoes/novas` a cada 30 s, com a aba à vista. O
+`services/notificacoes.py` faz cinco consultas (curtidas e comentários nos
+seus posts, respostas e curtidas nos seus comentários, novos seguidores), cada
+uma pelo índice da coluna que filtra (`post_id`, `parent_id`,
+`comentario_id`, `seguido_id`). Depois, em Python, agrupa as curtidas por post
+num dict em uma passada e conta o que veio depois da marca "visto até": O(n)
+no número de ações sobre as suas coisas, mais O(m log m) para ordenar as m
+linhas da página. Para a conta com mais movimento do seed (centenas de ações)
+responde em uns 10 ms. Não guardamos uma tabela de notificações porque montar
+na leitura faz desfazer (descurtir, deixar de seguir, apagar o post) tirar o
+aviso sozinho. Numa rede grande, o n cresce com a fama da pessoa: aí valeria
+guardar as notificações numa tabela com índice em (destinatário, data) e
+contar só as novas no banco, em O(novas), pagando com apagar a linha a cada
+"desfazer".
 
 **Login sem prazo de validade (escolha consciente).** O token do login vale
 até a pessoa clicar em sair, que apaga a sessão no banco. Uma validade (por
@@ -258,3 +275,64 @@ fork do time e merge só depois da aprovação de outra pessoa.
   ser feitos arquivo por arquivo. Os textos de erro também saíram fora do
   padrão do time ("Não deu para...") e foram trocados por "Não foi possível..."
   depois da revisão do Gustavo.
+
+**Camila (Pessoa B: base visual, posts, perfil-diário, página do post e
+design).** Usei o Claude Code (Claude Opus e Sonnet) no projeto, com o
+`CLAUDE.md` do time para ele seguir o nosso fluxo. Os commits eu mesma rodava,
+com mensagens no meu jeito, explicando o porquê.
+
+- **Para quê:** escrever o front das minhas features (a base visual, o post, o
+  perfil-diário com o fogo e as horas estudadas, a página do post com os
+  comentários e o topo do perfil no celular) e o `DESIGN.md`, e desenhar
+  propostas em HTML antes de mexer no código, como as pranchas do computador e
+  do celular e as Turmas. Também abri as issues e os PRs, revisei os PRs do
+  Gustavo e fiz os merges. No fim, fiz uma passada final: conferi todas as
+  telas no celular e no computador, nos modos claro e noturno, e o fluxo de
+  cadastro, login, post e seguir, como a banca faria.
+- **O que foi meu:** o gosto e as decisões do design. Recusei layouts que a IA
+  propôs (um com o post e os comentários muito divididos, outro parecido demais
+  com o Twitter), escolhi o que ficava com a cara do projeto, tirei o bloco
+  lavanda dos comentários (e troquei "anotações" por "comentários"), pedi um
+  contorno contínuo no lugar do pontilhado, ajustei o lavanda até ficar pastel
+  e legível, e escolhi o desenho das Turmas e das Mensagens. Também decidi
+  abrir o post e os comentários numa página própria: a ideia veio das outras
+  redes, mas o visual continuou o nosso, de caderno.
+- **Onde a IA ajudou além do código:** a passada final achou três problemas que
+  eu não tinha visto: o topo estourava a tela em celulares de 360px, a aba
+  não tinha ícone e os posts do diário não tinham curtir, comentar e salvar.
+  Quando a Clarisse avisou sobre o `marcar_curtidos`, a IA confirmou que a
+  rota do diário mostrava o coração sempre vazio, mesmo para quem já tinha
+  curtido, e o corrigiu com um teste.
+- **Onde precisei corrigir:** um print do celular saiu com uma área em branco
+  enorme embaixo, e eu percebi e pedi para refazer. Um merge perdeu uma chave
+  no `api.ts`, e ela foi corrigida na hora. A IA também mediu
+  errado a sobra de largura em 320px na descrição de um PR, e o Gustavo
+  apontou o número certo na revisão. Também deixei combinado com a IA que ela
+  pergunta antes de decidir qualquer coisa de design e não muda um desenho já
+  aprovado.
+
+**Pedro (Pessoa D: follow, feed e turmas).** Usei o Claude Code (Claude Opus)
+no projeto, com o `CLAUDE.md` do time para ele seguir o nosso fluxo: uma
+branch por feature, commits pequenos em português, PR para o fork do time e
+merge só depois da aprovação de outra pessoa.
+
+- **Para quê:** preparar o ambiente no Windows (só o uv e o Node, sem o
+  `make`); escrever o backend, os testes e as telas das minhas features (o
+  follow com o `<BotaoSeguir>`, o feed com os filtros e o "Carregar mais" em
+  cima do rascunho da Camila, e a API das Turmas); abrir os PRs; testar o
+  fluxo inteiro no navegador, como a banca, no computador e no celular; e me
+  explicar cada passo, porque eu pedi para entender o que estava sendo feito.
+- **O que foi meu:** pedir que cada parte fosse explicada antes de seguir;
+  conferir se o trabalho estava de acordo com o plano do time antes de abrir
+  cada PR; decidir instalar só o indispensável; escolher quem revisava cada
+  PR; e levar para a IA as revisões da Camila e do Gustavo.
+- **Onde a IA ajudou além do código:** percebeu que o teste de follow do
+  núcleo dependia do perfil da Camila e manteve o `@skip` até ele entrar; viu
+  que o PR da Camila que pôs o botão no perfil mexia no mesmo `BotaoSeguir` e
+  deixou os dois arquivos iguais para não dar conflito; lembrou que o Feed,
+  que é do núcleo, ainda faltava na véspera; e juntou o código repetido entre
+  o feed e as turmas.
+- **Onde precisei corrigir:** a revisão da Camila apontou textos de erro fora
+  do padrão do `DESIGN.md` e um erro 500 quando o Seguir levava dois cliques
+  rápidos. Os dois foram corrigidos, o segundo com um teste que simula os
+  cliques ao mesmo tempo.

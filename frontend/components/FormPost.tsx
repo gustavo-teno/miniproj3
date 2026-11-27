@@ -29,6 +29,9 @@ export function FormPost({
   const [tag, setTag] = useState("");
   const [minutos, setMinutos] = useState("");
   const [enviando, setEnviando] = useState(false);
+  // A ref muda na hora; o estado só no próximo desenho. Cliques que chegam
+  // juntos ainda veem `enviando` falso, mas já veem a ref ligada.
+  const enviandoAgora = useRef(false);
   const [erro, setErro] = useState<string | null>(null);
   const caixaTexto = useRef<HTMLTextAreaElement>(null);
 
@@ -45,6 +48,8 @@ export function FormPost({
   async function enviar(e: FormEvent) {
     e.preventDefault();
     if (!texto.trim() || !tag) return; // o navegador já avisa nos campos obrigatórios
+    if (enviandoAgora.current) return; // cliques que chegam juntos não criam o post duas vezes
+    enviandoAgora.current = true;
     setEnviando(true);
     setErro(null);
     try {
@@ -59,6 +64,7 @@ export function FormPost({
       // O texto fica no campo: ninguém perde o que escreveu por causa de um erro.
       setErro(falha instanceof Error ? falha.message : "Não foi possível postar. Tente de novo.");
     } finally {
+      enviandoAgora.current = false;
       setEnviando(false);
     }
   }
