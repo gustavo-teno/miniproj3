@@ -51,6 +51,6 @@ CLAUDE.local.md
 *.stackdump
 
 # vídeos: grandes demais para o Git (o GitHub recusa acima de 100 MB, e cada
-# clone baixaria o peso). O vídeo da entrega fica anexado a uma release.
+# clone baixaria o peso). O vídeo da entrega está no YouTube (link no README).
 *.mp4
 *.mov
