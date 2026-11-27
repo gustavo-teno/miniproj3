@@ -4,6 +4,7 @@ from app.models.comment import Comment  # noqa: F401
 from app.models.curtida_comentario import CurtidaComentario  # noqa: F401
 from app.models.curtida_mensagem import CurtidaMensagem  # noqa: F401
 from app.models.follow import Follow  # noqa: F401
+from app.models.imagem_post import ImagemPost  # noqa: F401
 from app.models.leitura import Leitura  # noqa: F401
 from app.models.like import Like  # noqa: F401
 from app.models.mensagem import Mensagem  # noqa: F401

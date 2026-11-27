@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import type { MouseEvent, ReactNode } from "react";
 
 import { Avatar } from "@/components/Avatar";
+import { ImagemDoPost } from "@/components/ImagemDoPost";
 import { SimboloMateria } from "@/components/SimboloMateria";
 import type { Post } from "@/lib/api";
 import { estiloDaTag } from "@/lib/materias";
@@ -28,12 +29,15 @@ export function CardPost({
   rodape,
   embaixo,
   abrirAoClicar = true,
+  aoTirarImagem,
 }: {
   post: Post;
   rodape?: ReactNode;
   // A conversa da página do post: fica dentro da folha, embaixo do post.
   embaixo?: ReactNode;
   abrirAoClicar?: boolean;
+  // Só na página do post e só para o autor (#105): o botão "Tirar a imagem".
+  aoTirarImagem?: () => Promise<void>;
 }) {
   const opcoes = useOpcoes();
   const router = useRouter();
@@ -95,6 +99,9 @@ export function CardPost({
 
           {/* whitespace-pre-line: as quebras de linha que a pessoa digitou aparecem. */}
           <p className="pauta mt-1 whitespace-pre-line break-words font-light leading-6">{post.texto}</p>
+
+          {/* A foto do caderno ou da lista (#105, Pessoa A), embaixo do texto. */}
+          {post.tem_imagem && <ImagemDoPost postId={post.id} aoTirar={aoTirarImagem} />}
 
           {rodape && <div className="mt-2 flex gap-6 text-sm text-tinta-suave">{rodape}</div>}
         </div>
