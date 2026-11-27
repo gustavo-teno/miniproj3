@@ -34,7 +34,7 @@ from app.models.like import Like
 from app.models.mensagem import Mensagem
 from app.models.post import Post
 from app.models.user import User
-from app.services.imagens import formato
+from app.services.imagens import dimensoes, formato
 from scripts.seed_dados import (
     ASSUNTOS,
     BATE_PAPO,
@@ -316,7 +316,9 @@ def _anexar_fotos(db: Session, usuarios: list[User], posts: list[Post],
         if "texto" in foto:
             post.texto = foto["texto"]
         dados = (PASTA_FOTOS / foto["arquivo"]).read_bytes()
-        db.add(ImagemPost(post_id=post.id, dados=dados, tipo=formato(dados)))
+        largura, altura = dimensoes(dados) or (None, None)
+        db.add(ImagemPost(post_id=post.id, dados=dados, tipo=formato(dados),
+                          largura=largura, altura=altura))
         com_foto.add(post.id)
         _comentar_foto(db, post, foto.get("comentarios", []), seguidores, agora)
 

@@ -1,5 +1,7 @@
 """Imagem nos posts de matéria (#105, Pessoa A)."""
 
+from app.services.imagens import dimensoes
+
 # Os primeiros bytes de cada formato bastam: o backend reconhece a imagem pela
 # assinatura do arquivo, sem abrir a imagem inteira.
 JPEG = b"\xff\xd8\xff\xe0" + b"\x00" * 200
@@ -147,3 +149,40 @@ def test_imagem_vai_com_nosniff(client, logar):
     anexar(client, ana, post_id)
     r = client.get(f"/posts/{post_id}/imagem", headers=ana)
     assert r.headers["x-content-type-options"] == "nosniff"
+
+
+# O tamanho da imagem (#127). Um JPEG com um bloco APP0 antes do SOF (como os
+# de verdade) e um PNG com o IHDR, só com os cabeçalhos.
+def jpeg_de(largura, altura):
+    app0 = b"\xff\xe0" + (16).to_bytes(2, "big") + b"JFIF\x00" + b"\x00" * 9
+    sof = b"\xff\xc0" + (17).to_bytes(2, "big") + b"\x08" + altura.to_bytes(2, "big") + largura.to_bytes(2, "big")
+    return b"\xff\xd8" + app0 + sof + b"\x00" * 100
+
+
+def png_de(largura, altura):
+    return b"\x89PNG\r\n\x1a\n" + (13).to_bytes(4, "big") + b"IHDR" + largura.to_bytes(4, "big") + altura.to_bytes(4, "big")
+
+
+def test_dimensoes_le_o_cabecalho():
+    assert dimensoes(jpeg_de(1200, 1800)) == (1200, 1800)
+    assert dimensoes(png_de(648, 610)) == (648, 610)
+    # Cortado no meio do cabeçalho, ou sem SOF: não dá para saber.
+    assert dimensoes(jpeg_de(1200, 1800)[:20]) is None
+    assert dimensoes(JPEG) is None
+
+
+def test_tamanho_da_imagem_vem_no_post(client, logar):
+    ana, bia = logar("ana"), logar("bia")
+    client.post("/usuarios/ana/follow", headers=bia)
+    em_pe, sem_tamanho, sem_imagem = postar(client, ana), postar(client, ana), postar(client, ana)
+    anexar(client, ana, em_pe, dados=jpeg_de(1200, 1800))
+    anexar(client, ana, sem_tamanho)
+
+    itens = {p["id"]: p for p in client.get("/feed", headers=bia).json()["items"]}
+    tamanho = {i: (p["imagem_largura"], p["imagem_altura"]) for i, p in itens.items()}
+    assert tamanho == {em_pe: (1200, 1800), sem_tamanho: (None, None), sem_imagem: (None, None)}
+
+    # Trocar a imagem troca o tamanho junto.
+    anexar(client, ana, em_pe, dados=png_de(800, 600))
+    p = client.get(f"/posts/{em_pe}", headers=bia).json()
+    assert (p["imagem_largura"], p["imagem_altura"]) == (800, 600)

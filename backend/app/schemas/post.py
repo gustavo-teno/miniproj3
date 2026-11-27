@@ -70,3 +70,7 @@ class PostOut(BaseModel):
     salvo_por_mim: bool = False
     # Se o post tem imagem (#105): a tela busca em GET /posts/{id}/imagem.
     tem_imagem: bool = False
+    # O tamanho dela em pixels (#127), para a tela reservar o espaço no formato
+    # certo. None se o post não tem imagem ou se não deu para ler.
+    imagem_largura: int | None = None
+    imagem_altura: int | None = None

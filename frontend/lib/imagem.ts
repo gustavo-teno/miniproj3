@@ -5,7 +5,7 @@
 // devolve os bytes, então estes pedidos usam o pedirAoBackend do lib/api.ts
 // direto, e não o apiGet (o token e as mensagens de erro são os mesmos).
 
-import { pedirAoBackend } from "@/lib/api";
+import { pedirAoBackend, type Post } from "@/lib/api";
 
 // O lado maior da imagem depois de reduzida e o tamanho que miramos. O
 // backend aceita até 600 KB; aqui miramos a metade, para sobrar folga.
@@ -53,11 +53,21 @@ function paraJpeg(canvas: HTMLCanvasElement, qualidade: number): Promise<Blob> {
   );
 }
 
-export async function enviarImagem(postId: number, imagem: Blob): Promise<void> {
+// Manda a imagem e devolve o tamanho dela: o post novo já aparece com a caixa
+// da foto no formato certo (#127), como os que vêm do backend.
+export async function enviarImagem(
+  postId: number,
+  imagem: Blob,
+): Promise<Pick<Post, "imagem_largura" | "imagem_altura">> {
   await pedirAoBackend("PUT", `/posts/${postId}/imagem`, {
     corpo: imagem,
     tipo: imagem.type || "image/jpeg",
   });
+  // Se não der para medir, a caixa fica em 4:3: a imagem já subiu, não é erro.
+  const bitmap = await createImageBitmap(imagem).catch(() => null);
+  const tamanho = { imagem_largura: bitmap?.width ?? null, imagem_altura: bitmap?.height ?? null };
+  bitmap?.close();
+  return tamanho;
 }
 
 export async function tirarImagem(postId: number): Promise<void> {

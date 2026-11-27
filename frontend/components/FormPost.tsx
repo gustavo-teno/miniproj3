@@ -68,7 +68,7 @@ export function FormPost({
       });
       if (imagem) {
         try {
-          await enviarImagem(post.id, imagem);
+          Object.assign(post, await enviarImagem(post.id, imagem));
           post.tem_imagem = true;
         } catch (falha) {
           // O post já existe: ele aparece, e o aviso diz que a imagem não foi.

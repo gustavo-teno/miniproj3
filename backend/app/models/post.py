@@ -51,3 +51,11 @@ class Post(Base):
     tem_imagem: Mapped[bool] = column_property(
         select(ImagemPost.id).where(ImagemPost.post_id == id).correlate_except(ImagemPost).exists()
     )
+    # O tamanho da imagem (#127), do mesmo jeito: a tela reserva o espaço da
+    # foto no formato dela (em pé ou deitada) antes de os bytes chegarem.
+    imagem_largura: Mapped[int | None] = column_property(
+        select(ImagemPost.largura).where(ImagemPost.post_id == id).correlate_except(ImagemPost).scalar_subquery()
+    )
+    imagem_altura: Mapped[int | None] = column_property(
+        select(ImagemPost.altura).where(ImagemPost.post_id == id).correlate_except(ImagemPost).scalar_subquery()
+    )
