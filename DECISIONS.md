@@ -164,9 +164,10 @@ entram na tabela "Quem faz o quê" de lá.
 | Feed (núcleo) | Pessoa D | Cronológico e só de quem você segue, com filtro para esconder o bate-papo. |
 | Perfil (núcleo) | Pessoa B (Camila) | O diário com divisórias por matéria, com a meta, a ofensiva e o resumo da semana no topo. |
 | Follow (núcleo) | Pessoa D (Pedro) | Acompanhar a jornada de quem tem a mesma meta que você. |
-| Curtidas (núcleo) | Pessoa C | Um apoio rápido para quem estudou hoje. |
-| Comentários (núcleo) | Pessoa C | Dicas e incentivo na sessão do outro, que é o sinal de que a rede funcionou. |
-| Seed fake (núcleo) | Pessoa C | Vestibulandos fictícios com metas e rotinas variadas, para a rede já parecer uma turma. |
+| Curtidas (núcleo) | Pessoa C (Clarisse) | Um apoio rápido para quem estudou hoje. |
+| Comentários (núcleo) | Pessoa C (Clarisse) | Dicas e incentivo na sessão do outro, que é o sinal de que a rede funcionou. |
+| Seed fake (núcleo) | Pessoa C (Clarisse) | Vestibulandos fictícios com metas e rotinas variadas, para a rede já parecer uma turma; com conversas nos comentários e fotos de estudo, para o vídeo e a banca não abrirem uma rede vazia. |
+| Deploy público | Pessoa C (Clarisse) | Quem quiser ver a rede abre um link (Vercel + Render), sem instalar nada, e o que cria continua lá. |
 | Ofensiva que perdoa | Pessoa A (Gustavo) | Motiva a voltar todo dia sem punir o descanso (decisão 4). |
 | Turmas | Pessoa D | Quem acabou de chegar encontra quem tem a mesma meta e sai do feed vazio (decisão 5). |
 | DMs entre mútuos | Pessoa A (Gustavo) | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
@@ -174,7 +175,7 @@ entram na tabela "Quem faz o quê" de lá.
 | Curtir mensagem nas DMs | Pessoa A (Gustavo) | Dois toques num balão dizem "valeu" ou "tamo junto" sem precisar escrever, como nos apps de mensagem. |
 | Emoji ao escrever | Pessoa A (Gustavo) | Quem escreve pelo computador também comemora uma lista feita com 🔥 ou 💪, como faria no celular. |
 | Salvar posts | Pessoa A (Gustavo) | Guardar uma explicação boa ou uma lista de questões para rever depois, só para você. |
-| Comentários em árvore e curtir comentário | Pessoa C (Clarisse) | A dúvida de um comentário vira conversa embaixo dele, e uma dica boa ganha um "valeu" sem precisar escrever. |
+| Comentários em árvore, curtir comentário e "Ver conversa" | Pessoa C (Clarisse) | A dúvida de um comentário vira conversa embaixo dele, uma dica boa ganha um "valeu" sem precisar escrever, e uma conversa grande abre numa tela só dela sem encompridar o post. |
 | Imagem nos posts de matéria | Pessoa A (Gustavo) | A foto do caderno, do mapa mental ou da lista resolvida mostra o estudo melhor que a descrição; só em post de matéria, porque é registro do estudo, não vitrine (decisão 1). |
 | Notificações | Pessoa A (Gustavo) | Quem postou a sessão fica sabendo que a turma curtiu, comentou ou começou a seguir, sem precisar abrir o post de novo para descobrir. |
 
@@ -186,7 +187,22 @@ comentário uma vez, O(n) no número de respostas do post. Não guardamos a
 árvore em memória: a conversa de um post tem dezenas de comentários, então
 montar de novo é barato e ela nunca fica desatualizada quando alguém responde
 ou um post é apagado. A página continua contando só os comentários diretos, e
-a ordem é cronológica em todo nível, como pede o contrato.
+a ordem é cronológica em todo nível, como pede o contrato. A tela "Ver
+conversa" (`GET /posts/{id}/comentarios/{comentario_id}`) usa a mesma função
+para um comentário só. As respostas param em 10 níveis (422 depois disso):
+sem limite, uma corrente criada de propósito pela API deixaria a árvore funda
+demais para a recursão (o Python para em uns 1.000 níveis).
+
+**Deploy: o Render grátis, sem perder o que a banca cria.** O backend roda no
+Render (plano grátis) e o site na Vercel, e cada merge na main publica os dois
+sozinhos (no Render, por um Deploy Hook chamado pelo GitHub Actions, porque o
+serviço foi criado como repositório público e não recebe o aviso do GitHub).
+O disco do Render zera a cada reinício, então o servidor roda o seed ao ligar
+(`SEED_ON_BOOT`) e a rede nunca abre vazia. O Render também desliga a API
+depois de 15 min sem visita, e aí o que alguém criou some: um agendamento no
+GitHub visita a API a cada 10 min para ela não dormir. Cabe nas 750 h grátis
+do Render porque é o único serviço da conta. Num produto de verdade, o banco
+seria um Postgres gerenciado, que não zera, e nada disso seria preciso.
 
 **Notificações: o contador é montado a cada pedido.** O sino pergunta
 `GET /notificacoes/novas` a cada 30 s, com a aba à vista. O
@@ -261,8 +277,11 @@ fork do time e merge só depois da aprovação de outra pessoa.
 
 - **Para quê:** escrever o código e os testes das minhas features a partir do
   que eu pedia (curtidas, comentários, o seed com os 25 vestibulandos, as
-  respostas e curtidas em comentários), abrir as issues e os PRs, revisar os
-  PRs da Camila e me guiar no deploy do Render, que eu configurei.
+  respostas e curtidas em comentários, o "Ver conversa", o carregamento das
+  listas e as fotos do seed), abrir as issues e os PRs, revisar os PRs da
+  Camila e do Gustavo e me guiar no deploy do Render, que eu configurei. Nas
+  fotos do seed, a IA buscou opções no Pexels e no Unsplash, eu escolhi quais
+  entravam, e ela anotou o autor e a licença de cada uma.
 - **O que foi meu:** escolher o papel e o escopo, decidir o que entrava e o que
   ficava de fora, testar no navegador e repassar as correções que o Gustavo e a
   Camila pediam nas revisões, e ainda tomar algumas decisões contrariando a
@@ -270,12 +289,19 @@ fork do time e merge só depois da aprovação de outra pessoa.
 - **Onde a IA ajudou além do código:** apontou que a ordem cronológica dos
   comentários é exigida pelo `CATALOGO.md` e pelo teste do núcleo, e achou no
   `CONTRATO.md` o formato de "Comentários em árvore", que segui nas respostas.
+  Também achou por que o site público ficava lento (a página do post esperava
+  o post chegar para só então pedir os comentários) e por que o Render não
+  publicava sozinho os merges (o serviço tinha sido criado como repositório
+  público).
 - **Onde precisei corrigir:** um arquivo de erro do terminal
   (`bash.exe.stackdump`) entrou num PR sem querer e foi tirado antes da
   revisão (e passou para o `.gitignore`). Depois disso, os commits passaram a
   ser feitos arquivo por arquivo. Os textos de erro também saíram fora do
   padrão do time ("Não deu para...") e foram trocados por "Não foi possível..."
-  depois da revisão do Gustavo.
+  depois da revisão do Gustavo. No deploy, a IA trabalhou com informação
+  velha: chegou a tirar da branch o deploy automático que já estava na main, e
+  desfez antes de entrar. E num vídeo da tela, ela só conseguia ver quadros
+  soltos, sem o áudio, então eu precisei dizer o que estava errado.
 
 **Camila (Pessoa B: base visual, posts, perfil-diário, página do post e
 design).** Usei o Claude Code (Claude Opus e Sonnet) no projeto, com o
