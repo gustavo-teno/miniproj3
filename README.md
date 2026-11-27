@@ -85,7 +85,7 @@ Quem fez cada uma e por quê: tabela de Features do
 
 ## Como rodar na sua máquina
 
-Precisa de Python 3.12 com [uv](https://docs.astral.sh/uv/) e Node 20 ou mais
+Precisa de Python 3.11 ou mais novo, com [uv](https://docs.astral.sh/uv/), e Node 20 ou mais
 novo. Uma vez só:
 
 ```bash
