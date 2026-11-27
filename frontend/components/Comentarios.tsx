@@ -322,7 +322,7 @@ function ItemComentario({
               dateTime={c.created_at}
               title={dataCompleta(c.created_at)}
               suppressHydrationWarning
-              className="flex-none text-tinta-suave"
+              className="flex-none text-xs font-light text-tinta-suave"
             >
               {tempoDesde(c.created_at)}
             </time>

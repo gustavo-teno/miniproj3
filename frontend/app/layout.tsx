@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 
+import { MemoriaDaNavegacao } from "@/components/MemoriaDaNavegacao";
 import { Navegacao } from "@/components/Navegacao";
 import { NOME_REDE, SLOGAN_REDE } from "@/lib/rede";
 import "./globals.css";
@@ -33,6 +34,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-fundo font-texto text-tinta">
         <Navegacao />
+        {/* Para o voltar levar ao mesmo ponto da tela anterior (#116). */}
+        <MemoriaDaNavegacao />
         <main className="mx-auto max-w-[1320px] px-6 py-6">{children}</main>
       </body>
     </html>
