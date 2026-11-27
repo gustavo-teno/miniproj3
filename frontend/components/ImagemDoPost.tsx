@@ -67,16 +67,18 @@ export function ImagemDoPost({ postId, aoTirar }: { postId: number; aoTirar?: ()
 
   return (
     <div ref={caixa} className="mt-2">
-      {url ? (
-        // eslint-disable-next-line @next/next/no-img-element -- endereço local (blob:), o next/image não serve
-        <img
-          src={url}
-          alt="Imagem do post"
-          className="max-h-[420px] max-w-full rounded-lg border border-linha object-contain"
-        />
-      ) : (
-        <div role="status" aria-label="Carregando a imagem" className="h-48 max-w-sm animate-pulse rounded-lg bg-linha" />
-      )}
+      {/* A caixa tem o mesmo tamanho antes e depois de a foto chegar: assim
+          o card não cresce quando ela carrega, a lista não pula enquanto as
+          fotos chegam, e o voltar (MemoriaDaNavegacao) cai no ponto certo.
+          A foto aparece inteira dentro dela (em pé ou deitada), sem corte. */}
+      <div className="aspect-[4/3] w-full max-w-md overflow-hidden rounded-lg border border-linha bg-fundo">
+        {url ? (
+          // eslint-disable-next-line @next/next/no-img-element -- endereço local (blob:), o next/image não serve
+          <img src={url} alt="Imagem do post" className="size-full object-contain" />
+        ) : (
+          <div role="status" aria-label="Carregando a imagem" className="size-full animate-pulse bg-linha" />
+        )}
+      </div>
       {aoTirar && url && !confirmando && (
         <button
           type="button"
