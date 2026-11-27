@@ -49,3 +49,8 @@ CLAUDE.local.md
 
 # arquivo de erro que o Git Bash do Windows cria quando trava
 *.stackdump
+
+# vídeos: grandes demais para o Git (o GitHub recusa acima de 100 MB, e cada
+# clone baixaria o peso). O vídeo da entrega fica anexado a uma release.
+*.mp4
+*.mov

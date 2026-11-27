@@ -3,6 +3,9 @@
 **O diário de estudos da sua turma de vestibular.**
 
 - **Site:** https://caderno-wheat.vercel.app
+- **Vídeo de apresentação (4 min):**
+  [baixar o vídeo](https://github.com/gustavo-teno/miniproj3/releases/download/video-entrega/margem-video.mp4)
+  (29 MB), anexado à [release do vídeo](https://github.com/gustavo-teno/miniproj3/releases/tag/video-entrega)
 - **Conta de demonstração:** `ada`, senha `senha-forte-123` (a mesma para
   todos os usuários do seed)
 - **API:** https://caderno-api-p944.onrender.com, com a documentação das rotas
