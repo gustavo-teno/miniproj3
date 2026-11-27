@@ -51,8 +51,9 @@ def ver_imagem(
 ):
     imagem = service.ler(db, post_id)
     # private: só o navegador de quem pediu guarda, nunca um cache no caminho.
+    # nosniff: o navegador usa o tipo que mandamos e não tenta adivinhar outro.
     return Response(
         content=imagem.dados,
         media_type=imagem.tipo,
-        headers={"Cache-Control": "private, max-age=300"},
+        headers={"Cache-Control": "private, max-age=300", "X-Content-Type-Options": "nosniff"},
     )
