@@ -178,6 +178,7 @@ entram na tabela "Quem faz o quê" de lá.
 | Comentários em árvore, curtir comentário e "Ver conversa" | Pessoa C (Clarisse) | A dúvida de um comentário vira conversa embaixo dele, uma dica boa ganha um "valeu" sem precisar escrever, e uma conversa grande abre numa tela só dela sem encompridar o post. |
 | Imagem nos posts de matéria | Pessoa A (Gustavo) | A foto do caderno, do mapa mental ou da lista resolvida mostra o estudo melhor que a descrição; só em post de matéria, porque é registro do estudo, não vitrine (decisão 1). |
 | Notificações | Pessoa A (Gustavo) | Quem postou a sessão fica sabendo que a turma curtiu, comentou ou começou a seguir, sem precisar abrir o post de novo para descobrir. |
+| Tela de abertura | Pessoa A (Gustavo) | Quem abre o link pela primeira vez vê o que é a rede, com dois posts de exemplo, antes de criar a conta, em vez de cair direto num formulário de login. |
 
 **Comentários em árvore: a árvore é montada a cada pedido.** O
 `core/arvore.py` recebe os comentários diretos no post (a página pedida) e
