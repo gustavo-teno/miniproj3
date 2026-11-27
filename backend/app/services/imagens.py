@@ -10,7 +10,8 @@ Regras:
   pelo nome nem pelo que o navegador diz (415 para o resto).
 - No máximo 600 KB (413). A tela reduz antes de mandar (uns 300 KB); o limite
   tem folga para não recusar uma foto que ficou um pouco maior.
-- Apagar o post apaga a imagem junto (services/posts.py).
+- Apagar o post, ou trocar a tag dele para bate-papo, tira a imagem junto
+  (services/posts.py).
 """
 
 from fastapi import HTTPException

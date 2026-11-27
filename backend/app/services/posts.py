@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
+from app.constantes import TAG_PADRAO
 from app.models.comment import Comment
 from app.models.curtida_comentario import CurtidaComentario
 from app.models.imagem_post import ImagemPost
@@ -49,6 +50,9 @@ def editar(db: Session, user: User, post_id: int, dados: PostEditar) -> Post:
 
     for campo, valor in mudancas.items():
         setattr(post, campo, valor)
+    # Bate-papo não leva imagem (#105): o post que vira bate-papo perde a dele.
+    if post.tag == TAG_PADRAO:
+        db.execute(delete(ImagemPost).where(ImagemPost.post_id == post.id))
     db.commit()
     db.refresh(post)
     return post
