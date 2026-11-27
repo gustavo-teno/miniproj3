@@ -68,3 +68,5 @@ class PostOut(BaseModel):
     # Do mesmo jeito, para o botão Salvar (#64): services/salvos.py
     # (marcar_salvos).
     salvo_por_mim: bool = False
+    # Se o post tem imagem (#105): a tela busca em GET /posts/{id}/imagem.
+    tem_imagem: bool = False
