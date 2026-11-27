@@ -1,7 +1,7 @@
 // Peças comuns das telas de entrar e de criar conta, para as duas ficarem
 // iguais: a caixa no meio da tela, os campos e o aviso de erro.
 
-import { LogoPostIt } from "@/components/LogoPostIt";
+import { LogoMargem } from "@/components/LogoMargem";
 import { NOME_REDE } from "@/lib/rede";
 
 export const estiloCampo =
@@ -19,14 +19,14 @@ export function CaixaAuth({
 }: {
   titulo: string;
   // Uma linha acima do título no lugar do nome da rede (o cadastro usa
-  // "Olá! Boas-vindas ao Post-it"). Sem ela, aparece só o nome da rede.
+  // "Olá! Boas-vindas ao margem"). Sem ela, aparece só o nome da rede.
   saudacao?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="mx-auto max-w-md py-10">
       {/* O logo em cima de tudo: é a primeira tela de quem chega. */}
-      <LogoPostIt className="mx-auto mb-3 size-14" />
+      <LogoMargem className="mx-auto mb-3 size-14" comPauta />
       {/* A saudação é o destaque da tela: grande, em negrito e em lavanda, maior
           que o título (combinado em 24/11). Sem ela, o nome da rede pequeno. */}
       {saudacao ? (

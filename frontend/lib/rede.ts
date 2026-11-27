@@ -1,5 +1,5 @@
-// O nome da rede, decidido pelo time em 26/11 (#98). O layout, o título da aba
+// O nome da rede: era "Post-it" (#98) e virou "margem" em 26/11. O layout, o título da aba
 // e as telas leem desta constante: para trocar, troque só aqui. O logo está em
-// components/LogoPostIt.tsx e o ícone da aba em app/icon.svg.
-export const NOME_REDE = "Post-it";
+// components/LogoMargem.tsx e o ícone da aba em app/icon.svg.
+export const NOME_REDE = "margem";
 export const SLOGAN_REDE = "o diário de estudos da sua turma de vestibular";
