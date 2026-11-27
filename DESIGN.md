@@ -271,7 +271,6 @@ Use o que já existe antes de criar um novo.
 | `<TagMateria tag>` | etiqueta com símbolo e nome da matéria |
 | `<SimboloMateria tag>` | só o símbolo (usa a cor do texto em volta) |
 | `<Avatar autor>` | foto da pessoa ou as iniciais; tamanhos `pequeno`, padrão, `grande` (card do post) e `enorme` (topo do perfil) |
-| `<UserCard>` | pessoa numa lista (seguir, turmas) |
 | `<EstanteCadernos>` | a estante do perfil: um caderno por matéria, com posts e último post |
 | `<FogoDoDiario>` / `<PainelFogo>` | o fogo da ofensiva com a legenda, no diário e no perfil de quem visita |
 | `<HorasEstudadas>` | as horas da semana, só para a dona do perfil |
