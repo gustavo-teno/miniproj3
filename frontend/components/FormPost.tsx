@@ -39,8 +39,10 @@ export function FormPost({
   const enviandoAgora = useRef(false);
   const [erro, setErro] = useState<string | null>(null);
   const caixaTexto = useRef<HTMLTextAreaElement>(null);
+  // Já escreveu, mas ainda não escolheu a matéria: é o que deixa o Postar apagado.
+  const faltaMateria = texto.trim() !== "" && !tag;
 
-  const campo = "rounded-lg border border-linha bg-superficie px-2 py-1.5 text-sm text-tinta";
+  const campo ="rounded-lg border border-linha bg-superficie px-2 py-1.5 text-sm text-tinta";
 
   function fechar() {
     setAberto(false);
@@ -173,12 +175,21 @@ export function FormPost({
           <button
             type="submit"
             disabled={enviando || !texto.trim() || !tag}
+            aria-describedby={faltaMateria ? "postar-falta-materia" : undefined}
             className="rounded-lg bg-destaque px-3 py-1.5 text-sm font-semibold text-sobre-destaque disabled:opacity-50"
           >
             {enviando ? "Postando..." : "Postar"}
           </button>
         </div>
       </div>
+
+      {/* O botão fica apagado até escolher a matéria: sem este aviso, quem já
+          escreveu não entendia o que faltava (#131). */}
+      {faltaMateria && !erro && (
+        <p id="postar-falta-materia" className={`text-sm text-tinta-suave ${autor ? "pl-11" : ""}`}>
+          Escolha a matéria (ou Bate-papo) para postar.
+        </p>
+      )}
 
       {erro && (
         <p role="alert" className="text-sm text-tinta">

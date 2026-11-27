@@ -30,6 +30,8 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const caixaTexto = useRef<HTMLTextAreaElement>(null);
+  // Já escreveu, mas ainda não escolheu a matéria: é o que deixa o Postar apagado.
+  const faltaMateria = texto.trim() !== "" && !tag;
 
   // Trocou de caderno: a matéria marcada acompanha. Em "Todas" (""), fica a
   // que a pessoa já tinha escolhido.
@@ -141,9 +143,18 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
         </p>
       )}
 
+      {/* O botão fica apagado até escolher a matéria: sem este aviso, quem já
+          escreveu não entendia o que faltava (#131). */}
+      {faltaMateria && !erro && (
+        <p id="diario-falta-materia" className="text-sm text-tinta-suave">
+          Escolha a matéria (ou Bate-papo) para postar.
+        </p>
+      )}
+
       <button
         type="submit"
         disabled={enviando || !texto.trim() || !tag}
+        aria-describedby={faltaMateria ? "diario-falta-materia" : undefined}
         className="rounded-lg bg-destaque py-2.5 text-sm font-semibold text-sobre-destaque disabled:opacity-50"
       >
         {enviando ? "Postando..." : "Postar"}
