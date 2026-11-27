@@ -8,6 +8,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
+import { BotaoVoltar } from "@/components/BotaoVoltar";
 import { CardPost } from "@/components/CardPost";
 import { FolhaPulsando } from "@/components/EsqueletoPosts";
 import { AvisoErro } from "@/components/FormAuth";
@@ -56,6 +57,7 @@ export function FolhaDoPost({
   if (erro) {
     return (
       <div className="mx-auto max-w-2xl">
+        <BotaoVoltar />
         <AvisoErro texto={erro} />
       </div>
     );
@@ -64,16 +66,20 @@ export function FolhaDoPost({
     // A mesma folha pulsando das listas de posts (EsqueletoPosts), com o lugar
     // da conversa embaixo, em vez de um "Carregando..." solto no canto.
     return (
-      <div role="status" aria-label="Carregando o post" className="mx-auto max-w-2xl">
-        <FolhaPulsando barra={false}>
-          <div className="mt-6 h-20 animate-pulse rounded-xl bg-linha" />
-        </FolhaPulsando>
+      <div className="mx-auto max-w-2xl">
+        <BotaoVoltar />
+        <div role="status" aria-label="Carregando o post">
+          <FolhaPulsando barra={false}>
+            <div className="mt-6 h-20 animate-pulse rounded-xl bg-linha" />
+          </FolhaPulsando>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl">
+      <BotaoVoltar />
       {/* O post e a conversa ficam na mesma folha: nada de caixa separada. */}
       <CardPost
         post={post}
