@@ -23,11 +23,13 @@ import bcrypt
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.constantes import TAG_PADRAO
 from app.core.ofensiva import BRASILIA, hoje_em_brasilia
 from app.db import Base, SessionLocal, engine
 from app.models.comment import Comment
 from app.models.curtida_comentario import CurtidaComentario
 from app.models.follow import Follow
+from app.models.imagem_post import ImagemPost
 from app.models.leitura import Leitura
 from app.models.like import Like
 from app.models.mensagem import Mensagem
@@ -40,6 +42,7 @@ from scripts.seed_dados import (
     CONVERSA_DEMO,
     CONVERSAS_DEMO,
     FIRME,
+    FOTOS,
     QUEBROU,
     REFLEXOES,
     RESPOSTAS,
@@ -50,6 +53,9 @@ from scripts.seed_dados import (
 
 # A mesma senha para todo usuário do seed, para dar para logar como eles.
 SENHA_SEED = "senha-forte-123"
+
+# As fotos dos posts (FOTOS), com os créditos no CREDITOS.md de lá.
+PASTA_FOTOS = Path(__file__).resolve().parent / "fotos_seed"
 
 # Quantos dias para trás o seed cria sessões de estudo.
 DIAS_DE_HISTORIA = 21
@@ -280,6 +286,31 @@ def _criar_conversa_demo(db: Session, usuarios: list[User], seguidores: dict[int
         pai_id = fala.id
 
 
+def _anexar_fotos(db: Session, usuarios: list[User], posts: list[Post],
+                  seguidores: dict[int, list[User]]) -> None:
+    """Põe cada foto de FOTOS num post do mesmo assunto. Entre os que servem,
+    prefere os da Ada e de quem ela segue (aparecem no feed e no diário dela, no
+    vídeo) e, depois, o mais recente."""
+    demo = next(u for u in usuarios if u.username == USUARIO_DEMO)
+    # A Ada e quem ela segue (seguidores[x] é quem segue x).
+    da_demo = {demo.id} | {u.id for u in usuarios if demo in seguidores[u.id]}
+    com_foto: set[int] = set()
+    for foto in FOTOS:
+        def serve(post: Post) -> bool:
+            return (post.tag != TAG_PADRAO and post.id not in com_foto
+                    and (foto["tag"] is None or post.tag == foto["tag"])
+                    and all(trecho in post.texto for trecho in foto["contem"])
+                    and post.texto.startswith(foto.get("sessoes", ("",))))
+        candidatos = sorted(filter(serve, posts),
+                            key=lambda p: (p.autor_id in da_demo, p.created_at), reverse=True)
+        if not candidatos:
+            continue  # o seed mudou e nenhum post fala disso: o post fica sem foto
+        post = candidatos[0]
+        db.add(ImagemPost(post_id=post.id, dados=(PASTA_FOTOS / foto["arquivo"]).read_bytes(),
+                          tipo="image/jpeg"))
+        com_foto.add(post.id)
+
+
 def seed_fake(db: Session, agora: datetime | None = None) -> None:
     """Popula a rede: a demo nunca começa vazia (contrato do teste do núcleo)."""
     agora = agora or datetime.now(timezone.utc)
@@ -293,6 +324,7 @@ def seed_fake(db: Session, agora: datetime | None = None) -> None:
     # Outra semente: assim o resto da rede continua igual ao de antes das respostas.
     _criar_respostas(db, posts, seguidores, agora, random.Random(SEMENTE + 1))
     _criar_conversa_demo(db, usuarios, seguidores, agora)
+    _anexar_fotos(db, usuarios, posts, seguidores)
     db.commit()
 
 
