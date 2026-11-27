@@ -1,0 +1,37 @@
+# Mantém a API do Render acordada durante a avaliação (#14, Pessoa C).
+#
+# O Render grátis desliga a API depois de 15 min sem visita, e ao voltar o
+# banco volta ao seed (o disco zera). Se a banca criar uma conta, postar e
+# parar uns minutos, perderia tudo e cairia no login, justo no fluxo do deploy
+# (cadastro → login → post → follow → feed). Este agendamento visita a API a
+# cada 10 min, então ela não chega a dormir.
+#
+# Horas: o Render dá 750 h por mês por conta, e um serviço ligado o mês todo
+# usa no máximo 744 h. Cabe porque a API do Caderno é o único serviço grátis da
+# conta. O GitHub não cobra o Actions de repositório público.
+#
+# Para desligar depois da avaliação: aba Actions → "Manter a API acordada" →
+# "..." → Disable workflow.
+#
+# Atenção: o GitHub só roda agendamentos da branch padrão (a main), e em horário
+# de muito uso pode atrasar alguns minutos. Antes de uma apresentação, ainda
+# vale abrir o site uns minutos antes.
+
+name: Manter a API acordada
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  # Botão "Run workflow" na aba Actions, para acordar a API na hora.
+  workflow_dispatch:
+
+jobs:
+  visitar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Visita a API (a primeira visita depois de dormir leva uns 30 s)
+        run: |
+          curl --fail --silent --show-error --max-time 120 --retry 2 \
+            -o /dev/null -w "API respondeu %{http_code} em %{time_total}s\n" \
+            https://caderno-api-p944.onrender.com/opcoes
