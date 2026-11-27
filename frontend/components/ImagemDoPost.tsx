@@ -15,6 +15,8 @@ export function ImagemDoPost({ postId, aoTirar }: { postId: number; aoTirar?: ()
   const [url, setUrl] = useState<string | null>(null);
   const [falhou, setFalhou] = useState(false);
   const [tirando, setTirando] = useState(false);
+  // Tirar a imagem não tem volta: o primeiro clique só pergunta.
+  const [confirmando, setConfirmando] = useState(false);
 
   useEffect(() => {
     const el = caixa.current;
@@ -56,6 +58,7 @@ export function ImagemDoPost({ postId, aoTirar }: { postId: number; aoTirar?: ()
       await aoTirar();
     } finally {
       setTirando(false);
+      setConfirmando(false);
     }
   }
 
@@ -74,15 +77,25 @@ export function ImagemDoPost({ postId, aoTirar }: { postId: number; aoTirar?: ()
       ) : (
         <div role="status" aria-label="Carregando a imagem" className="h-48 max-w-sm animate-pulse rounded-lg bg-linha" />
       )}
-      {aoTirar && url && (
+      {aoTirar && url && !confirmando && (
         <button
           type="button"
-          onClick={tirar}
-          disabled={tirando}
+          onClick={() => setConfirmando(true)}
           className="mt-1 text-sm text-tinta-suave hover:text-tinta hover:underline"
         >
           Tirar a imagem
         </button>
+      )}
+      {aoTirar && url && confirmando && (
+        <p role="group" aria-label="Confirmar" className="mt-1 flex flex-wrap items-center gap-x-3 text-sm text-tinta-suave">
+          Tirar a imagem do post?
+          <button type="button" onClick={tirar} disabled={tirando} className="font-medium text-tinta hover:underline">
+            Sim, tirar
+          </button>
+          <button type="button" onClick={() => setConfirmando(false)} disabled={tirando} className="hover:text-tinta hover:underline">
+            Cancelar
+          </button>
+        </p>
       )}
     </div>
   );

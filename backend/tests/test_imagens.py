@@ -119,3 +119,31 @@ def test_sem_login_da_401(client, logar):
     anexar(client, ana, post_id)
     assert client.get(f"/posts/{post_id}/imagem").status_code == 401
     assert client.put(f"/posts/{post_id}/imagem", content=JPEG).status_code == 401
+
+
+def test_virar_bate_papo_tira_a_imagem(client, logar):
+    ana = logar("ana")
+    post_id = postar(client, ana)
+    anexar(client, ana, post_id)
+
+    r = client.patch(f"/posts/{post_id}", json={"tag": "bate-papo"}, headers=ana)
+    assert r.status_code == 200
+    assert r.json()["tem_imagem"] is False
+    assert client.get(f"/posts/{post_id}/imagem", headers=ana).status_code == 404
+
+
+def test_editar_o_texto_mantem_a_imagem(client, logar):
+    ana = logar("ana")
+    post_id = postar(client, ana)
+    anexar(client, ana, post_id)
+
+    r = client.patch(f"/posts/{post_id}", json={"texto": "lista revisada"}, headers=ana)
+    assert r.json()["tem_imagem"] is True
+
+
+def test_imagem_vai_com_nosniff(client, logar):
+    ana = logar("ana")
+    post_id = postar(client, ana)
+    anexar(client, ana, post_id)
+    r = client.get(f"/posts/{post_id}/imagem", headers=ana)
+    assert r.headers["x-content-type-options"] == "nosniff"
