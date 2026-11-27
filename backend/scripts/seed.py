@@ -23,7 +23,6 @@ import bcrypt
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.constantes import TAG_PADRAO
 from app.core.ofensiva import BRASILIA, hoje_em_brasilia
 from app.db import Base, SessionLocal, engine
 from app.models.comment import Comment
@@ -35,6 +34,7 @@ from app.models.like import Like
 from app.models.mensagem import Mensagem
 from app.models.post import Post
 from app.models.user import User
+from app.services.imagens import formato
 from scripts.seed_dados import (
     ASSUNTOS,
     BATE_PAPO,
@@ -290,24 +290,32 @@ def _anexar_fotos(db: Session, usuarios: list[User], posts: list[Post],
                   seguidores: dict[int, list[User]]) -> None:
     """Põe cada foto de FOTOS num post do mesmo assunto. Entre os que servem,
     prefere os da Ada e de quem ela segue (aparecem no feed e no diário dela, no
-    vídeo) e, depois, o mais recente."""
+    vídeo) e, depois, o mais recente. Foto com "texto" troca o texto do post, e
+    foto com "vestibular" só vai para quem presta aquela prova."""
     demo = next(u for u in usuarios if u.username == USUARIO_DEMO)
     # A Ada e quem ela segue (seguidores[x] é quem segue x).
     da_demo = {demo.id} | {u.id for u in usuarios if demo in seguidores[u.id]}
+    vestibular = {u.id: u.vestibular for u in usuarios}
     com_foto: set[int] = set()
     for foto in FOTOS:
         def serve(post: Post) -> bool:
-            return (post.tag != TAG_PADRAO and post.id not in com_foto
-                    and (foto["tag"] is None or post.tag == foto["tag"])
-                    and all(trecho in post.texto for trecho in foto["contem"])
-                    and post.texto.startswith(foto.get("sessoes", ("",))))
+            if post.id in com_foto or post.tag != foto["tag"]:
+                return False
+            if "vestibular" in foto and vestibular[post.autor_id] != foto["vestibular"]:
+                return False
+            if "texto" in foto:
+                return True
+            return (all(trecho in post.texto for trecho in foto["contem"])
+                    and post.texto.startswith(foto["sessoes"]))
         candidatos = sorted(filter(serve, posts),
                             key=lambda p: (p.autor_id in da_demo, p.created_at), reverse=True)
         if not candidatos:
             continue  # o seed mudou e nenhum post fala disso: o post fica sem foto
         post = candidatos[0]
-        db.add(ImagemPost(post_id=post.id, dados=(PASTA_FOTOS / foto["arquivo"]).read_bytes(),
-                          tipo="image/jpeg"))
+        if "texto" in foto:
+            post.texto = foto["texto"]
+        dados = (PASTA_FOTOS / foto["arquivo"]).read_bytes()
+        db.add(ImagemPost(post_id=post.id, dados=dados, tipo=formato(dados)))
         com_foto.add(post.id)
 
 

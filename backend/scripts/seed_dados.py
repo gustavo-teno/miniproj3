@@ -227,25 +227,38 @@ COMENTARIOS = [
 ]
 
 # As fotos dos posts (imagem nos posts, #105), em scripts/fotos_seed/ (créditos
-# no CREDITOS.md de lá). Cada uma vai para um post do mesmo assunto: "tag" é a
-# matéria (None = qualquer uma) e o texto do post precisa conter tudo o que está
-# em "contem" (o assunto e/ou o tipo de sessão). Contas e cadernos vão para
-# sessões de questões, lista ou resumo, nunca para flashcard ou simulado.
+# no CREDITOS.md de lá). Cada uma vai para um post da mesma matéria ("tag").
+# Há dois jeitos de casar a foto com o post:
+# - "contem": o texto sorteado do post precisa conter o assunto da foto, e
+#   "sessoes" diz o tipo de sessão (contas e cadernos vão para questões, lista
+#   ou resumo, nunca para flashcard ou simulado);
+# - "texto": o post ganha um texto escrito para aquela foto. É o caso das
+#   fotos do time, que mostram algo específico (uma questão, uma redação).
+# "vestibular" (opcional) limita a quem presta aquela prova: questão e
+# redação do Enem só vão para quem está na turma do Enem.
+# Toda foto tem matéria: uma foto genérica (um mapa mental qualquer) caía num
+# post que dizia um assunto que ela não mostrava (#123).
 _SESSOES_DE_CADERNO = ("Fiz ", "Refiz", "Videoaula", "Resumo", "Primeira vez")
 FOTOS = [
     {"arquivo": "fisica-eletrodinamica.jpg", "tag": "fisica",
      "contem": ["eletrodinâmica"], "sessoes": _SESSOES_DE_CADERNO},
     {"arquivo": "quimica-organica.jpg", "tag": "quimica",
      "contem": ["funções orgânicas"], "sessoes": _SESSOES_DE_CADERNO},
-    {"arquivo": "matematica-funcoes.jpg", "tag": "matematica",
-     "contem": ["função afim"], "sessoes": _SESSOES_DE_CADERNO},
-    {"arquivo": "redacao-argumentos.jpg", "tag": "redacao",
-     "contem": ["tese e argumentação"], "sessoes": _SESSOES_DE_CADERNO + ("Revisão",)},
-    {"arquivo": "filosofia-contrato-social.jpg", "tag": "filosofia",
-     "contem": ["filosofia política"], "sessoes": _SESSOES_DE_CADERNO},
-    {"arquivo": "mapa-mental-caderno.jpg", "tag": None, "contem": ["com mapa mental"]},
-    {"arquivo": "mapa-mental-marcadores.jpg", "tag": None, "contem": ["com mapa mental"]},
-    {"arquivo": "resumo-post-its.jpg", "tag": None, "contem": ["colado na parede"]},
+    {"arquivo": "biologia-enem-agua.jpg", "tag": "biologia", "vestibular": "enem",
+     "texto": "Questão do Enem 2005 sobre água e sais minerais. Marcariam qual? "
+              "Achei legal porque envolve um pouquinho 🤏 de matemática num assunto "
+              "diferente de genética."},
+    {"arquivo": "biologia-enem-etileno.png", "tag": "biologia", "vestibular": "enem",
+     "texto": "Enem 2023, a questão dos abacates no recipiente fechado. Fiquei entre "
+              "a A e a C, alguém me explica por que não é o CO₂?"},
+    {"arquivo": "redacao-participacao-politica.jpg", "tag": "redacao", "vestibular": "enem",
+     "texto": "Redação de treino: a participação política dos jovens. Usei a Grécia "
+              "antiga e a Revolta da Vacina de repertório, e na proposta de "
+              "intervenção pus aulas de ciência política nas escolas. Quem quiser "
+              "corrigir, aceito!"},
+    {"arquivo": "mapa-mental-caderno.jpg", "tag": "sociologia",
+     "texto": "Revisão de Marx e Weber com mapa mental. Trabalho, dinheiro e "
+              "família, tudo ligado."},
 ]
 
 # Uma conversa num post da Ada, cada fala respondendo a anterior: com mais de

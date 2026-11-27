@@ -149,7 +149,7 @@ def test_fotos_vao_para_posts_do_mesmo_assunto(db):
     # mesmo assunto, uma por post, e cabe no limite da rota de imagem.
     from app.constantes import TAG_PADRAO
     from app.models.imagem_post import ImagemPost
-    from app.services.imagens import TAMANHO_MAXIMO
+    from app.services.imagens import TAMANHO_MAXIMO, formato
     from scripts.seed_dados import FOTOS
 
     imagens = list(db.scalars(select(ImagemPost)))
@@ -160,7 +160,12 @@ def test_fotos_vao_para_posts_do_mesmo_assunto(db):
         foto = por_bytes[imagem.dados]
         post = db.get(Post, imagem.post_id)
         assert post.tag != TAG_PADRAO
-        assert foto["tag"] is None or post.tag == foto["tag"]
-        assert all(trecho in post.texto for trecho in foto["contem"])
-        assert imagem.tipo == "image/jpeg" and imagem.dados.startswith(b"\xff\xd8\xff")
+        assert post.tag == foto["tag"]
+        if "vestibular" in foto:
+            assert db.get(User, post.autor_id).vestibular == foto["vestibular"]
+        if "texto" in foto:
+            assert post.texto == foto["texto"]
+        else:
+            assert all(trecho in post.texto for trecho in foto["contem"])
+        assert imagem.tipo == formato(imagem.dados) is not None
         assert len(imagem.dados) <= TAMANHO_MAXIMO
