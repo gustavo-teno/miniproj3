@@ -69,17 +69,18 @@ export function CardPost({
         <div className="min-w-0 flex-1">
           {/* Quem postou vem primeiro. A matéria fica na linha de baixo, com
               marca-texto na cor dela. */}
-          <p className="flex min-w-0 items-center gap-2">
+          <p className="flex min-w-0 items-baseline gap-2">
             <Link href={`/u/${post.autor.username}`} className="truncate font-semibold hover:underline">
               {post.autor.name}
             </Link>
-            {/* suppressHydrationWarning: o servidor e o navegador calculam o
-                "há 2h" em momentos diferentes, então o texto pode mudar. */}
+            {/* A data um tamanho abaixo do nome e mais leve, para não competir
+                com ele. suppressHydrationWarning: o servidor e o navegador
+                calculam o "há 2h" em momentos diferentes, então o texto pode mudar. */}
             <time
               dateTime={post.created_at}
               title={dataCompleta(post.created_at)}
               suppressHydrationWarning
-              className="flex-none text-tinta-suave"
+              className="flex-none text-sm font-light text-tinta-suave"
             >
               {tempoDesde(post.created_at)}
             </time>
