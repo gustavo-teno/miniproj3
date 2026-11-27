@@ -9,6 +9,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
+import { FolhaPulsando } from "@/components/EsqueletoPosts";
 import { AvisoErro } from "@/components/FormAuth";
 import { apiGet, buscarEu, type Post } from "@/lib/api";
 import { tirarImagem } from "@/lib/imagem";
@@ -60,26 +61,13 @@ export function FolhaDoPost({
     );
   }
   if (!post) {
-    // O desenho da folha enquanto o post chega, como nas outras telas (o
-    // retângulo pulsando), em vez de um "Carregando..." solto no canto.
+    // A mesma folha pulsando das listas de posts (EsqueletoPosts), com o lugar
+    // da conversa embaixo, em vez de um "Carregando..." solto no canto.
     return (
-      <div className="mx-auto max-w-2xl">
-        <div
-          role="status"
-          aria-label="Carregando o post"
-          className="folha rounded-xl border border-linha bg-superficie py-4 pl-7 pr-6"
-        >
-          <div className="flex gap-3 sm:gap-4">
-            <div className="size-11 flex-none animate-pulse rounded-full bg-linha" />
-            <div className="flex-1 space-y-2">
-              <div className="h-4 w-1/3 animate-pulse rounded bg-linha" />
-              <div className="h-3 w-1/5 animate-pulse rounded bg-linha" />
-              <div className="h-4 w-full animate-pulse rounded bg-linha" />
-              <div className="h-4 w-2/3 animate-pulse rounded bg-linha" />
-            </div>
-          </div>
+      <div role="status" aria-label="Carregando o post" className="mx-auto max-w-2xl">
+        <FolhaPulsando barra={false}>
           <div className="mt-6 h-20 animate-pulse rounded-xl bg-linha" />
-        </div>
+        </FolhaPulsando>
       </div>
     );
   }

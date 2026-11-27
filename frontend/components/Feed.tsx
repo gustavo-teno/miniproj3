@@ -12,6 +12,7 @@ import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
 import { LinkComentarios } from "@/components/Comentarios";
+import { EsqueletoPosts } from "@/components/EsqueletoPosts";
 import { AvisoErro } from "@/components/FormAuth";
 import { FormPost } from "@/components/FormPost";
 import { SimboloMateria } from "@/components/SimboloMateria";
@@ -111,9 +112,7 @@ export function Feed() {
 
         <AvisoErro texto={erro} />
 
-        {posts === undefined && !erro && (
-          <div role="status" aria-label="Carregando o feed" className="h-40 animate-pulse rounded-xl bg-linha" />
-        )}
+        {posts === undefined && !erro && <EsqueletoPosts rotulo="Carregando o feed" />}
 
         {posts?.length === 0 &&
           (filtrado ? (
