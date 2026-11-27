@@ -94,8 +94,9 @@
   contam. Cada pessoa tem 2 folgas por semana (de segunda a domingo, no horário
   de Brasília), e no máximo 2 dias seguidos sem estudar: o terceiro quebra a
   ofensiva, para a semana virando não permitir 4 dias parados. A folga é usada
-  automaticamente: mantém a ofensiva, mas não soma ao número. O dia de hoje só
-  conta depois que acaba. Quando a ofensiva quebra, o perfil mostra o recorde
+  automaticamente: mantém a ofensiva, mas não soma ao número. Hoje, sem post,
+  fica em aberto até acabar: não gasta folga nem quebra a ofensiva. Com post de
+  matéria, já conta. Quando a ofensiva quebra, o perfil mostra o recorde
   ao lado, e as folgas da semana voltam para a ofensiva nova.
   O número aparece no perfil, mas nunca numa lista ou ranking. O fogo ao lado
   do número muda de cor com a ofensiva atual, como uma chama esquentando: 1 a
