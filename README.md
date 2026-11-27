@@ -3,6 +3,7 @@
 **O diário de estudos da sua turma de vestibular.**
 
 - **Site:** https://caderno-wheat.vercel.app
+- **Vídeo:** https://youtu.be/Qspbnh2-qDQ
 - **Conta de demonstração:** `ada`, senha `senha-forte-123` (a mesma para
   todos os usuários do seed)
 - **API:** https://caderno-api-p944.onrender.com, com a documentação das rotas
