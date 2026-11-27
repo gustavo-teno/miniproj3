@@ -6,7 +6,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 
 import { Avatar } from "@/components/Avatar";
 import { BotaoEmoji, inserirNoCursor } from "@/components/BotaoEmoji";
@@ -53,6 +53,23 @@ const TOQUE_DUPLO_MS = 350;
 // "18:41"; o dia e a hora completos aparecem ao passar o mouse.
 function hora(iso: string): string {
   return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
+
+// O dia de uma mensagem, para a etiqueta que separa os dias na conversa
+// (#128): "Hoje", "Ontem" ou a data ("24/11", e "24/11/2025" se for de outro
+// ano). Sem ela, a mensagem de 3 dias atrás mostrava só "07:05" e parecia de
+// hoje de manhã.
+function diaDaMensagem(iso: string, agora: Date = new Date()): string {
+  const quando = new Date(iso);
+  const ontem = new Date(agora);
+  ontem.setDate(agora.getDate() - 1);
+  if (quando.toDateString() === agora.toDateString()) return "Hoje";
+  if (quando.toDateString() === ontem.toDateString()) return "Ontem";
+  return quando.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    ...(quando.getFullYear() === agora.getFullYear() ? {} : { year: "numeric" }),
+  });
 }
 
 export default function ConversaPage() {
@@ -238,68 +255,81 @@ export default function ConversaPage() {
               Nenhuma mensagem ainda.{podeResponder && " Que tal combinar uma sessão de estudo?"}
             </p>
           )}
-          {mensagens.map((m) => {
+          {mensagens.map((m, i) => {
             const curtida = curtidas[m.id];
             const quantas = (curtida?.minha ? 1 : 0) + (curtida?.outro ? 1 : 0);
+            const dia = diaDaMensagem(m.created_at);
+            // A etiqueta do dia vai antes da primeira mensagem de cada dia.
+            const comecaDia = i === 0 || diaDaMensagem(mensagens[i - 1].created_at) !== dia;
             return (
-              <div
-                key={m.id}
-                onClick={() => tocarNoBalao(m.id)}
-                title="Dois cliques para curtir"
-                // touch-action: manipulation tira o zoom do toque duplo no celular.
-                className={
-                  "relative max-w-[80%] touch-manipulation rounded-2xl px-3.5 py-2 " +
-                  (quantas ? "mb-3 " : "") +
-                  (m.minha
-                    ? "self-end rounded-br-md bg-destaque text-sobre-destaque"
-                    : "self-start rounded-bl-md bg-destaque-fundo text-tinta")
-                }
-              >
-                <p className="whitespace-pre-line break-words">{m.texto}</p>
-                <time
-                  dateTime={m.created_at}
-                  title={dataCompleta(m.created_at)}
-                  // No balão lavanda de quem escreveu, a hora vai sem transparência:
-                  // com opacity-75 o branco dava contraste 3,65 (o mínimo é 4,5).
-                  className={"mt-0.5 block text-right font-numeros text-[11px] " + (m.minha ? "" : "opacity-75")}
+              <Fragment key={m.id}>
+                {comecaDia && (
+                  <p
+                    role="separator"
+                    aria-label={dia}
+                    className="my-1 self-center rounded-full border border-linha bg-superficie px-3 py-0.5 text-xs font-medium text-tinta-suave"
+                  >
+                    {dia}
+                  </p>
+                )}
+                <div
+                  onClick={() => tocarNoBalao(m.id)}
+                  title="Dois cliques para curtir"
+                  // touch-action: manipulation tira o zoom do toque duplo no celular.
+                  className={
+                    "relative max-w-[80%] touch-manipulation rounded-2xl px-3.5 py-2 " +
+                    (quantas ? "mb-3 " : "") +
+                    (m.minha
+                      ? "self-end rounded-br-md bg-destaque text-sobre-destaque"
+                      : "self-start rounded-bl-md bg-destaque-fundo text-tinta")
+                  }
                 >
-                  {hora(m.created_at)}
-                </time>
-                {/* Para quem usa teclado ou leitor de tela: o toque duplo não
-                    serve, então há um botão, que só aparece ao receber o foco. */}
-                {(podeResponder || curtida?.minha) && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      alternarCurtida(m.id);
-                    }}
-                    className="sr-only focus:not-sr-only focus:mt-1 focus:block focus:text-xs focus:underline"
+                  <p className="whitespace-pre-line break-words">{m.texto}</p>
+                  <time
+                    dateTime={m.created_at}
+                    title={dataCompleta(m.created_at)}
+                    // No balão lavanda de quem escreveu, a hora vai sem transparência:
+                    // com opacity-75 o branco dava contraste 3,65 (o mínimo é 4,5).
+                    className={"mt-0.5 block text-right font-numeros text-[11px] " + (m.minha ? "" : "opacity-75")}
                   >
-                    {curtida?.minha ? "Descurtir mensagem" : "Curtir mensagem"}
-                  </button>
-                )}
-                {/* O coração fica no canto de baixo do balão, do lado de dentro
-                    da conversa, como nos apps de mensagem. Com os dois, "2". */}
-                {quantas > 0 && (
-                  <span
-                    aria-label={
-                      curtida?.minha && curtida?.outro
-                        ? "Vocês dois curtiram"
-                        : curtida?.minha
-                          ? "Você curtiu"
-                          : `${pessoa.name} curtiu`
-                    }
-                    className={
-                      "absolute -bottom-3 flex items-center gap-0.5 rounded-full border border-linha bg-superficie px-1.5 text-xs leading-5 text-tinta " +
-                      (m.minha ? "left-2" : "right-2")
-                    }
-                  >
-                    <span aria-hidden>❤️</span>
-                    {quantas > 1 && <span aria-hidden className="font-numeros">{quantas}</span>}
-                  </span>
-                )}
-              </div>
+                    {hora(m.created_at)}
+                  </time>
+                  {/* Para quem usa teclado ou leitor de tela: o toque duplo não
+                      serve, então há um botão, que só aparece ao receber o foco. */}
+                  {(podeResponder || curtida?.minha) && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        alternarCurtida(m.id);
+                      }}
+                      className="sr-only focus:not-sr-only focus:mt-1 focus:block focus:text-xs focus:underline"
+                    >
+                      {curtida?.minha ? "Descurtir mensagem" : "Curtir mensagem"}
+                    </button>
+                  )}
+                  {/* O coração fica no canto de baixo do balão, do lado de dentro
+                      da conversa, como nos apps de mensagem. Com os dois, "2". */}
+                  {quantas > 0 && (
+                    <span
+                      aria-label={
+                        curtida?.minha && curtida?.outro
+                          ? "Vocês dois curtiram"
+                          : curtida?.minha
+                            ? "Você curtiu"
+                            : `${pessoa.name} curtiu`
+                      }
+                      className={
+                        "absolute -bottom-3 flex items-center gap-0.5 rounded-full border border-linha bg-superficie px-1.5 text-xs leading-5 text-tinta " +
+                        (m.minha ? "left-2" : "right-2")
+                      }
+                    >
+                      <span aria-hidden>❤️</span>
+                      {quantas > 1 && <span aria-hidden className="font-numeros">{quantas}</span>}
+                    </span>
+                  )}
+                </div>
+              </Fragment>
             );
           })}
           {/* A margem faz a última mensagem parar acima da caixa de escrever,
