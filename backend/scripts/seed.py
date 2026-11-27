@@ -23,7 +23,6 @@ import bcrypt
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.constantes import TAG_PADRAO
 from app.core.ofensiva import BRASILIA, hoje_em_brasilia
 from app.db import Base, SessionLocal, engine
 from app.models.comment import Comment
@@ -35,6 +34,7 @@ from app.models.like import Like
 from app.models.mensagem import Mensagem
 from app.models.post import Post
 from app.models.user import User
+from app.services.imagens import formato
 from scripts.seed_dados import (
     ASSUNTOS,
     BATE_PAPO,
@@ -287,28 +287,58 @@ def _criar_conversa_demo(db: Session, usuarios: list[User], seguidores: dict[int
 
 
 def _anexar_fotos(db: Session, usuarios: list[User], posts: list[Post],
-                  seguidores: dict[int, list[User]]) -> None:
+                  seguidores: dict[int, list[User]], agora: datetime) -> None:
     """Põe cada foto de FOTOS num post do mesmo assunto. Entre os que servem,
     prefere os da Ada e de quem ela segue (aparecem no feed e no diário dela, no
-    vídeo) e, depois, o mais recente."""
+    vídeo) e, depois, o mais recente. Foto com "texto" troca o texto do post,
+    foto com "vestibular" só vai para quem presta aquela prova e foto com
+    "comentarios" ganha essa conversa embaixo."""
     demo = next(u for u in usuarios if u.username == USUARIO_DEMO)
     # A Ada e quem ela segue (seguidores[x] é quem segue x).
     da_demo = {demo.id} | {u.id for u in usuarios if demo in seguidores[u.id]}
+    vestibular = {u.id: u.vestibular for u in usuarios}
     com_foto: set[int] = set()
     for foto in FOTOS:
         def serve(post: Post) -> bool:
-            return (post.tag != TAG_PADRAO and post.id not in com_foto
-                    and (foto["tag"] is None or post.tag == foto["tag"])
-                    and all(trecho in post.texto for trecho in foto["contem"])
-                    and post.texto.startswith(foto.get("sessoes", ("",))))
+            if post.id in com_foto or post.tag != foto["tag"]:
+                return False
+            if "vestibular" in foto and vestibular[post.autor_id] != foto["vestibular"]:
+                return False
+            if "texto" in foto:
+                return True
+            return (all(trecho in post.texto for trecho in foto["contem"])
+                    and post.texto.startswith(foto["sessoes"]))
         candidatos = sorted(filter(serve, posts),
                             key=lambda p: (p.autor_id in da_demo, p.created_at), reverse=True)
         if not candidatos:
             continue  # o seed mudou e nenhum post fala disso: o post fica sem foto
         post = candidatos[0]
-        db.add(ImagemPost(post_id=post.id, dados=(PASTA_FOTOS / foto["arquivo"]).read_bytes(),
-                          tipo="image/jpeg"))
+        if "texto" in foto:
+            post.texto = foto["texto"]
+        dados = (PASTA_FOTOS / foto["arquivo"]).read_bytes()
+        db.add(ImagemPost(post_id=post.id, dados=dados, tipo=formato(dados)))
         com_foto.add(post.id)
+        _comentar_foto(db, post, foto.get("comentarios", []), seguidores, agora)
+
+
+def _comentar_foto(db: Session, post: Post, falas: list[tuple[str, str]],
+                   seguidores: dict[int, list[User]], agora: datetime) -> None:
+    """Os "comentarios" da foto: cada "fa" é um comentário de outra pessoa que
+    segue o autor, e "autor" responde ao último "fa". As falas ficam entre o
+    post e agora, cada uma depois da anterior."""
+    fas = iter(seguidores[post.autor_id])
+    passo = min(timedelta(minutes=40), (agora - post.created_at) / (len(falas) + 1))
+    momento, ultimo_fa = post.created_at, None
+    for quem, texto in falas:
+        momento += passo
+        if quem == "fa":
+            ultimo_fa = Comment(autor_id=next(fas).id, post_id=post.id,
+                                texto=texto, created_at=momento)
+            db.add(ultimo_fa)
+            db.flush()  # o id dele é o pai da resposta do autor
+        else:
+            db.add(Comment(autor_id=post.autor_id, post_id=post.id,
+                           parent_id=ultimo_fa.id, texto=texto, created_at=momento))
 
 
 def seed_fake(db: Session, agora: datetime | None = None) -> None:
@@ -324,7 +354,7 @@ def seed_fake(db: Session, agora: datetime | None = None) -> None:
     # Outra semente: assim o resto da rede continua igual ao de antes das respostas.
     _criar_respostas(db, posts, seguidores, agora, random.Random(SEMENTE + 1))
     _criar_conversa_demo(db, usuarios, seguidores, agora)
-    _anexar_fotos(db, usuarios, posts, seguidores)
+    _anexar_fotos(db, usuarios, posts, seguidores, agora)
     db.commit()
 
 

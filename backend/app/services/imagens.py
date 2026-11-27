@@ -26,7 +26,7 @@ from app.services.posts import buscar
 TAMANHO_MAXIMO = 600 * 1024
 
 
-def _formato(dados: bytes) -> str | None:
+def formato(dados: bytes) -> str | None:
     """O formato da imagem pelos primeiros bytes ("assinatura" do arquivo)."""
     if dados.startswith(b"\xff\xd8\xff"):
         return "image/jpeg"
@@ -47,7 +47,7 @@ def guardar(db: Session, user: User, post_id: int, dados: bytes) -> None:
         raise HTTPException(status_code=422, detail="a imagem veio vazia")
     if len(dados) > TAMANHO_MAXIMO:
         raise HTTPException(status_code=413, detail="a imagem passa de 600 KB")
-    tipo = _formato(dados)
+    tipo = formato(dados)
     if tipo is None:
         raise HTTPException(status_code=415, detail="a imagem precisa ser JPEG, PNG ou WebP")
 
