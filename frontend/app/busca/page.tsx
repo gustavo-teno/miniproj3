@@ -29,31 +29,37 @@ export default function BuscaPage() {
   const liberado = useExigeLogin();
   const [texto, setTexto] = useState("");
   const [aba, setAba] = useState<Aba>("pessoas");
-  // O resultado e o termo e a aba que o geraram, para não mostrar o
-  // resultado de uma busca velha como se fosse da atual.
+  // As duas buscas e o termo que as gerou, para não mostrar o resultado de
+  // uma busca velha como se fosse da atual. As duas saem juntas para cada aba
+  // mostrar quantos resultados tem (#129).
   const [resultado, setResultado] = useState<{
-    chave: string;
-    pessoas?: Page<User>;
-    posts?: Page<Post>;
+    termo: string;
+    pessoas: Page<User>;
+    posts: Page<Post>;
   } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   const termo = texto.trim();
-  const chave = `${aba}:${termo}`;
 
   useEffect(() => {
     if (termo.length < MINIMO) return;
     let ativo = true;
     const relogio = setTimeout(() => {
-      const pedido =
-        aba === "pessoas"
-          ? buscarPessoas(termo).then((pessoas) => ({ chave, pessoas }))
-          : buscarPosts(termo).then((posts) => ({ chave, posts }));
-      pedido
-        .then((r) => {
+      Promise.all([buscarPessoas(termo), buscarPosts(termo)])
+        .then(([pessoas, posts]) => {
           if (!ativo) return;
-          setResultado(r);
+          setResultado({ termo, pessoas, posts });
           setErro(null);
+          // A aba aberta veio vazia e a outra não: abre a que tem resultado.
+          // Antes, "genetica" abria em Pessoas dizendo "Nada encontrado",
+          // com 7 posts esperando na outra aba. Só no resultado de um termo
+          // novo: depois disso, a aba que a pessoa clica é a que vale.
+          setAba((agora) => {
+            const vazia = (agora === "pessoas" ? pessoas : posts).total === 0;
+            const outra = agora === "pessoas" ? "posts" : "pessoas";
+            const outraTem = (outra === "pessoas" ? pessoas : posts).total > 0;
+            return vazia && outraTem ? outra : agora;
+          });
         })
         .catch((e: Error) => ativo && setErro(e.message));
     }, ESPERA_MS);
@@ -62,12 +68,18 @@ export default function BuscaPage() {
       ativo = false;
       clearTimeout(relogio);
     };
-  }, [aba, termo, chave]);
+  }, [termo]);
 
   if (!liberado) return null;
 
-  const atual = resultado?.chave === chave ? resultado : null;
+  const daBusca = resultado?.termo === termo ? resultado : null;
+  // Só a aba aberta aparece embaixo, com o mesmo formato de antes.
+  const atual = daBusca ? (aba === "pessoas" ? { pessoas: daBusca.pessoas } : { posts: daBusca.posts }) : null;
   const total = atual?.pessoas?.total ?? atual?.posts?.total;
+
+  // Quantos resultados cada aba tem, ao lado do nome dela.
+  const contagem = (pagina?: Page<unknown>) =>
+    pagina ? <span className="font-numeros"> · {pagina.total}</span> : null;
 
   const estiloAba = (ativa: boolean) =>
     "border-b-[3px] px-1 py-2 text-[15px] " +
@@ -92,10 +104,10 @@ export default function BuscaPage() {
 
       <div role="tablist" aria-label="O que buscar" className="mt-3 flex gap-6 border-b border-linha">
         <button type="button" role="tab" aria-selected={aba === "pessoas"} onClick={() => setAba("pessoas")} className={estiloAba(aba === "pessoas")}>
-          Pessoas
+          Pessoas{contagem(daBusca?.pessoas)}
         </button>
         <button type="button" role="tab" aria-selected={aba === "posts"} onClick={() => setAba("posts")} className={estiloAba(aba === "posts")}>
-          Posts
+          Posts{contagem(daBusca?.posts)}
         </button>
       </div>
 
