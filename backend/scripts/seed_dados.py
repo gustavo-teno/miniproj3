@@ -226,6 +226,28 @@ COMENTARIOS = [
     "Me identifiquei demais.",
 ]
 
+# As fotos dos posts (imagem nos posts, #105), em scripts/fotos_seed/ (créditos
+# no CREDITOS.md de lá). Cada uma vai para um post do mesmo assunto: "tag" é a
+# matéria (None = qualquer uma) e o texto do post precisa conter tudo o que está
+# em "contem" (o assunto e/ou o tipo de sessão). Contas e cadernos vão para
+# sessões de questões, lista ou resumo, nunca para flashcard ou simulado.
+_SESSOES_DE_CADERNO = ("Fiz ", "Refiz", "Videoaula", "Resumo", "Primeira vez")
+FOTOS = [
+    {"arquivo": "fisica-eletrodinamica.jpg", "tag": "fisica",
+     "contem": ["eletrodinâmica"], "sessoes": _SESSOES_DE_CADERNO},
+    {"arquivo": "quimica-organica.jpg", "tag": "quimica",
+     "contem": ["funções orgânicas"], "sessoes": _SESSOES_DE_CADERNO},
+    {"arquivo": "matematica-funcoes.jpg", "tag": "matematica",
+     "contem": ["função afim"], "sessoes": _SESSOES_DE_CADERNO},
+    {"arquivo": "redacao-argumentos.jpg", "tag": "redacao",
+     "contem": ["tese e argumentação"], "sessoes": _SESSOES_DE_CADERNO + ("Revisão",)},
+    {"arquivo": "filosofia-contrato-social.jpg", "tag": "filosofia",
+     "contem": ["filosofia política"], "sessoes": _SESSOES_DE_CADERNO},
+    {"arquivo": "mapa-mental-caderno.jpg", "tag": None, "contem": ["com mapa mental"]},
+    {"arquivo": "mapa-mental-marcadores.jpg", "tag": None, "contem": ["com mapa mental"]},
+    {"arquivo": "resumo-post-its.jpg", "tag": None, "contem": ["colado na parede"]},
+]
+
 # Uma conversa num post da Ada, cada fala respondendo a anterior: com mais de
 # 3 respostas, ela aparece recolhida em "Ver conversa" no vídeo e para a banca.
 # "fa" é alguém que segue a Ada; "demo" é a própria Ada.

@@ -142,3 +142,25 @@ def test_seed_on_boot_popula_a_rede_ao_ligar(monkeypatch):
     with TestClient(app) as client:
         r = client.post("/auth/login", json={"username": "ada", "password": seed.SENHA_SEED})
         assert r.status_code == 200
+
+
+def test_fotos_vao_para_posts_do_mesmo_assunto(db):
+    # Imagem nos posts (#105): cada foto de FOTOS vai para um post de matéria do
+    # mesmo assunto, uma por post, e cabe no limite da rota de imagem.
+    from app.constantes import TAG_PADRAO
+    from app.models.imagem_post import ImagemPost
+    from app.services.imagens import TAMANHO_MAXIMO
+    from scripts.seed_dados import FOTOS
+
+    imagens = list(db.scalars(select(ImagemPost)))
+    assert len(imagens) == len(FOTOS)
+    assert len({i.post_id for i in imagens}) == len(FOTOS)
+    por_bytes = {(seed.PASTA_FOTOS / f["arquivo"]).read_bytes(): f for f in FOTOS}
+    for imagem in imagens:
+        foto = por_bytes[imagem.dados]
+        post = db.get(Post, imagem.post_id)
+        assert post.tag != TAG_PADRAO
+        assert foto["tag"] is None or post.tag == foto["tag"]
+        assert all(trecho in post.texto for trecho in foto["contem"])
+        assert imagem.tipo == "image/jpeg" and imagem.dados.startswith(b"\xff\xd8\xff")
+        assert len(imagem.dados) <= TAMANHO_MAXIMO
