@@ -4,11 +4,13 @@
 // Ao clicar, abre para escrever, com a matéria (obrigatória, decisão 2) e a
 // duração da sessão (opcional). Salva de verdade com POST /posts.
 
-import { useRef, useState, type FormEvent } from "react";
+import { useCallback, useRef, useState, type FormEvent } from "react";
 
+import { AnexarImagem } from "@/components/AnexarImagem";
 import { Avatar } from "@/components/Avatar";
 import { BotaoEmoji, inserirNoCursor } from "@/components/BotaoEmoji";
 import { apiPost, type Autor, type Post } from "@/lib/api";
+import { enviarImagem } from "@/lib/imagem";
 import { useOpcoes } from "@/lib/opcoes";
 
 // Os mesmos limites do backend (schemas/post.py), para avisar antes de enviar.
@@ -28,6 +30,9 @@ export function FormPost({
   const [texto, setTexto] = useState("");
   const [tag, setTag] = useState("");
   const [minutos, setMinutos] = useState("");
+  // A foto do caderno ou da lista (#105), já reduzida. Sobe depois do post.
+  const [imagem, setImagem] = useState<Blob | null>(null);
+  const mudarImagem = useCallback((b: Blob | null) => setImagem(b), []);
   const [enviando, setEnviando] = useState(false);
   // A ref muda na hora; o estado só no próximo desenho. Cliques que chegam
   // juntos ainda veem `enviando` falso, mas já veem a ref ligada.
@@ -42,6 +47,7 @@ export function FormPost({
     setTexto("");
     setTag("");
     setMinutos("");
+    setImagem(null);
     setErro(null);
   }
 
@@ -58,6 +64,19 @@ export function FormPost({
         tag,
         minutos: minutos ? Number(minutos) : null,
       });
+      if (imagem) {
+        try {
+          await enviarImagem(post.id, imagem);
+          post.tem_imagem = true;
+        } catch (falha) {
+          // O post já existe: ele aparece, e o aviso diz que a imagem não foi.
+          onPostado?.(post);
+          fechar();
+          setAberto(true);
+          setErro(`O post foi publicado, mas a imagem não subiu. ${falha instanceof Error ? falha.message : ""}`.trim());
+          return;
+        }
+      }
       onPostado?.(post);
       fechar();
     } catch (falha) {
@@ -126,6 +145,7 @@ export function FormPost({
             </option>
           ))}
         </select>
+        <AnexarImagem imagem={imagem} aoMudar={mudarImagem} aoErro={setErro} bloqueado={tag === "bate-papo"} />
         {/* O emoji (Pessoa A) na linha de baixo do campo, depois da matéria. */}
         <BotaoEmoji
           abrirPara="baixo"

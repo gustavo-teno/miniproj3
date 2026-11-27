@@ -5,11 +5,13 @@
 // (a do caderno aberto já vem marcada), o tempo de estudo e o botão na largura
 // toda. Salva com o mesmo POST /posts do feed.
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
+import { AnexarImagem } from "@/components/AnexarImagem";
 import { BotaoEmoji, inserirNoCursor } from "@/components/BotaoEmoji";
 import { SimboloMateria } from "@/components/SimboloMateria";
 import { apiPost, type Post } from "@/lib/api";
+import { enviarImagem } from "@/lib/imagem";
 import { estiloDaTag } from "@/lib/materias";
 import { useOpcoes } from "@/lib/opcoes";
 
@@ -22,6 +24,9 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
   const [texto, setTexto] = useState("");
   const [tag, setTag] = useState(tagInicial);
   const [minutos, setMinutos] = useState("");
+  // A foto do caderno ou da lista (#105), já reduzida. Sobe depois do post.
+  const [imagem, setImagem] = useState<Blob | null>(null);
+  const mudarImagem = useCallback((b: Blob | null) => setImagem(b), []);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const caixaTexto = useRef<HTMLTextAreaElement>(null);
@@ -43,9 +48,21 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
         tag,
         minutos: minutos ? Number(minutos) : null,
       });
+      let falhaNaImagem: string | null = null;
+      if (imagem) {
+        try {
+          await enviarImagem(post.id, imagem);
+          post.tem_imagem = true;
+        } catch (falha) {
+          // O post já existe: ele aparece, e o aviso diz que a imagem não foi.
+          falhaNaImagem = `O post foi publicado, mas a imagem não subiu. ${falha instanceof Error ? falha.message : ""}`.trim();
+        }
+      }
       onPostado(post);
       setTexto("");
       setMinutos("");
+      setImagem(null);
+      if (falhaNaImagem) setErro(falhaNaImagem);
     } catch (falha) {
       // O texto fica no campo: ninguém perde o que escreveu por causa de um erro.
       setErro(falha instanceof Error ? falha.message : "Não foi possível postar. Tente de novo.");
@@ -99,6 +116,7 @@ export function PostarNoDiario({ tagInicial, onPostado }: { tagInicial: string; 
             ))}
           </select>
         </label>
+        <AnexarImagem imagem={imagem} aoMudar={mudarImagem} aoErro={setErro} bloqueado={tag === "bate-papo"} />
         {/* O emoji (Pessoa A) na linha de baixo do campo, depois da matéria. */}
         <BotaoEmoji
           abrirPara="baixo"
