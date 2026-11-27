@@ -66,6 +66,9 @@ export default function ConversaPage() {
   const [erro, setErro] = useState<string | null>(null);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
+  // A ref muda na hora; o estado só no próximo desenho. Cliques (ou Enter)
+  // que chegam juntos ainda veem `enviando` falso, mas já veem a ref ligada.
+  const enviandoAgora = useRef(false);
   const [curtidas, setCurtidas] = useState<Curtidas>({});
   // As curtidas que a tela acabou de mudar e o backend ainda não confirmou: a
   // pergunta por novidades não as desfaz enquanto isso.
@@ -127,7 +130,8 @@ export default function ConversaPage() {
   async function enviar(e?: FormEvent) {
     e?.preventDefault();
     const limpo = texto.trim();
-    if (!limpo || enviando) return;
+    if (!limpo || enviandoAgora.current) return; // a mensagem não sai duas vezes
+    enviandoAgora.current = true;
     setEnviando(true);
     setErro(null);
     try {
@@ -137,6 +141,7 @@ export default function ConversaPage() {
     } catch (err) {
       setErro((err as Error).message);
     } finally {
+      enviandoAgora.current = false;
       setEnviando(false);
     }
   }
