@@ -65,7 +65,7 @@ export default function SalvosPage() {
 
       {posts === undefined && !erro && (
         <div className="mt-4">
-          <EsqueletoPosts rotulo="Carregando os salvos" />
+          <EsqueletoPosts rotulo="Carregando os salvos" colunas />
         </div>
       )}
 

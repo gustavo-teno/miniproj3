@@ -81,8 +81,15 @@ export default function TurmaPage() {
         <AvisoErro texto={tipoTurma ? erro : "Turma não encontrada."} />
       </div>
 
+      {/* O cabeçalho da turma e, embaixo, as folhas dos posts: a turma abre na
+          aba Posts, então a página já tem a cara dela enquanto carrega. */}
       {tipoTurma && !turma && !erro && (
-        <div role="status" aria-label="Carregando a turma" className="mt-3 h-24 animate-pulse rounded-xl bg-linha" />
+        <>
+          <div role="status" aria-label="Carregando a turma" className="mt-3 h-24 animate-pulse rounded-xl bg-linha" />
+          <div className="mt-6">
+            <EsqueletoPosts colunas />
+          </div>
+        </>
       )}
 
       {turma && (
@@ -341,7 +348,7 @@ function AbaPosts({ turma }: { turma: Turma }) {
 
       {posts === undefined && !erro && (
         <div className="mt-4">
-          <EsqueletoPosts />
+          <EsqueletoPosts colunas />
         </div>
       )}
 
