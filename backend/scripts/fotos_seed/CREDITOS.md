@@ -12,7 +12,7 @@ recortada da prova oficial do Enem (#123).
 
 | Arquivo | O que mostra | Post |
 |---|---|---|
-| `biologia-enem-agua.jpg` | Questão do Enem 2005 (INEP) sobre a quantidade de água nos tecidos | Biologia: a questão, perguntando qual alternativa marcariam |
+| `biologia-enem-agua.jpg` | Questão do Enem 2005 (INEP) sobre a quantidade de água nos tecidos. O print é de um site de questões (os botões A–E não são da prova impressa), e não anotamos qual na época | Biologia: a questão, perguntando qual alternativa marcariam |
 | `biologia-enem-etileno.png` | Questão 97 do Enem 2023 (caderno azul, 2º dia), recortada da [prova oficial do INEP](https://download.inep.gov.br/enem/provas_e_gabaritos/2023_PV_impresso_D2_CD7.pdf) | Biologia: em dúvida entre duas alternativas |
 | `redacao-participacao-politica.jpg` | Redação de treino à mão sobre a participação política dos jovens | Redação: pedindo correção |
 
