@@ -13,6 +13,7 @@ import { Avatar } from "@/components/Avatar";
 import { BotaoCurtir } from "@/components/BotaoCurtir";
 import { BotaoSalvar } from "@/components/BotaoSalvar";
 import { CardPost } from "@/components/CardPost";
+import { EsqueletoPosts } from "@/components/EsqueletoPosts";
 import { LinkComentarios } from "@/components/Comentarios";
 import { AvisoErro } from "@/components/FormAuth";
 import { SimboloMateria } from "@/components/SimboloMateria";
@@ -80,8 +81,15 @@ export default function TurmaPage() {
         <AvisoErro texto={tipoTurma ? erro : "Turma não encontrada."} />
       </div>
 
+      {/* O cabeçalho da turma e, embaixo, as folhas dos posts: a turma abre na
+          aba Posts, então a página já tem a cara dela enquanto carrega. */}
       {tipoTurma && !turma && !erro && (
-        <div role="status" aria-label="Carregando a turma" className="mt-3 h-24 animate-pulse rounded-xl bg-linha" />
+        <>
+          <div role="status" aria-label="Carregando a turma" className="mt-3 h-24 animate-pulse rounded-xl bg-linha" />
+          <div className="mt-6">
+            <EsqueletoPosts colunas />
+          </div>
+        </>
       )}
 
       {turma && (
@@ -339,7 +347,9 @@ function AbaPosts({ turma }: { turma: Turma }) {
       </div>
 
       {posts === undefined && !erro && (
-        <div role="status" aria-label="Carregando os posts" className="mt-4 h-40 animate-pulse rounded-xl bg-linha" />
+        <div className="mt-4">
+          <EsqueletoPosts colunas />
+        </div>
       )}
 
       {posts?.length === 0 && (
