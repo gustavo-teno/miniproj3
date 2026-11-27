@@ -3,9 +3,6 @@
 **Time:** Gustavo (@gustavo-teno), Pedro (@Pedrolk647), Clarisse
 (@clarissegabriela31-coder), Camila (@camilaabmf)
 
-Este arquivo acompanha o projeto. Comecem com o que já sabem e atualizem quando
-as decisões mudarem.
-
 ## Produto
 
 - **Público:** vestibulandos (ENEM, Fuvest, Unicamp, ITA, IME e outros) que
@@ -24,6 +21,12 @@ as decisões mudarem.
   rede nunca coloca ninguém num ranking.
 - **Como saberíamos que funcionou:** a pessoa volta no dia seguinte para
   registrar a própria sessão de estudo e comentar a de quem ela segue.
+- **Nome:** o margem, com artigo masculino, como "o Trilha". A margem do
+  caderno é o espaço que é só seu: ali você anota a dúvida, o resumo e o
+  lembrete, sem se comparar com ninguém (decisão 1). O primeiro nome foi
+  Post-it, que trocamos por ser marca registrada da 3M. O nome fica num lugar
+  só no código (`NOME_REDE`, em `frontend/lib/rede.ts`), então trocar é mudar
+  uma linha.
 
 ## Decisões de produto
 
@@ -154,14 +157,14 @@ as decisões mudarem.
 
 ## Features
 
-As letras são os papéis do [PLANO.md](PLANO.md); C e D ainda vão ser escolhidos e
-entram na tabela "Quem faz o quê" de lá.
+As letras são os papéis do [PLANO.md](PLANO.md). Cada pessoa fez as próprias
+features de ponta a ponta: backend, tela e testes.
 
 | Feature | Dono | Por quê (1 frase) |
 |---|---|---|
 | Auth (núcleo) | Pessoa A (Gustavo) | Cada vestibulando tem o próprio diário e a própria meta. |
 | Posts (núcleo) | Pessoa B (Camila) | O registro da sessão de estudo, com tag (matéria ou bate-papo) e duração. |
-| Feed (núcleo) | Pessoa D | Cronológico e só de quem você segue, com filtro para esconder o bate-papo. |
+| Feed (núcleo) | Pessoa D (Pedro) | Cronológico e só de quem você segue, com filtro para esconder o bate-papo. |
 | Perfil (núcleo) | Pessoa B (Camila) | O diário com divisórias por matéria, com a meta, a ofensiva e o resumo da semana no topo. |
 | Follow (núcleo) | Pessoa D (Pedro) | Acompanhar a jornada de quem tem a mesma meta que você. |
 | Curtidas (núcleo) | Pessoa C (Clarisse) | Um apoio rápido para quem estudou hoje. |
@@ -169,7 +172,7 @@ entram na tabela "Quem faz o quê" de lá.
 | Seed fake (núcleo) | Pessoa C (Clarisse) | Vestibulandos fictícios com metas e rotinas variadas, para a rede já parecer uma turma; com conversas nos comentários e fotos de estudo, para o vídeo e a banca não abrirem uma rede vazia. |
 | Deploy público | Pessoa C (Clarisse) | Quem quiser ver a rede abre um link (Vercel + Render), sem instalar nada, e o que cria continua lá. |
 | Ofensiva que perdoa | Pessoa A (Gustavo) | Motiva a voltar todo dia sem punir o descanso (decisão 4). |
-| Turmas | Pessoa D | Quem acabou de chegar encontra quem tem a mesma meta e sai do feed vazio (decisão 5). |
+| Turmas | Pessoa D (Pedro), com as telas da Pessoa A (Gustavo) | Quem acabou de chegar encontra quem tem a mesma meta e sai do feed vazio (decisão 5). |
 | DMs entre mútuos | Pessoa A (Gustavo) | Onde dois colegas da mesma turma viram parceiros de estudo (decisão 6). |
 | Busca de pessoas e posts | Pessoa A (Gustavo) | Achar um colega pelo nome ou um post sobre um assunto, sem depender da meta. |
 | Curtir mensagem nas DMs | Pessoa A (Gustavo) | Dois toques num balão dizem "valeu" ou "tamo junto" sem precisar escrever, como nos apps de mensagem. |
@@ -227,6 +230,33 @@ request e uma tela para o "sua sessão expirou". Para uma rede de teste com
 prazo de uma semana, não compensa. Num produto de verdade, seria a primeira
 melhoria da auth.
 
+## O que cortamos
+
+Os cortes de cada decisão estão na própria decisão: o ranking (1), o post sem
+tag (2), o feed algorítmico (3), o streak sem folga (4), os grupos criados
+pelos usuários (5) e as DMs abertas e o chat em tempo real (6). O login sem
+prazo de validade está explicado acima. Além deles:
+
+- **Foto de perfil por arquivo.** A foto do perfil é um link para uma imagem
+  que já está na internet. Enviar o arquivo pede guardar e servir imagens, e
+  isso só valeu a pena no fim, para a imagem dos posts de matéria, que mostra
+  o caderno ou a lista de questões resolvida. A base ficou pronta (a imagem
+  reduzida no navegador e guardada no banco), mas ficou para depois do prazo.
+- **Imagem nas DMs.** Boa parte do público é menor de idade, e imagem numa
+  conversa privada é o tipo de conteúdo que ninguém além das duas pessoas vê
+  nem tem como denunciar. Sem moderação, preferimos deixar só texto.
+- **Bloquear alguém.** Como a DM só existe entre quem se segue (decisão 6),
+  deixar de seguir já fecha a conversa. Bloquear de verdade (esconder os
+  posts e impedir de seguir de novo) mexeria no feed, nas turmas e na busca, e
+  não cabia no prazo.
+- **Ver a rede sem conta.** Tudo pede login. Uma tela aberta, que mostrasse
+  as turmas e alguns posts para quem ainda não entrou, ajudaria a convencer
+  quem chega, mas expõe o diário de estudantes em boa parte menores de idade e
+  pediria um desenho próprio.
+- **Respostas rápidas nas DMs.** Botões com frases prontas ("bora estudar?")
+  eram fáceis de fazer, mas deixam a conversa impessoal, justamente o
+  contrário do que faz dois colegas virarem parceiros de estudo.
+
 ## Uma escolha técnica
 
 **A ofensiva é calculada na hora, numa função pura em `core/`.** O arquivo
@@ -267,8 +297,49 @@ ela é chamada.
 
 ## Uso de IA
 
-Claude: rascunho deste arquivo e revisão do texto. O conteúdo e as decisões
-foram discutidos e aprovados pelo time.
+O time todo usou o **Claude Code** (Anthropic). Os commits feitos com ele
+levam a linha `Co-Authored-By: Claude`, e os PRs, o rodapé "Generated with
+Claude Code", então o histórico do Git mostra onde ele entrou. Dois
+combinados valeram para todo mundo: cada PR foi revisado por outra pessoa do
+time, que testava a versão na tela antes de aprovar; e as decisões de produto
+deste arquivo foram discutidas e aprovadas pelo time, não pela ferramenta.
+
+**Gustavo (Pessoa A: auth, ofensiva, DMs, busca e extras).** Usei o Claude
+Code (Claude Opus) no projeto inteiro. Antes do código, montei com ele o
+fluxo que o time todo usou com a IA: o `CLAUDE.md` com as regras de git, os
+hooks que impedem commit na `main` e avisam quando o banco local ficou velho,
+e a skill `/abrir-pr`, que atualiza a branch, roda os testes e abre o PR do
+mesmo jeito para todo mundo.
+
+- **Para quê:** organizar o brainstorm do nicho e escrever o rascunho deste
+  arquivo e do [PLANO.md](PLANO.md) (papéis, issues e cronograma); escrever o
+  código e os testes das minhas features (o esqueleto, a auth, a ofensiva, as
+  DMs, a busca, salvar posts, emoji, curtir mensagem, notificações e imagem
+  nos posts), as telas das Turmas, que assumi na véspera, e o README; revisar
+  os PRs dos colegas, subindo uma cópia de cada PR e testando no navegador, no
+  computador e no celular; e escrever as mensagens para o grupo do time.
+- **O que foi meu:** escolher com o time o nicho, o problema e as decisões de
+  produto; decidir quais extras entravam e quais ficavam de fora (as
+  respostas rápidas e a imagem nas DMs, acima); assumir o que faltava da
+  Pessoa D quando o prazo apertou; exigir que toda tela fosse conferida em
+  375px, sem nada fora da tela; pedir que tudo fosse explicado em linguagem
+  simples, para eu entender o que estava entregando; e aprovar ou pedir
+  mudança em cada PR que revisei.
+- **Onde a IA ajudou além do código:** na revisão da ofensiva, achou que a
+  ofensiva nova herdava as folgas gastas pela que tinha quebrado; viu que
+  guardar a imagem numa coluna nova de `posts` obrigaria todo mundo a apagar
+  o banco, e propôs uma tabela separada; organizou a ordem das revisões pelos
+  arquivos que cada PR mexia, para os conflitos serem pequenos; e conferiu o
+  site no ar depois de cada merge, o que mostrou que o servidor não estava
+  recebendo os merges (daí o deploy automático da Clarisse).
+- **Onde precisei corrigir:** o sino das notificações empurrou a engrenagem
+  do topo para fora da tela em celulares de 360 e 375px; o teste em 375px
+  pegou, e a aba "Meu diário" virou só ícone no celular. A primeira versão da
+  imagem nos posts copiava o código do token em vez de usar o do `lib/api.ts`,
+  e a cópia saiu antes do merge. No botão "← Voltar" do post, a IA testou o
+  voltar só em trechos do feed sem foto, e a Clarisse achou na revisão que,
+  com fotos acima, a pessoa voltava noutro post: a foto passou a reservar o
+  espaço antes de carregar.
 
 **Clarisse (Pessoa C: curtidas, comentários, seed e deploy).** Usei o Claude
 Code (Claude Opus) no projeto, com o `CLAUDE.md` do time para ele seguir o
